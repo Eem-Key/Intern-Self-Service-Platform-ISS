@@ -1,0 +1,130 @@
+import { useState } from 'react';
+
+import FormInput from '../../components/ui/formInput';
+import PrimaryButton from '../../components/ui/primaryButton';
+import PasswordStrength from '../../components/ui/passwordStrength';
+
+import validateChangePassword from './validateChangePassword';
+import type { ChangePasswordErrors,} from './validateChangePassword';
+import type { ChangePasswordFormValues,} from './changePassword.schema';
+
+type ChangePasswordModalProps = {
+    onSuccess: () => void;
+};
+
+function ChangePasswordModal({ onSuccess }: ChangePasswordModalProps) {
+    const [formValues, setFormValues] = useState<ChangePasswordFormValues>({
+        currentPassword: '',
+        newPassword: '',
+        confirmNewPassword: '',
+    });
+
+    const [errors, setErrors] = useState<ChangePasswordErrors>({});
+    const [serverError, setServerError] = useState('');
+
+    const handleChange = (
+        field: keyof ChangePasswordFormValues,
+        value: string
+    ) => {
+        setFormValues((prev) => ({
+        ...prev,
+        [field]: value,
+        }));
+
+        setErrors((prev) => ({
+        ...prev,
+        [field]: undefined,
+        }));
+
+        setServerError('');
+    };
+
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+
+        setServerError('');
+
+        const validationErrors = validateChangePassword(formValues);
+
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+
+        setErrors({});
+
+        // Temporary UI test only.
+        // replace this with backend API call.
+        console.log(formValues);
+
+        onSuccess();
+    };
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 px-4">
+        <div className="w-full max-w-[530px] overflow-hidden rounded-2xl bg-white shadow-xl">
+            <div className="bg-gradient-to-r from-[#005de8] to-[#003d8f] px-10 py-7">
+            <div className="flex items-center gap-3">
+                <div className="h-10 w-[3px] rounded-full bg-[#ffbd13]" />
+
+                <h2 className="text-3xl font-bold text-white">
+                Change Password
+                </h2>
+            </div>
+            </div>
+
+            <div className="px-10 py-6">
+            <p className="mb-5 text-sm leading-snug text-black">
+                To ensure the integrity of our records, all new interns are required
+                to establish a secure personal password upon their first login.
+            </p>
+
+            {serverError && (
+                <div className="mb-4 rounded-md bg-red-100 px-4 py-2 text-sm text-red-600">
+                {serverError}
+                </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-3 text-left">
+                <FormInput
+                id="currentPassword"
+                label="Current Password"
+                type="password"
+                value={formValues.currentPassword}
+                error={errors.currentPassword}
+                onChange={(value) => handleChange('currentPassword', value)}
+                />
+
+                <div>
+                <FormInput
+                    id="newPassword"
+                    label="New Password"
+                    type="password"
+                    value={formValues.newPassword}
+                    error={errors.newPassword}
+                    onChange={(value) => handleChange('newPassword', value)}
+                />
+
+                <PasswordStrength password={formValues.newPassword} />
+                </div>
+
+                <FormInput
+                id="confirmNewPassword"
+                label="Confirm New Password"
+                type="password"
+                value={formValues.confirmNewPassword}
+                error={errors.confirmNewPassword}
+                onChange={(value) => handleChange('confirmNewPassword', value)}
+                />
+
+                <PrimaryButton type="submit" className="mt-6">
+                Update Password
+                </PrimaryButton>
+            </form>
+            </div>
+        </div>
+        </div>
+    );
+}
+
+export default ChangePasswordModal;
