@@ -1,51 +1,49 @@
 // MOCK Login
+import { supabase } from '../../config/supabase';
 import type { LoginFormValues, LoginResponse } from './login.types';
 
-const USE_MOCK_LOGIN = true;
-
-export async function loginUser(
-    payload: LoginFormValues
-): Promise<LoginResponse> {
-    if (USE_MOCK_LOGIN) {
-        await new Promise((resolve) => setTimeout(resolve, 700));
-
+export async function loginUser(payload: LoginFormValues): Promise<LoginResponse> {
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email: payload.email,
+        password: payload.password,
+    });
     
-    if (
-        payload.email !== 'intern@equicom.com' ||
-        payload.password !== 'password123'
-    ) {
-        throw new Error('Incorrect email address or password.');
+    if (authError) {
+        throw new Error(authError.message);
+    }
+
+    const user = authData.user;
+    if (!user) {
+        throw new Error('Authentication failed. User session empty.');
+    }
+
+    const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('first_name, last_name, role, department, position, office, requires_password_change')
+        .eq('id', user.id)
+        .single();
+
+    if (profileError) {
+        throw new Error(`Profile synchronization failed: ${profileError.message}`);
     }
 
     return {
         message: 'Login successful',
         data: {
-            accessToken: 'mock-access-token',
-            refreshToken: 'mock-refresh-token',
-            requiresPasswordChange: true,
+            accessToken: authData.session?.access_token || '',
+            refreshToken: authData.session?.refresh_token || '',
             user: {
-            id: '1',
-            first_name: 'Intern',
-            middle_name: null,
-            last_name: 'User',
-            suffix: null,
-            role: 'intern',
-            position: 'Intern',
-            department: 'SDS',
-            office: 'Makati Office',
-            birth_date: null,
-            gender: null,
-            avatar_url: null,
-            contact_number: null,
-            address: null,
-            email: payload.email,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
+                id: user.id,
+                email: user.email || '',
+                first_name: profileData.first_name,
+                last_name: profileData.last_name,
+                role: profileData.role,
+                department: profileData.department,
+                position: profileData.position,
+                office: profileData.office,
             },
+            requiresPasswordChange: profileData.requires_password_change,
         },
-        };
-    }
-
-    throw new Error('Backend login is not connected yet.');
+    };
 }
 

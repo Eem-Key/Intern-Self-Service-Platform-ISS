@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 # Dependency directories (Crucial for your workspaces!)
 node_modules/
 jspm_packages/
@@ -34,6 +33,3 @@ Thumbs.db
 *.njsproj
 *.sln
 *.sw?
-=======
-node_modules
->>>>>>> Stashed changes
