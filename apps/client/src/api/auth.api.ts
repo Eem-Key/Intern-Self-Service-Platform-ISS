@@ -1,8 +1,37 @@
 // MOCK Login
-import { supabase } from '../../config/supabase';
-import type { LoginFormValues, LoginResponse } from '../../../../shared/types/login.types';
+import { supabase } from '../config/supabase';
+import type { LoginFormValues, LoginResponse } from '../../../shared/types/login.types';
+import type { ChangePasswordFormValues } from '../../../shared/schemas/changePassword.schema';
 
-export async function loginUser(payload: LoginFormValues): Promise<LoginResponse> {
+export async function updatePasswordAPI(
+    payload: ChangePasswordFormValues, 
+    id: string
+): Promise<{ error: string | null }> {
+    try {
+        const { error: authError } = await supabase.auth.updateUser({
+            password: payload.newPassword
+        });
+
+        if (authError) {
+            return { error: authError.message };
+        }
+
+        const { error: profileError } = await supabase
+            .from('profiles')
+            .update({ requires_password_change: false })
+            .eq('id', id);
+
+        if (profileError) {
+            return { error: `Password updated, but failed to update status: ${profileError.message}` };
+        }
+
+        return { error: null };
+    } catch (err) {
+        return { error: 'An unexpected error occurred while updating your password.' };
+    }
+}
+
+export async function loginUserAPI(payload: LoginFormValues): Promise<LoginResponse> {
     const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email: payload.email,
         password: payload.password,

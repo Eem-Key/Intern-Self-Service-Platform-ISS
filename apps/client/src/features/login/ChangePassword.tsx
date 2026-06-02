@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import React from 'react';
 
 import FormInput from '../../components/ui/formInput';
 import PrimaryButton from '../../components/ui/primaryButton';
@@ -8,11 +9,16 @@ import validateChangePassword from './validateChangePassword';
 import type { ChangePasswordErrors,} from './validateChangePassword';
 import type { ChangePasswordFormValues,} from '../../../../shared/schemas/changePassword.schema';
 
+import { updatePasswordAPI } from '../../api/auth.api';
+import { supabase } from '../../config/supabase';
+
 type ChangePasswordModalProps = {
     onSuccess: () => void;
+    id: string;
+    email: string;
 };
 
-function ChangePasswordModal({ onSuccess }: ChangePasswordModalProps) {
+function ChangePasswordModal({ onSuccess, id , email}: ChangePasswordModalProps) {
     const [formValues, setFormValues] = useState<ChangePasswordFormValues>({
         currentPassword: '',
         newPassword: '',
@@ -39,27 +45,44 @@ function ChangePasswordModal({ onSuccess }: ChangePasswordModalProps) {
         setServerError('');
     };
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
 
         setServerError('');
 
         const validationErrors = validateChangePassword(formValues);
-
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);
             return;
         }
-
         setErrors({});
 
-        // Temporary UI test only.
-        // replace this with backend API call.
-        console.log(formValues);
+        try {
+            const { error: authError } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: formValues.currentPassword,
+            });
 
-        onSuccess();
+            if (authError) {
+                setServerError("Incorrect current password.");
+                return;
+            }
+            const { error: updateError } = await updatePasswordAPI(formValues, id);
+
+            if (updateError) {
+                const errorMessage = typeof updateError === 'object' && updateError !== null && 'message' in updateError
+                    ? (updateError as any).message
+                    : String(updateError);
+
+                setServerError(errorMessage);
+                return;
+            }
+
+            onSuccess();
+        } catch (err) {
+            setServerError("An unexpected error occurred.");
+        }
     };
-
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 px-4">
         <div className="w-full max-w-[530px] overflow-hidden rounded-2xl bg-white shadow-xl">

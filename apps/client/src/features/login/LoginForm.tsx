@@ -5,7 +5,7 @@ import FormInput from '../../components/ui/formInput';
 import PrimaryButton from '../../components/ui/primaryButton';
 import FirstLoginPrompt from './FirstLogin';
 import ChangePasswordModal from './ChangePassword';
-import { loginUser } from './login.api';
+import { loginUserAPI } from '../../api/auth.api';
 import validateForm from './ValidateForm';
 import type { LoginFormValues, LoginResponse } from '../../../../shared/types/login.types';
 
@@ -34,7 +34,7 @@ function LoginForm() {
     };
 
     const loginMutation = useMutation({
-        mutationFn: loginUser,
+        mutationFn: loginUserAPI,
 
         onSuccess: (response) => {
         const { accessToken, refreshToken, user, requiresPasswordChange } =
@@ -82,7 +82,7 @@ function LoginForm() {
 
         setErrors({});
         loginMutation.mutate(formValues);
-        };
+    };
 
     const handleChangePassword = () => {
         setFirstLoginData(null);
@@ -109,8 +109,12 @@ function LoginForm() {
             />
         )}
 
-        {showChangePassword && (
-            <ChangePasswordModal onSuccess={handlePasswordUpdated} />
+        {showChangePassword && firstLoginData?.data.user.email && (
+            <ChangePasswordModal 
+                onSuccess={handlePasswordUpdated} 
+                id={firstLoginData.data.user.id}
+                email={firstLoginData.data.user.email} 
+            />
         )}
 
         {serverError && (
