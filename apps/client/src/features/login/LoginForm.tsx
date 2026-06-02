@@ -85,7 +85,6 @@ function LoginForm() {
     };
 
     const handleChangePassword = () => {
-        setFirstLoginData(null);
         setShowChangePassword(true);
     };
 
@@ -96,18 +95,19 @@ function LoginForm() {
 
     const handlePasswordUpdated = () => {
         setShowChangePassword(false);
+        setFirstLoginData(null);
         navigate('/dashboard');
-    };
+        };
 
     return (
         <>
-        {firstLoginData && (
+        {firstLoginData && !showChangePassword && (
             <FirstLoginPrompt
-            internName={firstLoginData.data.user.first_name || 'Intern'}
-            onChangePassword={handleChangePassword}
-            onChangeLater={handleChangeLater}
+                internName={firstLoginData.data.user.first_name || 'Intern'}
+                onChangePassword={handleChangePassword}
+                onChangeLater={handleChangeLater}
             />
-        )}
+            )}
 
         {showChangePassword && firstLoginData?.data.user.email && (
             <ChangePasswordModal 

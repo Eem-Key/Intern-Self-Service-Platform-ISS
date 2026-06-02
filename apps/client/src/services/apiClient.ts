@@ -1,7 +1,7 @@
 import type { ApiErrorResponse } from '../../../shared/types/api.types';
 
 const API_BASE_URL =
-    import.meta.env.VITE_API_BASE_URL || 'http://localhost:5197/api';
+    import.meta.env.VITE_API_BASE_URL || 'http://localhost:5173/api';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
@@ -30,7 +30,6 @@ export async function apiClient<T>(
 
     if (!response.ok) {
         const errorData = data as ApiErrorResponse | null;
-
         throw new Error(errorData?.message || 'Something went wrong.');
     }
 
