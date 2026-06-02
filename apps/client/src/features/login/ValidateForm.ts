@@ -1,5 +1,5 @@
-import { loginSchema } from './login.schema';
-import type { LoginFormValues } from './login.types';
+import { loginSchema } from '../../../../shared/schemas/login.schema';
+import type { LoginFormValues } from '../../../../shared/types/login.types';
 
 type LoginErrors = Partial<Record<keyof LoginFormValues, string>>;
 

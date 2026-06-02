@@ -6,7 +6,7 @@ import PasswordStrength from '../../components/ui/passwordStrength';
 
 import validateChangePassword from './validateChangePassword';
 import type { ChangePasswordErrors,} from './validateChangePassword';
-import type { ChangePasswordFormValues,} from './changePassword.schema';
+import type { ChangePasswordFormValues,} from '../../../../shared/schemas/changePassword.schema';
 
 type ChangePasswordModalProps = {
     onSuccess: () => void;

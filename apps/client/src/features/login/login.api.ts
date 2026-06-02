@@ -1,6 +1,6 @@
 // MOCK Login
 import { supabase } from '../../config/supabase';
-import type { LoginFormValues, LoginResponse } from './login.types';
+import type { LoginFormValues, LoginResponse } from '../../../../shared/types/login.types';
 
 export async function loginUser(payload: LoginFormValues): Promise<LoginResponse> {
     const { data: authData, error: authError } = await supabase.auth.signInWithPassword({

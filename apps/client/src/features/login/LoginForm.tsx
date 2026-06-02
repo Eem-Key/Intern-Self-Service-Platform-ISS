@@ -7,7 +7,7 @@ import FirstLoginPrompt from './FirstLogin';
 import ChangePasswordModal from './ChangePassword';
 import { loginUser } from './login.api';
 import validateForm from './ValidateForm';
-import type { LoginFormValues, LoginResponse } from './login.types';
+import type { LoginFormValues, LoginResponse } from '../../../../shared/types/login.types';
 
 type LoginErrors = Partial<Record<keyof LoginFormValues, string>>;
 

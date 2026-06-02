@@ -1,4 +1,4 @@
-import type { ApiErrorResponse } from '../types/api.types';
+import type { ApiErrorResponse } from '../../../shared/types/api.types';
 
 const API_BASE_URL =
     import.meta.env.VITE_API_BASE_URL || 'http://localhost:5197/api';
