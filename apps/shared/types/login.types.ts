@@ -3,7 +3,7 @@ export type LoginFormValues = {
     password: string;
 };
 
-export type UserRole = 'intern' | 'admin' | 'supervisor' | string;
+export type UserRole = 'intern' | 'admin' | string;
 
 export type UserProfile = {
     id: string;

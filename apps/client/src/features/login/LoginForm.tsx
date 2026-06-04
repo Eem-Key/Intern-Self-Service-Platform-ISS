@@ -21,10 +21,18 @@ function LoginForm() {
 
     const [errors, setErrors] = useState<LoginErrors>({});
     const [serverError, setServerError] = useState('');
-    const [firstLoginData, setFirstLoginData] = useState<LoginResponse | null>(
-        null
-    );
+    const [firstLoginData, setFirstLoginData] = useState<LoginResponse | null>(null);
     const [showChangePassword, setShowChangePassword] = useState(false);
+
+    const getDashboardRoute = (role?: string) => {
+        const normalizedRole = role?.toLowerCase();
+
+        if (normalizedRole === 'admin' || normalizedRole === 'supervisor') {
+        return '/admin/dashboard';
+        }
+
+        return '/intern/dashboard';
+    };
 
     const clearError = (field: keyof LoginFormValues) => {
         setErrors((prev) => ({
@@ -34,9 +42,9 @@ function LoginForm() {
     };
 
     const loginMutation = useMutation({
-        mutationFn: loginUserAPI,
+    mutationFn: loginUserAPI,
 
-        onSuccess: (response) => {
+    onSuccess: (response) => {
         const { accessToken, refreshToken, user, requiresPasswordChange } =
             response.data;
 
@@ -47,12 +55,15 @@ function LoginForm() {
             localStorage.setItem('refreshToken', refreshToken);
         }
 
-        if (requiresPasswordChange) {
+        const role = user.role?.toLowerCase();
+        const isIntern = role === 'intern';
+
+        if (isIntern && requiresPasswordChange) {
             setFirstLoginData(response);
             return;
         }
 
-        navigate('/dashboard');
+        navigate(getDashboardRoute(role));
         },
 
         onError: (error) => {
@@ -76,8 +87,8 @@ function LoginForm() {
         const validationErrors = validateForm(formValues);
 
         if (Object.keys(validationErrors).length > 0) {
-            setErrors(validationErrors);
-            return;
+        setErrors(validationErrors);
+        return;
         }
 
         setErrors({});
@@ -89,31 +100,40 @@ function LoginForm() {
     };
 
     const handleChangeLater = () => {
+        if (!firstLoginData) return;
+
+        const dashboardRoute = getDashboardRoute(firstLoginData.data.user.role);
+
         setFirstLoginData(null);
-        navigate('/dashboard');
+        setShowChangePassword(false);
+        navigate(dashboardRoute);
     };
 
     const handlePasswordUpdated = () => {
+        if (!firstLoginData) return;
+
+        const dashboardRoute = getDashboardRoute(firstLoginData.data.user.role);
+
         setShowChangePassword(false);
         setFirstLoginData(null);
-        navigate('/dashboard');
-        };
+        navigate(dashboardRoute);
+    };
 
     return (
         <>
         {firstLoginData && !showChangePassword && (
             <FirstLoginPrompt
-                internName={firstLoginData.data.user.first_name || 'Intern'}
-                onChangePassword={handleChangePassword}
-                onChangeLater={handleChangeLater}
+            internName={firstLoginData.data.user.first_name || 'Intern'}
+            onChangePassword={handleChangePassword}
+            onChangeLater={handleChangeLater}
             />
-            )}
+        )}
 
         {showChangePassword && firstLoginData?.data.user.email && (
-            <ChangePasswordModal 
-                onSuccess={handlePasswordUpdated} 
-                id={firstLoginData.data.user.id}
-                email={firstLoginData.data.user.email} 
+            <ChangePasswordModal
+            onSuccess={handlePasswordUpdated}
+            id={firstLoginData.data.user.id}
+            email={firstLoginData.data.user.email}
             />
         )}
 
@@ -136,7 +156,7 @@ function LoginForm() {
             <FormInput
             id="email"
             label="Email Address"
-            type="text"
+            type="email"
             value={formValues.email}
             error={errors.email}
             onChange={(value) => handleChange('email', value)}

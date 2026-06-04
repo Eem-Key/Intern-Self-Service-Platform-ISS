@@ -2,11 +2,18 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { supabase } from '../config/supabase';
 import { LoginPage } from '../features/login/Index';
+import InternDashboard from '../features/dashboard/intern/InternDashboard';
+import AdminDashboard from '../features/dashboard/admin/AdminDashboard';
+import InternProfile from '../features/dashboard/intern/InternProfile';
+import InternLeave from '../features/dashboard/intern/InternLeaveForm';
+import InternLogs from '../features/dashboard/intern/InternLogs';
 import type { Session } from '@supabase/supabase-js';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const accessToken = localStorage.getItem('accessToken');
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -14,8 +21,11 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
       setLoading(false);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
@@ -29,7 +39,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!session) {
+  if (!session && !accessToken) {
     return <Navigate to="/login" replace />;
   }
 
@@ -42,14 +52,47 @@ function AppRoutes() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
 
-        {/* Temporary dashboard route */}
         <Route
-          path="/dashboard"
+          path="/intern/dashboard"
           element={
             <ProtectedRoute>
-              <div className="flex min-h-screen items-center justify-center bg-white">
-                <h1 className="text-2xl font-bold text-black">Dashboard</h1>
-              </div>
+              <InternDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/intern/profile"
+          element={
+            <ProtectedRoute>
+              <InternProfile />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/intern/leave"
+          element={
+            <ProtectedRoute>
+              <InternLeave />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/intern/logs"
+          element={
+            <ProtectedRoute>
+              <InternLogs />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
             </ProtectedRoute>
           }
         />
