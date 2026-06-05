@@ -102,7 +102,7 @@ function InternSidebar() {
         )}
 
         <div className="lg:text-center">
-          <h2 className="text-lg font-bold sm:text-xl">{fullName}</h2>
+          <h2 className="mt-2 text-lg font-bold sm:text-xl">{fullName}</h2>
           <p className="text-xs sm:text-sm">{position}</p>
         </div>
       </div>
