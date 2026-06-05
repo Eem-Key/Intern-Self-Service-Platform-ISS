@@ -11,14 +11,10 @@ function ProgramProgressCard() {
       
       return getProgramProgressAPI(id);
     },
+    
   });
 
   const progress = data?.data;
-<<<<<<< Updated upstream
-
-=======
-  const hoursLeft = progress?.hours_left ?? 0;
->>>>>>> Stashed changes
   const renderedHours = progress?.rendered_hours ?? 0;
   const requiredHours = progress?.required_hours ?? 0;
   const wfhHours = progress?.wfh_hours ?? 0;

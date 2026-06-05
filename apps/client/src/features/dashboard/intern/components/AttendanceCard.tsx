@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Building2, ChevronDown, Square } from 'lucide-react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import StatusMessage from '../../../../components/feedback/StatusMessage';
 import {
   getActiveAttendanceAPI,
@@ -37,6 +37,8 @@ function AttendanceCard() {
 
     return () => window.clearTimeout(timer);
   }, [statusMessage]);
+
+  const queryClient = useQueryClient();
   
   const { data: activeAttendance, refetch, isLoading } = useQuery({
     queryKey: ['active-attendance'],
@@ -80,6 +82,10 @@ function AttendanceCard() {
       return timeOutAPI(activeAttendance.id);
     },
     onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['active-attendance'] }),
+        queryClient.invalidateQueries({ queryKey: ['program-progress'] })
+      ]);
       setStatusMessage({
         variant: 'success',
         title: 'Time Out Successful!',

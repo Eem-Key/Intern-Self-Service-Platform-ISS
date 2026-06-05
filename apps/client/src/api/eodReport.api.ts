@@ -1,5 +1,3 @@
-// MOCK FOR TESTING
-
 import type {
     EODReport,
     EODReportPayload,
