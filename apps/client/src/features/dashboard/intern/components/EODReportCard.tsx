@@ -1,6 +1,6 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Clock } from 'lucide-react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 import StatusMessage from '../../../../components/feedback/StatusMessage';
 import {
@@ -9,40 +9,36 @@ import {
 } from '../../../../api/eodReport.api';
 import type { EODReportPayload } from '../../../../../../shared/types/eodReport.types';
 
+import { getTodayAttendanceAPI } from '../../../../api/attendance.api';
+
 type EODReportErrors = Partial<Record<keyof EODReportPayload, string>>;
 
 function getTodayDate() {
   return new Date().toISOString().slice(0, 10);
 }
 
-const durationOptions = [
-  '00:30',
-  '01:00',
-  '01:30',
-  '02:00',
-  '02:30',
-  '03:00',
-  '03:30',
-  '04:00',
-  '04:30',
-  '05:00',
-  '05:30',
-  '06:00',
-  '06:30',
-  '07:00',
-  '07:30',
-  '08:00',
-  '08:30',
-  '09:00',
-  '09:30',
-  '10:00'
-];
+function getYesterdayDate() {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  return yesterday.toISOString().slice(0, 10);
+}
+
+function formatHoursLogged(hoursLogged: number | null | undefined) {
+  if (!hoursLogged) return '';
+
+  const totalMinutes = Math.round(hoursLogged * 60);
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+}
 
 function EODReportCard() {
   const dateInputRef = useRef<HTMLInputElement | null>(null);
-
+  const today = getTodayDate();
+  const yesterday = getYesterdayDate();
   const [formValues, setFormValues] = useState<EODReportPayload>({
-    dateWritten: '',
+    dateWritten: today,
     hoursSpent: '',
     projectName: '',
     taskAccomplished: '',
@@ -56,18 +52,17 @@ function EODReportCard() {
     message: string;
   } | null>(null);
 
-  const today = getTodayDate();
-
   const clearForm = () => {
-    setFormValues({
-      dateWritten: '',
-      hoursSpent: '',
-      projectName: '',
-      taskAccomplished: '',
-    });
+  setFormValues({
+    dateWritten: today,
+    hoursSpent: '',
+    projectName: '',
+    taskAccomplished: '',
+  });
 
-    setErrors({});
+  setErrors({});
   };
+
 
   const showStatusMessage = (
     variant: 'success' | 'error',
@@ -85,19 +80,21 @@ function EODReportCard() {
     }, 5000);
   };
 
-  const validateForm = () => {
+  const validateForm = (mode: 'save' | 'submit') => {
     const validationErrors: EODReportErrors = {};
 
     if (!formValues.dateWritten) {
       validationErrors.dateWritten = 'Date is required.';
-    } else if (formValues.dateWritten < today) {
-      validationErrors.dateWritten = 'Previous dates are not allowed.';
-    } else if (formValues.dateWritten > today) {
-      validationErrors.dateWritten = 'Future dates are not allowed.';
+    } else if (
+      formValues.dateWritten !== today &&
+      formValues.dateWritten !== yesterday
+    ) {
+      validationErrors.dateWritten = 'Only today or yesterday can be selected.';
     }
+    
 
-    if (!formValues.hoursSpent.trim()) {
-      validationErrors.hoursSpent = 'Hour spent is required.';
+    if (mode === 'submit' && !formValues.hoursSpent.trim()) {
+      validationErrors.hoursSpent = 'Hours spent is required. Please time out first.';
     }
 
     if (!formValues.projectName.trim()) {
@@ -173,7 +170,7 @@ function EODReportCard() {
   });
 
   const handleSave = () => {
-    const validationErrors = validateForm();
+    const validationErrors = validateForm('save');
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
@@ -186,7 +183,7 @@ function EODReportCard() {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const validationErrors = validateForm();
+    const validationErrors = validateForm('submit');
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
@@ -196,7 +193,29 @@ function EODReportCard() {
     submitMutation.mutate(formValues);
   };
 
-  const [isDurationOpen, setIsDurationOpen] = useState(false);
+  const { data: todayAttendance } = useQuery({
+    queryKey: ['today-attendance'],
+    queryFn: getTodayAttendanceAPI,
+  });
+
+  const attendance = todayAttendance?.data ?? null;
+  const hasTimedOut = Boolean(attendance?.clock_out);
+  const attendanceHoursSpent = formatHoursLogged(attendance?.hours_logged);
+
+  useEffect(() => {
+  if (!hasTimedOut) {
+    setFormValues((prev) => ({
+      ...prev,
+      hoursSpent: '',
+    }));
+    return;
+  }
+
+  setFormValues((prev) => ({
+    ...prev,
+    hoursSpent: attendanceHoursSpent,
+  }));
+}, [hasTimedOut, attendanceHoursSpent]);
 
   return (
     <section className="relative h-full rounded-xl bg-white px-8 py-3 shadow-md sm:px-6">
@@ -223,14 +242,14 @@ function EODReportCard() {
               <input
                 ref={dateInputRef}
                 type="date"
-                min={today}
+                min={yesterday}
                 max={today}
                 value={formValues.dateWritten}
                 onClick={openDatePicker}
                 onChange={(event) =>
                   handleChange('dateWritten', event.target.value)
                 }
-                className="h-9 w-full rounded bg-[#eeeeee] px-4 text-sm outline-none"
+                className="h-10 w-full rounded bg-[#eeeeee] px-4 text-sm outline-none"
               />
             </div>
 
@@ -247,40 +266,23 @@ function EODReportCard() {
             <div className="relative">
               <input
                 type="text"
-                readOnly
                 placeholder="HH:MM"
                 value={formValues.hoursSpent}
-                onClick={() => setIsDurationOpen((prev) => !prev)}
-                className="h-9 w-full cursor-pointer rounded bg-[#eeeeee] px-4 pr-10 text-sm outline-none"
+                disabled
+                className="h-10 w-full cursor-not-allowed rounded bg-[#eeeeee] px-4 pr-10 text-sm text-gray-600 outline-none"
               />
 
-              <button
-                type="button"
-                onClick={() => setIsDurationOpen((prev) => !prev)}
-                className="absolute right-3 top-1/2 -translate-y-1/2"
-                aria-label="Open duration options"
-              >
-                <Clock size={17} />
-              </button>
-
-              {isDurationOpen && (
-                <div className="absolute left-0 top-full z-30 mt-1 max-h-44 w-full overflow-y-auto rounded-lg bg-white shadow-lg">
-                  {durationOptions.map((duration) => (
-                    <button
-                      key={duration}
-                      type="button"
-                      onClick={() => {
-                        handleChange('hoursSpent', duration);
-                        setIsDurationOpen(false);
-                      }}
-                      className="w-full px-4 py-2 text-left text-sm hover:bg-[#eeeeee]"
-                    >
-                      {duration}
-                    </button>
-                  ))}
-                </div>
-              )}
+              <Clock
+                size={17}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+              />
             </div>
+
+            {!hasTimedOut && (
+              <p className="mt-1 text-[10px] text-gray-500">
+                Hours spent will be available after you time out.
+              </p>
+            )}
 
             {errors.hoursSpent && (
               <p className="mt-1 text-xs text-red-600">
@@ -309,7 +311,7 @@ function EODReportCard() {
           )}
         </div>
 
-        <div className="flex flex-1 flex-col">
+        <div>
           <label className="text-sm">Task Accomplished</label>
 
           <textarea
@@ -317,7 +319,7 @@ function EODReportCard() {
             onChange={(event) =>
               handleChange('taskAccomplished', event.target.value)
             }
-            className="min-h-[160px] flex-1 resize-none rounded bg-[#eeeeee] p-3 text-sm outline-none"
+            className="h-[200px] w-full resize-none rounded bg-[#eeeeee] p-3 text-sm outline-none"
           />
 
           {errors.taskAccomplished && (
@@ -327,7 +329,7 @@ function EODReportCard() {
           )}
         </div>
 
-        <div className="flex flex-col justify-end gap-3 pt-2 sm:flex-row">
+        <div className="mt-2 mb-0 flex flex-col justify-end gap-3 sm:flex-row">
           <button
             type="button"
             onClick={handleSave}
@@ -339,8 +341,12 @@ function EODReportCard() {
 
           <button
             type="submit"
-            disabled={saveMutation.isPending || submitMutation.isPending}
-            className="rounded-full bg-[#FFBF10] px-7 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-70 sm:min-w-[85px]"
+            disabled={
+              !hasTimedOut ||
+              saveMutation.isPending ||
+              submitMutation.isPending
+            }
+            className="rounded-full bg-[#FFBF10] px-7 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:bg-[#eeeeee] disabled:text-gray-500 disabled:opacity-70 sm:min-w-[100px]"
           >
             {submitMutation.isPending ? 'Submitting...' : 'Submit'}
           </button>

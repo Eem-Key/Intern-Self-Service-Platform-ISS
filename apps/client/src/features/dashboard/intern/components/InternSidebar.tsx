@@ -44,9 +44,7 @@ function getFullName(user: UserProfile | null) {
 
   const fullName = [
     user.first_name,
-    user.middle_name,
     user.last_name,
-    user.suffix,
   ]
     .filter(Boolean)
     .join(' ');

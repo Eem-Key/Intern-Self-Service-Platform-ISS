@@ -8,6 +8,9 @@ import type {
 
 const MOCK_EOD_REPORTS_KEY = 'mockEODReports';
 
+const FORCE_SAVE_ERROR = false;
+const FORCE_SUBMIT_ERROR = false;
+
 function getStoredReports(): EODReport[] {
     const savedReports = localStorage.getItem(MOCK_EOD_REPORTS_KEY);
 
@@ -25,7 +28,7 @@ function saveStoredReports(reports: EODReport[]) {
 function createMockReport(
     payload: EODReportPayload,
     status: 'draft' | 'submitted'
-    ): EODReport {
+): EODReport {
     return {
         id: crypto.randomUUID(),
         intern_id: 'mock-intern-id',
@@ -43,14 +46,18 @@ function createMockReport(
 
 export async function saveEODDraftAPI(
     payload: EODReportPayload
-    ): Promise<EODReportResponse> {
+): Promise<EODReportResponse> {
     await new Promise((resolve) => setTimeout(resolve, 300));
+
+    if (FORCE_SAVE_ERROR) {
+        throw new Error('Save failed. Please try again.');
+    }
 
     const reports = getStoredReports();
     const newReport = createMockReport(payload, 'draft');
 
     saveStoredReports([newReport, ...reports]);
-    // throw new Error('Save failed. Please try again.'); //-- simulate error for testing
+
     return {
         message: 'EOD draft saved successfully',
         data: newReport,
@@ -59,14 +66,18 @@ export async function saveEODDraftAPI(
 
 export async function submitEODReportAPI(
     payload: EODReportPayload
-    ): Promise<EODReportResponse> {
+): Promise<EODReportResponse> {
     await new Promise((resolve) => setTimeout(resolve, 300));
+
+    if (FORCE_SUBMIT_ERROR) {
+        throw new Error('Submission failed. Please try again.');
+    }
 
     const reports = getStoredReports();
     const newReport = createMockReport(payload, 'submitted');
 
     saveStoredReports([newReport, ...reports]);
-    //throw new Error('Submission failed. Please try again.'); //-- simulate error for testing
+
     return {
         message: 'EOD report submitted successfully',
         data: newReport,

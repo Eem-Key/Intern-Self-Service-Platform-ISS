@@ -2,7 +2,6 @@ import { useState } from 'react';
 import React from 'react';
 
 import FormInput from '../../components/ui/formInput';
-import PrimaryButton from '../../components/ui/primaryButton';
 import PasswordStrength from '../../components/ui/passwordStrength';
 
 import validateChangePassword from './validateChangePassword';
@@ -11,6 +10,7 @@ import type { ChangePasswordFormValues,} from '../../../../shared/schemas/change
 
 import { updatePasswordAPI } from '../../api/auth.api';
 import { supabase } from '../../config/supabase';
+import ChangePassButton from '../../components/ui/changePassButton';
 
 type ChangePasswordModalProps = {
     onSuccess: () => void;
@@ -140,9 +140,9 @@ function ChangePasswordModal({ onSuccess, id , email}: ChangePasswordModalProps)
                 onChange={(value) => handleChange('confirmNewPassword', value)}
                 />
 
-                <PrimaryButton type="submit" className="mt-6">
+                <ChangePassButton type="submit" className="mt-6">
                 Update Password
-                </PrimaryButton>
+                </ChangePassButton>
             </form>
             </div>
         </div>

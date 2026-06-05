@@ -17,7 +17,7 @@ function LoginPage() {
                 <img
                 src={logo}
                 alt="Equicom Logo"
-                className="h-22 w-auto object-contain"
+                className="h-30 w-auto object-contain"
                 />
             </div>
 

@@ -22,7 +22,7 @@ function PrimaryButton({
       onClick={onClick}
       className={`h-11 w-full rounded-md bg-[#ffbd13] text-sm font-medium text-black transition hover:bg-[#e8a900] disabled:cursor-not-allowed disabled:opacity-60 ${className}`}
     >
-      {isLoading ? 'Updating...' : children}
+      {isLoading ? 'Logging in...' : children}
     </button>
   );
 }
