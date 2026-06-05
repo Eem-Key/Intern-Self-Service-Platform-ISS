@@ -1,6 +1,5 @@
 import { Calendar, FileClock, Home, LogOut, User } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { supabase } from '../../../../config/supabase';
 import { logoutUserAPI } from '../../../../api/auth.api';
 import type { UserProfile } from '../../../../../../shared/types/login.types';
 

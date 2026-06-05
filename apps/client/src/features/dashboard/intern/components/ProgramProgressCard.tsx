@@ -1,11 +1,34 @@
 import { useQuery } from '@tanstack/react-query';
 import { getProgramProgressAPI } from '../../../../api/programProgress.api';
 
+function getAuthUserId(): string | null {
+  const storedUser = localStorage.getItem('authUser');
+
+  if (!storedUser) return null;
+
+  try {
+    const user = JSON.parse(storedUser);
+    return user?.id || null;
+  } catch {
+    return null;
+  }
+}
+
 function ProgramProgressCard() {
-  const { data, isLoading } = useQuery({
-    queryKey: ['program-progress'],
-    queryFn: getProgramProgressAPI,
+  const internId = getAuthUserId();
+
+  console.log("Current internId:", internId);
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['program-progress', internId],
+    queryFn: () => getProgramProgressAPI(internId!),
+    enabled: !!internId,
   });
+
+  console.log("Query status:", { isLoading, data, error });
+
+  if (isLoading) return <div>Loading...</div>;
+  if (!data) return <div>No progress data found.</div>;
 
   const progress = data?.data;
 
