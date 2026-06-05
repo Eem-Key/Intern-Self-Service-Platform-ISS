@@ -7,6 +7,10 @@ import AdminDashboard from '../features/dashboard/admin/AdminDashboard';
 import InternProfile from '../features/dashboard/intern/InternProfile';
 import InternLeave from '../features/dashboard/intern/InternLeaveForm';
 import InternLogs from '../features/dashboard/intern/InternLogs';
+
+import AdminInternList from '../features/dashboard/admin/AdminInternList';
+import AdminApprovals from '../features/dashboard/admin/AdminApprovals';
+import AdminActivityRecords from '../features/dashboard/admin/AdminActivityRecords';
 import type { Session } from '@supabase/supabase-js';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -93,6 +97,33 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/interns"
+          element={
+            <ProtectedRoute>
+              <AdminInternList />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/approvals"
+          element={
+            <ProtectedRoute>
+              <AdminApprovals />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/activity-records"
+          element={
+            <ProtectedRoute>
+              <AdminActivityRecords />
             </ProtectedRoute>
           }
         />
