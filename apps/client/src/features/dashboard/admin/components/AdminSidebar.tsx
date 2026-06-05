@@ -9,6 +9,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 import { logoutUserAPI } from '../../../../api/auth.api';
 import type { UserProfile } from '../../../../../../shared/types/login.types';
+import profilepic from '../../../../assets/images/default_pic.png';
 
 const navItems = [
     {
@@ -83,12 +84,14 @@ function AdminSidebar() {
         }
     };
 
+    const userAvatar = user?.avatar_url ? user.avatar_url : profilepic;
+
     return (
         <aside className="w-full bg-[#002D6F] px-4 py-5 text-white lg:fixed lg:left-0 lg:top-0 lg:flex lg:h-screen lg:w-[270px] lg:flex-col lg:px-6 lg:py-8">
         <div className="flex items-center gap-4 lg:flex-col lg:gap-0">
-            {user?.avatar_url ? (
+            {userAvatar ? (
             <img
-                src={user.avatar_url}
+                src={user?.avatar_url || userAvatar}
                 alt={`${fullName} profile`}
                 className="h-16 w-16 rounded-full object-cover sm:h-20 sm:w-20 lg:h-28 lg:w-28"
             />
