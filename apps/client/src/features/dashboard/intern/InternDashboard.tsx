@@ -1,5 +1,5 @@
 import InternSidebar from './components/InternSidebar';
-import WelcomeBanner from './components/WelcomeBanner';
+import WelcomeBanner from './components/banner/WelcomeBanner';
 import AttendanceCard from './components/AttendanceCard';
 import ProgramProgressCard from './components/ProgramProgressCard';
 import NotificationCard from './components/NotificationCard';

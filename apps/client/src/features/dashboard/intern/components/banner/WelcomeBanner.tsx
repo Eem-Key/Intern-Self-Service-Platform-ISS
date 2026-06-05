@@ -1,4 +1,4 @@
-import logo from '../../../../assets/images/Logo2.png';
+import logo from '../../../../../assets/images/Logo2.png';
 
 function WelcomeBanner() {
   return (
