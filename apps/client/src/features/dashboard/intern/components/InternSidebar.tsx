@@ -1,6 +1,7 @@
 import { Calendar, FileClock, Home, LogOut, User } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../../../../config/supabase';
+import { logoutUserAPI } from '../../../../api/auth.api';
 import type { UserProfile } from '../../../../../../shared/types/login.types';
 
 
@@ -44,14 +45,22 @@ function getFullName(user: UserProfile | null) {
 
   const fullName = [
     user.first_name,
-    user.middle_name,
     user.last_name,
-    user.suffix,
   ]
     .filter(Boolean)
     .join(' ');
 
   return fullName || 'Intern';
+}
+
+function getPosition(user: UserProfile | null) {
+  if (!user) return 'No Position';
+
+  const position = [
+    user.position,
+  ]
+
+  return position;
 }
 
 function InternSidebar() {
@@ -61,10 +70,16 @@ function InternSidebar() {
   const user = getAuthUser();
 
   const fullName = getFullName(user);
-  const schoolName = 'Name of School';
+  const position = getPosition(user);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    const { error } = await logoutUserAPI();
+
+    if (error) {
+      console.error('Logout failed:', error);
+      alert('Failed to log out. Please try again.');
+      return;
+    }
 
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
@@ -88,7 +103,7 @@ function InternSidebar() {
 
         <div className="lg:text-center">
           <h2 className="text-lg font-bold sm:text-xl">{fullName}</h2>
-          <p className="text-xs sm:text-sm">{schoolName}</p>
+          <p className="text-xs sm:text-sm">{position}</p>
         </div>
       </div>
 

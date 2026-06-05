@@ -1,4 +1,3 @@
-// MOCK Login
 import { supabase } from '../config/supabase';
 import type { LoginFormValues, LoginResponse } from '../../../shared/types/login.types';
 import type { ChangePasswordFormValues } from '../../../shared/schemas/changePassword.schema';
@@ -48,7 +47,7 @@ export async function loginUserAPI(payload: LoginFormValues): Promise<LoginRespo
 
     const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('first_name, last_name, role, department, position, office, requires_password_change')
+        .select('first_name, last_name, role, position, avatar_url, requires_password_change')
         .eq('id', user.id)
         .single();
 
@@ -67,12 +66,24 @@ export async function loginUserAPI(payload: LoginFormValues): Promise<LoginRespo
                 first_name: profileData.first_name,
                 last_name: profileData.last_name,
                 role: profileData.role,
-                department: profileData.department,
                 position: profileData.position,
-                office: profileData.office,
+                avatar_url: profileData.avatar_url || '',
             },
             requiresPasswordChange: profileData.requires_password_change,
         },
     };
 }
 
+export async function logoutUserAPI(): Promise<{ error: string | null }> {
+    try {
+        const { error } = await supabase.auth.signOut();
+
+        if (error) {
+            return { error: error.message };
+        }
+
+        return { error: null };
+    } catch (err) {
+        return { error: 'An unexpected error occurred during logout.' };
+    }
+}

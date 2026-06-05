@@ -8,21 +8,11 @@ export type UserRole = 'intern' | 'admin' | string;
 export type UserProfile = {
     id: string;
     first_name: string;
-    middle_name?: string | null;
     last_name: string;
-    suffix?: string | null;
     role: UserRole;
-    position?: string | null;
-    department?: string | null;
-    office?: string | null;
-    birth_date?: string | null;
-    gender?: string | null;
+    position: string;
     avatar_url?: string | null;
-    contact_number?: string | null;
-    address?: string | null;
     email: string;
-    created_at?: string;
-    updated_at?: string;
 };
 
 export type LoginResponse = {
