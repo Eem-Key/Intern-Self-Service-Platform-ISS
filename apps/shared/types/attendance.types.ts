@@ -1,4 +1,4 @@
-export type WorkSetup = 'WFH' | 'ONSITE';
+export type WorkSetup = 'wfh' | 'onsite';
 
 export type AttendanceRecord = {
     id: string;
@@ -8,15 +8,6 @@ export type AttendanceRecord = {
     work_date: string;
     hours_logged: number | null;
     work_setup: WorkSetup;
-};
-
-export type TodayAttendanceResponse = {
-    message: string;
-    data: AttendanceRecord | null;
-};
-
-export type TimeInPayload = {
-    workSetup: WorkSetup;
 };
 
 export type TimeInResponse = {

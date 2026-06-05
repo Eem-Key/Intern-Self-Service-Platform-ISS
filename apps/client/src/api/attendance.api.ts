@@ -1,100 +1,162 @@
-// MOCK FOR TESTING
-
+import { supabase } from '../config/supabase';
+import { getAuthUserId } from '../utils/auth';
 import type {
     AttendanceRecord,
-    TimeInPayload,
     TimeInResponse,
     TimeOutResponse,
-    TodayAttendanceResponse,
+    WorkSetup,
 } from '../../../shared/types/attendance.types';
 
-const MOCK_ATTENDANCE_KEY = 'mockTodayAttendance';
+export async function getActiveAttendanceAPI(): Promise<AttendanceRecord | null> {
+    const intern_id = await getAuthUserId();
+    if (!intern_id) return null;
 
-function getMockAttendance(): AttendanceRecord | null {
-  const savedAttendance = localStorage.getItem(MOCK_ATTENDANCE_KEY);
+    const { data, error } = await supabase
+        .from('attendance_logs')
+        .select('*')
+        .eq('intern_id', intern_id)
+        .is('clock_out', null)
+        .maybeSingle();
 
-    if (!savedAttendance) {
-        return null;
-    }
-
-    return JSON.parse(savedAttendance) as AttendanceRecord;
-}
-
-function saveMockAttendance(attendance: AttendanceRecord) {
-    localStorage.setItem(MOCK_ATTENDANCE_KEY, JSON.stringify(attendance));
-}
-
-export async function getTodayAttendanceAPI(): Promise<TodayAttendanceResponse> {
-    await new Promise((resolve) => setTimeout(resolve, 300));
-
-    return {
-        message: 'Today attendance fetched successfully',
-        data: getMockAttendance(),
-    };
+    if (error) throw error;
+    return data;
 }
 
 export async function timeInAPI(
-    payload: TimeInPayload
+    setup: WorkSetup
 ): Promise<TimeInResponse> {
-    await new Promise((resolve) => setTimeout(resolve, 300));
-
-    const existingAttendance = getMockAttendance();
-
-    if (existingAttendance) {
-        throw new Error(
-        'Work setup can no longer be changed for today. Please contact your immediate supervisor to change it or note it in your EOD report.'
-        );
+    const intern_id = await getAuthUserId();
+    
+    if (!intern_id) {
+        throw new Error('You must be logged in to time in.');
     }
 
-    const today = new Date();
+    const { data: existingLog, error: checkError } = await supabase
+        .from('attendance_logs')
+        .select('id')
+        .eq('intern_id', intern_id)
+        .is('clock_out', null)
+        .maybeSingle();
 
-    const attendance: AttendanceRecord = {
-        id: crypto.randomUUID(),
-        intern_id: 'mock-intern-id',
-        clock_in: today.toISOString(),
-        clock_out: null,
-        work_date: today.toISOString().slice(0, 10),
-        hours_logged: null,
-        work_setup: payload.workSetup,
-    };
+    if (checkError) throw checkError;
 
-    saveMockAttendance(attendance);
+    if (existingLog) {
+        throw new Error('You have an active session. Please clock out of your current log before starting a new one.');
+    }
+
+    const { data: timein, error: insertError } = await supabase
+        .from('attendance_logs')
+        .insert([
+        {
+            intern_id: intern_id,
+            work_setup: setup,
+        },
+        ])
+        .select()
+        .single();
+
+        if (insertError) {
+            console.error('Error inserting attendance log:', insertError);
+            throw insertError;
+        }
+
+    const timeinAttendanceRecord = timein as AttendanceRecord;
 
     return {
         message: 'Time in successful',
-        data: attendance,
+        data: {
+            id: timeinAttendanceRecord.id,
+            intern_id: intern_id,
+            clock_in: timeinAttendanceRecord.clock_in,
+            clock_out: null,
+            work_date: timeinAttendanceRecord.work_date,
+            hours_logged: null,
+            work_setup: timeinAttendanceRecord.work_setup,
+        },
     };
+}
+
+export async function timeOutAPI(
+    attendanceId: string
+): Promise<TimeOutResponse> {
+    const intern_id = await getAuthUserId();
+    
+    if (!intern_id) {
+        throw new Error('You must be logged in to time out.');
     }
 
-export async function timeOutAPI(): Promise<TimeOutResponse> {
-    await new Promise((resolve) => setTimeout(resolve, 300));
-
-    const existingAttendance = getMockAttendance();
-
-    if (!existingAttendance?.clock_in) {
-        throw new Error('You need to time in first.');
+    const { data: log, error: checkError } = await supabase
+        .from('attendance_logs')
+        .select('clock_in, clock_out')
+        .eq('id', attendanceId)
+        .eq('intern_id', intern_id)
+        .single();
+    
+    if (checkError || !log) {
+        throw new Error('Attendance log not found.');
     }
 
-    if (existingAttendance.clock_out) {
-        throw new Error('You have already timed out for today.');
+    if (log.clock_out !== null) {
+        throw new Error('You have already timed out for this session.');
     }
 
-    const clockOut = new Date();
-    const clockIn = new Date(existingAttendance.clock_in);
+    const clockInDate = new Date(log.clock_in);
+    const now = new Date();
+    const totalDiffInMs = now.getTime() - clockInDate.getTime();
 
-    const hoursLogged =
-        (clockOut.getTime() - clockIn.getTime()) / (1000 * 60 * 60);
+    const lunchStart = new Date(clockInDate);
+    lunchStart.setHours(12, 0, 0, 0);
+    const lunchEnd = new Date(clockInDate);
+    lunchEnd.setHours(13, 0, 0, 0);
 
-    const updatedAttendance: AttendanceRecord = {
-        ...existingAttendance,
-        clock_out: clockOut.toISOString(),
-        hours_logged: Number(hoursLogged.toFixed(2)),
-    };
+    let lunchDurationInMs = 0;
 
-    saveMockAttendance(updatedAttendance);
+    if (now > lunchStart) {
+        // timed in before lunch and timed out after lunch
+        if (clockInDate < lunchStart && now > lunchEnd) {
+            lunchDurationInMs = 1000 * 60 * 60;
+        } 
+        // timed in during lunch and timed out after
+        else if (clockInDate >= lunchStart && clockInDate < lunchEnd && now > lunchEnd) {
+            lunchDurationInMs = lunchEnd.getTime() - clockInDate.getTime();
+        }
+        // timed in before lunch and timed out during lunch
+        else if (clockInDate < lunchStart && now >= lunchStart && now < lunchEnd) {
+            lunchDurationInMs = now.getTime() - lunchStart.getTime();
+        }
+    }
+
+    const netDiffInMs = totalDiffInMs - lunchDurationInMs;
+    const hours_logged = Math.floor(netDiffInMs / (1000 * 60 * 60));
+
+    const { data: timeout, error: updateError } = await supabase
+        .from('attendance_logs')
+        .update({
+            clock_out: now.toISOString(),
+            hours_logged: hours_logged,
+        })
+        .eq('id', attendanceId)
+        .eq('intern_id', intern_id)
+        .is('clock_out', null)
+        .select()
+        .single()
+
+    if (updateError) {
+        throw new Error(`Failed to clock out: ${updateError.message}`);
+    }
+
+    const timeoutAttendanceRecord = timeout as AttendanceRecord;
 
     return {
         message: 'Time out successful',
-        data: updatedAttendance,
+        data: {
+            id: timeoutAttendanceRecord.id,
+            intern_id: intern_id,
+            clock_in: timeoutAttendanceRecord.clock_in,
+            clock_out: timeoutAttendanceRecord.clock_out,
+            work_date: timeoutAttendanceRecord.work_date,
+            hours_logged: timeoutAttendanceRecord.hours_logged,
+            work_setup: timeoutAttendanceRecord.work_setup,
+        },
     };
 }

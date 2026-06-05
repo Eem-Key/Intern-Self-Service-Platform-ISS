@@ -9,7 +9,7 @@ import {
 } from '../../../../api/eodReport.api';
 import type { EODReportPayload } from '../../../../../../shared/types/eodReport.types';
 
-import { getTodayAttendanceAPI } from '../../../../api/attendance.api';
+import { getActiveAttendanceAPI } from '../../../../api/attendance.api';
 
 type EODReportErrors = Partial<Record<keyof EODReportPayload, string>>;
 
@@ -195,10 +195,10 @@ function EODReportCard() {
 
   const { data: todayAttendance } = useQuery({
     queryKey: ['today-attendance'],
-    queryFn: getTodayAttendanceAPI,
+    queryFn: getActiveAttendanceAPI,
   });
 
-  const attendance = todayAttendance?.data ?? null;
+  const attendance = todayAttendance ?? null;
   const hasTimedOut = Boolean(attendance?.clock_out);
   const attendanceHoursSpent = formatHoursLogged(attendance?.hours_logged);
 

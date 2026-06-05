@@ -1,37 +1,24 @@
 import { useQuery } from '@tanstack/react-query';
 import { getProgramProgressAPI } from '../../../../api/programProgress.api';
-
-function getAuthUserId(): string | null {
-  const storedUser = localStorage.getItem('authUser');
-
-  if (!storedUser) return null;
-
-  try {
-    const user = JSON.parse(storedUser);
-    return user?.id || null;
-  } catch {
-    return null;
-  }
-}
+import { getAuthUserId } from '../../../../utils/auth.ts';
 
 function ProgramProgressCard() {
-  const internId = getAuthUserId();
-
-  console.log("Current internId:", internId);
-
   const { data, isLoading, error } = useQuery({
-    queryKey: ['program-progress', internId],
-    queryFn: () => getProgramProgressAPI(internId!),
-    enabled: !!internId,
+    queryKey: ['program-progress'],
+    queryFn: async () => {
+      const id = await getAuthUserId();
+      if (!id) throw new Error("User not authenticated");
+      
+      return getProgramProgressAPI(id);
+    },
   });
 
-  console.log("Query status:", { isLoading, data, error });
-
-  if (isLoading) return <div>Loading...</div>;
-  if (!data) return <div>No progress data found.</div>;
-
   const progress = data?.data;
+<<<<<<< Updated upstream
 
+=======
+  const hoursLeft = progress?.hours_left ?? 0;
+>>>>>>> Stashed changes
   const renderedHours = progress?.rendered_hours ?? 0;
   const requiredHours = progress?.required_hours ?? 0;
   const wfhHours = progress?.wfh_hours ?? 0;

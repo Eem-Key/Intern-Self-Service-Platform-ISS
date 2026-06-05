@@ -1,15 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Building2, ChevronDown, Square } from 'lucide-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-
 import StatusMessage from '../../../../components/feedback/StatusMessage';
 import {
-  getTodayAttendanceAPI,
+  getActiveAttendanceAPI,
   timeInAPI,
   timeOutAPI,
 } from '../../../../api/attendance.api';
-import type { WorkSetup } from '../../../../../../shared/types/attendance.types';
 import { useAttendanceTimer } from './attendance/useAttendanceTimer';
+import type { WorkSetup } from '../../../../../../shared/types/attendance.types';
 
 function formatToday() {
   return new Date().toLocaleDateString('en-US', {
@@ -19,7 +18,6 @@ function formatToday() {
     year: 'numeric',
   });
 }
-
 
 function AttendanceCard() {
   const [selectedWorkSetup, setSelectedWorkSetup] = useState<WorkSetup | ''>('');
@@ -39,59 +37,54 @@ function AttendanceCard() {
 
     return () => window.clearTimeout(timer);
   }, [statusMessage]);
-
-  const {
-    data: todayAttendance,
-    refetch,
-    isLoading,
-  } = useQuery({
-    queryKey: ['today-attendance'],
-    queryFn: getTodayAttendanceAPI,
+  
+  const { data: activeAttendance, refetch, isLoading } = useQuery({
+    queryKey: ['active-attendance'],
+    queryFn: getActiveAttendanceAPI,
   });
 
-  const attendance = todayAttendance?.data ?? null;
-
-  const currentWorkSetup = attendance?.work_setup || selectedWorkSetup;
-  const hasAttendanceForToday = Boolean(attendance);
-  const hasTimedIn = Boolean(attendance?.clock_in);
-  const hasTimedOut = Boolean(attendance?.clock_out);
+  const hasAttendanceForToday = Boolean(activeAttendance); 
+  const hasTimedIn = Boolean(activeAttendance); 
+  const hasTimedOut = false;
+  const currentWorkSetup = activeAttendance?.work_setup || selectedWorkSetup;
 
   const elapsedTime = useAttendanceTimer(
-    attendance?.clock_in ?? null,
-    attendance?.clock_out ?? null
+    activeAttendance?.clock_in ?? null,
+    activeAttendance?.clock_out ?? null
   );
 
   const timeInMutation = useMutation({
-    mutationFn: timeInAPI,
+    mutationFn: (setup: WorkSetup) => timeInAPI(setup), 
+    
     onSuccess: async () => {
       setStatusMessage({
         variant: 'success',
         title: 'Time In Successful!',
         message: 'Your attendance has been recorded for today.',
       });
-
       await refetch();
     },
-    onError: (error) => {
+    
+    onError: (error: any) => {
       setStatusMessage({
         variant: 'error',
         title: 'Time In Error',
-        message:
-          error.message ||
-          'We could not record your time in. Please try again.',
+        message: error.message || 'We could not record your time in. Please try again.',
       });
     },
   });
 
   const timeOutMutation = useMutation({
-    mutationFn: timeOutAPI,
+    mutationFn: () => {
+      if (!activeAttendance?.id) throw new Error("No active session found.");
+      return timeOutAPI(activeAttendance.id);
+    },
     onSuccess: async () => {
       setStatusMessage({
         variant: 'success',
         title: 'Time Out Successful!',
         message: 'Your total rendered hours have been recorded.',
       });
-
       await refetch();
     },
     onError: (error) => {
@@ -126,14 +119,14 @@ function AttendanceCard() {
   setIsDropdownOpen(false);
 };
 
-const handleWorkSetupClick = () => {
-  if (hasAttendanceForToday) {
-    showWorkSetupLockedError();
-    return;
-  }
+  const handleWorkSetupClick = () => {
+    if (hasAttendanceForToday) {
+      showWorkSetupLockedError();
+      return;
+    }
 
-  setIsDropdownOpen((prev) => !prev);
-};
+    setIsDropdownOpen((prev) => !prev);
+  };
 
   const handleTimeIn = () => {
     if (!selectedWorkSetup) {
@@ -145,9 +138,7 @@ const handleWorkSetupClick = () => {
       return;
     }
 
-    timeInMutation.mutate({
-      workSetup: selectedWorkSetup,
-    });
+    timeInMutation.mutate(selectedWorkSetup);
   };
 
   const handleTimeOut = () => {
@@ -200,7 +191,7 @@ const handleWorkSetupClick = () => {
             <div className="absolute left-0 top-full z-20 mt-1 w-full overflow-hidden rounded-b-3xl bg-[#eeeeee] shadow-md">
               <button
                 type="button"
-                onClick={() => handleSelectWorkSetup('WFH')}
+                onClick={() => handleSelectWorkSetup('wfh')}
                 className="w-full border-b border-gray-300 px-5 py-3 text-sm font-bold hover:bg-gray-200"
               >
                 WORK FROM HOME (WFH)
@@ -208,7 +199,7 @@ const handleWorkSetupClick = () => {
 
               <button
                 type="button"
-                onClick={() => handleSelectWorkSetup('ONSITE')}
+                onClick={() => handleSelectWorkSetup('onsite')}
                 className="w-full px-5 py-3 text-sm font-bold hover:bg-gray-200"
               >
                 ONSITE

@@ -13,9 +13,6 @@ export async function getProgramProgressAPI(id: string): Promise<ProgramProgress
         .select('required_hours')
         .eq('id', id)
         .single();
-
-    console.log("Searching for ID:", id);
-    console.log("Intern record found:", intern);
     
     if (internError) {
         throw new Error(`Failed to fetch intern data: ${internError.message}`);
@@ -26,7 +23,7 @@ export async function getProgramProgressAPI(id: string): Promise<ProgramProgress
         data: {
             required_hours: intern.required_hours,
             rendered_hours: summary?.rendered_hours,
-            hours_left: intern.required_hours - summary?.rendered_hours,
+            hours_left: Math.max(0, (intern.required_hours || 0) - (summary?.rendered_hours || 0)),
             wfh_hours: summary?.total_online_hours,
             onsite_hours: summary?.total_onsite_hours,
         }
