@@ -1,83 +1,82 @@
 import { useEffect, useRef, useState } from 'react';
 import { Clock } from 'lucide-react';
-import { useMutation, useQuery } from '@tanstack/react-query';
-
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import StatusMessage from '../../../../components/feedback/StatusMessage';
 import {
-  saveEODDraftAPI,
-  submitEODReportAPI,
+  insertEODDraftAPI,
+  updateEODReportAPI,
+  useEODAttendance,
+  useEODReport,
 } from '../../../../api/eodReport.api';
 import type { EODReportPayload } from '../../../../../../shared/types/eodReport.types';
 
-import { getActiveAttendanceAPI } from '../../../../api/attendance.api';
+const getTodayDate = () => new Date().toISOString().slice(0, 10);
+const getYesterdayDate = () => {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return d.toISOString().slice(0, 10);
+};
 
 type EODReportErrors = Partial<Record<keyof EODReportPayload, string>>;
 
-function getTodayDate() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function getYesterdayDate() {
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  return yesterday.toISOString().slice(0, 10);
-}
-
-function formatHoursLogged(hoursLogged: number | null | undefined) {
-  if (!hoursLogged) return '';
-
-  const totalMinutes = Math.round(hoursLogged * 60);
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
-
-  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-}
-
 function EODReportCard() {
-  const dateInputRef = useRef<HTMLInputElement | null>(null);
+  const queryClient = useQueryClient();
   const today = getTodayDate();
   const yesterday = getYesterdayDate();
+  const dateInputRef = useRef<HTMLInputElement | null>(null);
+  const [reportId, setReportId] = useState<string | null>(null);
   const [formValues, setFormValues] = useState<EODReportPayload>({
-    dateWritten: today,
-    hoursSpent: '',
+    dateWritten: getTodayDate(),
+    hoursSpent: 0,
     projectName: '',
     taskAccomplished: '',
   });
-
+  const { data: attendanceData } = useEODAttendance(formValues.dateWritten);
+  const { data: existingReport } = useEODReport(formValues.dateWritten);
   const [errors, setErrors] = useState<EODReportErrors>({});
+  const [statusMessage, setStatusMessage] = useState<any>(null);
+  const hasTimedOut = !!attendanceData?.clock_out;
+  const isSubmitted = existingReport?.status === 'submitted';
 
-  const [statusMessage, setStatusMessage] = useState<{
-    variant: 'success' | 'error';
-    title: string;
-    message: string;
-  } | null>(null);
+  const openDatePicker = () => {
+    if (dateInputRef.current?.showPicker) {
+      dateInputRef.current.showPicker();
+      return;
+    }
 
-  const clearForm = () => {
-  setFormValues({
-    dateWritten: today,
-    hoursSpent: '',
-    projectName: '',
-    taskAccomplished: '',
-  });
-
-  setErrors({});
+    dateInputRef.current?.focus();
   };
 
+  useEffect(() => {
+    if (existingReport) {
+      setReportId(existingReport.id);
+      setFormValues({
+        dateWritten: existingReport.date_written,
+        hoursSpent: existingReport.hours_spent,
+        projectName: existingReport.project_name,
+        taskAccomplished: existingReport.task_accomplished,
+      });
+    } else {
+      setReportId(null);
+      setFormValues(prev => ({
+        ...prev,
+        hoursSpent: attendanceData?.hours_logged ? attendanceData.hours_logged : 0,
+        projectName: '',
+        taskAccomplished: '',
+      }));
+    }
+  }, [existingReport, attendanceData]);
 
-  const showStatusMessage = (
-    variant: 'success' | 'error',
-    title: string,
-    message: string
-  ) => {
-    setStatusMessage({
-      variant,
-      title,
-      message,
-    });
+  const handleChange = (field: keyof EODReportPayload, value: string) => {
+    setFormValues((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
 
-    window.setTimeout(() => {
-      setStatusMessage(null);
-    }, 5000);
+    setErrors((prev) => ({
+      ...prev,
+      [field]: undefined,
+    }));
   };
 
   const validateForm = (mode: 'save' | 'submit') => {
@@ -91,9 +90,8 @@ function EODReportCard() {
     ) {
       validationErrors.dateWritten = 'Only today or yesterday can be selected.';
     }
-    
 
-    if (mode === 'submit' && !formValues.hoursSpent.trim()) {
+    if (mode === 'submit' && !formValues.hoursSpent) {
       validationErrors.hoursSpent = 'Hours spent is required. Please time out first.';
     }
 
@@ -108,138 +106,74 @@ function EODReportCard() {
     return validationErrors;
   };
 
-  const handleChange = (field: keyof EODReportPayload, value: string) => {
-    setFormValues((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-
-    setErrors((prev) => ({
-      ...prev,
-      [field]: undefined,
-    }));
-  };
-
-  const openDatePicker = () => {
-    if (dateInputRef.current?.showPicker) {
-      dateInputRef.current.showPicker();
-      return;
-    }
-
-    dateInputRef.current?.focus();
-  };
-
   const saveMutation = useMutation({
-    mutationFn: saveEODDraftAPI,
-    onSuccess: () => {
-      showStatusMessage(
-        'success',
-        'Report Draft Saved',
-        'Your End of Day (EOD) draft has been saved successfully.'
-      );
-
-      clearForm();
+    mutationFn: (payload: EODReportPayload) => 
+      reportId 
+        ? updateEODReportAPI(reportId, payload, 'draft') 
+        : insertEODDraftAPI(payload, 'draft'),
+    onSuccess: () => { 
+      showStatusMessage('success', 'Saved', 'Draft saved successfully.'); 
+      queryClient.invalidateQueries({ queryKey: ['eod-report', formValues.dateWritten] });
     },
-    onError: () => {
-      showStatusMessage(
-        'error',
-        'Save Failed',
-        "We couldn't save your EOD draft. Please check your connection and try again."
-      );
-    },
+    onError: () => showStatusMessage('error', 'Error', 'Failed to save draft.'),
   });
 
   const submitMutation = useMutation({
-    mutationFn: submitEODReportAPI,
-    onSuccess: () => {
-      showStatusMessage(
-        'success',
-        'Report Submitted!',
-        'Your EOD report has been sent to your supervisor for review.'
-      );
-
-      clearForm();
+    mutationFn: (payload: EODReportPayload) => 
+      reportId 
+        ? updateEODReportAPI(reportId, payload, 'submitted') 
+        : insertEODDraftAPI(payload, 'submitted'),
+    onSuccess: () => { 
+      showStatusMessage('success', 'Submitted', 'Report sent successfully.'); 
+      queryClient.invalidateQueries({ queryKey: ['eod-report', formValues.dateWritten] });
+      // clearForm(); 
     },
-    onError: () => {
-      showStatusMessage(
-        'error',
-        'Report Submission Error',
-        "We couldn't save your report. Please check your entries and try again."
-      );
-    },
+    onError: () => showStatusMessage('error', 'Error', 'Submission failed.'),
   });
 
-  const handleSave = () => {
-    const validationErrors = validateForm('save');
+  const showStatusMessage = (variant: 'success' | 'error', title: string, message: string) => {
+    setStatusMessage({ variant, title, message });
+    setTimeout(() => setStatusMessage(null), 5000);
+  };
 
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
+  // const clearForm = () => {
+  //   setFormValues({ dateWritten: getTodayDate(), hoursSpent: 0, projectName: '', taskAccomplished: '' });
+  //   setErrors({});
+  // };
+
+  const handleSave = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (existingReport?.status === 'submitted') {
+      showStatusMessage('error', 'Cannot Edit', 'This report has already been submitted and cannot be changed.');
       return;
     }
-
+    const validationErrors = validateForm('save');
+    if (Object.keys(validationErrors).length > 0) return setErrors(validationErrors);
     saveMutation.mutate(formValues);
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    const validationErrors = validateForm('submit');
-
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (existingReport?.status === 'submitted') {
+      showStatusMessage('error', 'Cannot Submit', 'This report has already been submitted.');
       return;
     }
-
+    const validationErrors = validateForm('submit');
+    if (Object.keys(validationErrors).length > 0) return setErrors(validationErrors);
     submitMutation.mutate(formValues);
   };
 
-  const { data: todayAttendance } = useQuery({
-    queryKey: ['today-attendance'],
-    queryFn: getActiveAttendanceAPI,
-  });
-
-  const attendance = todayAttendance ?? null;
-  const hasTimedOut = Boolean(attendance?.clock_out);
-  const attendanceHoursSpent = formatHoursLogged(attendance?.hours_logged);
-
-  useEffect(() => {
-  if (!hasTimedOut) {
-    setFormValues((prev) => ({
-      ...prev,
-      hoursSpent: '',
-    }));
-    return;
-  }
-
-  setFormValues((prev) => ({
-    ...prev,
-    hoursSpent: attendanceHoursSpent,
-  }));
-}, [hasTimedOut, attendanceHoursSpent]);
-
   return (
     <section className="relative h-full rounded-xl bg-white px-8 py-3 shadow-md sm:px-6">
-      {statusMessage && (
-        <StatusMessage
-          variant={statusMessage.variant}
-          title={statusMessage.title}
-          message={statusMessage.message}
-          isFixed
-          onClose={() => setStatusMessage(null)}
-        />
-      )}
-
-      <h2 className="border-b-4 border-[#FFBF10] pb-1 text-xl font-bold xl:text-2xl">
-        End of Day (EOD) Report
-      </h2>
+      {statusMessage && <StatusMessage {...statusMessage} isFixed onClose={() => setStatusMessage(null)} />}
+      
+      <h2 className="border-b-4 border-[#FFBF10] pb-1 text-xl font-bold xl:text-2xl">End of Day (EOD) Report</h2>
 
       <form onSubmit={handleSubmit} className="mt-3 flex h-[calc(100%-44px)] flex-col space-y-2.5">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label className="text-sm">Date</label>
-
-            <div>
-              <input
+            <input
                 ref={dateInputRef}
                 type="date"
                 min={yesterday}
@@ -251,89 +185,37 @@ function EODReportCard() {
                 }
                 className="h-10 w-full rounded bg-[#eeeeee] px-4 text-sm outline-none"
               />
-            </div>
-
-            {errors.dateWritten && (
-              <p className="mt-1 text-xs text-red-600">
-                {errors.dateWritten}
-              </p>
-            )}
+            {errors.dateWritten && <p className="text-xs text-red-600">{errors.dateWritten}</p>}
           </div>
-
           <div>
             <label className="text-sm">Hours Spent</label>
-
             <div className="relative">
-              <input
-                type="text"
-                placeholder="HH:MM"
-                value={formValues.hoursSpent}
-                disabled
-                className="h-10 w-full cursor-not-allowed rounded bg-[#eeeeee] px-4 pr-10 text-sm text-gray-600 outline-none"
-              />
-
-              <Clock
-                size={17}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
-              />
+              <input type="number" value={formValues.hoursSpent} disabled className="h-10 w-full rounded bg-[#eeeeee] px-4 text-sm text-gray-600 outline-none" />
+              <Clock size={17} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500" />
             </div>
-
-            {!hasTimedOut && (
-              <p className="mt-1 text-[10px] text-gray-500">
-                Hours spent will be available after you time out.
-              </p>
-            )}
-
-            {errors.hoursSpent && (
-              <p className="mt-1 text-xs text-red-600">
-                {errors.hoursSpent}
-              </p>
-            )}
+            {!hasTimedOut && <p className="mt-1 text-[10px] text-gray-500">Available after time out.</p>}
           </div>
         </div>
 
         <div>
           <label className="text-sm">Project Name</label>
-
-          <input
-            type="text"
-            value={formValues.projectName}
-            onChange={(event) =>
-              handleChange('projectName', event.target.value)
-            }
-            className="h-10 w-full rounded bg-[#eeeeee] px-4 text-sm outline-none"
-          />
-
-          {errors.projectName && (
-            <p className="mt-1 text-xs text-red-600">
-              {errors.projectName}
-            </p>
-          )}
+          <input disabled={isSubmitted} type="text" value={formValues.projectName} onChange={(e) => handleChange('projectName', e.target.value)} className="h-10 w-full rounded bg-[#eeeeee] px-4 text-sm outline-none" />
         </div>
 
         <div>
           <label className="text-sm">Task Accomplished</label>
-
-          <textarea
-            value={formValues.taskAccomplished}
-            onChange={(event) =>
-              handleChange('taskAccomplished', event.target.value)
-            }
-            className="h-[200px] w-full resize-none rounded bg-[#eeeeee] p-3 text-sm outline-none"
-          />
-
-          {errors.taskAccomplished && (
-            <p className="mt-1 text-xs text-red-600">
-              {errors.taskAccomplished}
-            </p>
-          )}
+          <textarea disabled={isSubmitted} value={formValues.taskAccomplished} onChange={(e) => handleChange('taskAccomplished', e.target.value)} className="h-[200px] w-full resize-none rounded bg-[#eeeeee] p-3 text-sm outline-none" />
         </div>
 
-        <div className="mt-2 mb-0 flex flex-col justify-end gap-3 sm:flex-row">
+        <div className="flex justify-end gap-3">
           <button
             type="button"
             onClick={handleSave}
-            disabled={saveMutation.isPending || submitMutation.isPending}
+            disabled={
+              saveMutation.isPending || 
+              submitMutation.isPending || 
+              existingReport?.status === 'submitted'
+            }
             className="rounded-full bg-[#eeeeee] px-7 py-1.5 text-sm font-bold text-gray-500 disabled:cursor-not-allowed disabled:opacity-70 sm:min-w-[85px]"
           >
             {saveMutation.isPending ? 'Saving...' : 'Save'}
@@ -344,7 +226,8 @@ function EODReportCard() {
             disabled={
               !hasTimedOut ||
               saveMutation.isPending ||
-              submitMutation.isPending
+              submitMutation.isPending || 
+              existingReport?.status === 'submitted'
             }
             className="rounded-full bg-[#FFBF10] px-7 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:bg-[#eeeeee] disabled:text-gray-500 disabled:opacity-70 sm:min-w-[100px]"
           >

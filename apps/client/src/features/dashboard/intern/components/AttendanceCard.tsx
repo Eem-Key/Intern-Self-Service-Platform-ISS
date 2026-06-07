@@ -84,7 +84,8 @@ function AttendanceCard() {
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['active-attendance'] }),
-        queryClient.invalidateQueries({ queryKey: ['program-progress'] })
+        queryClient.invalidateQueries({ queryKey: ['program-progress'] }),
+        queryClient.invalidateQueries({ queryKey: ['attendance-report'] })
       ]);
       setStatusMessage({
         variant: 'success',

@@ -1,83 +1,117 @@
+import { supabase } from '../config/supabase';
+import { getAuthUserId } from '../utils/auth';
 import type {
+    EODReportStatus,
     EODReport,
     EODReportPayload,
     EODReportResponse,
 } from '../../../shared/types/eodReport.types';
+import { useQuery } from '@tanstack/react-query';
+import { getAttendanceByDateAPI } from '../api/attendance.api';
 
-const MOCK_EOD_REPORTS_KEY = 'mockEODReports';
+export function useEODAttendance(date: string) {
+    return useQuery({
+        queryKey: ['attendance-report', date],
+        queryFn: () => getAttendanceByDateAPI(date),
+        enabled: !!date,
+    });
+}
 
-const FORCE_SAVE_ERROR = false;
-const FORCE_SUBMIT_ERROR = false;
+export function useEODReport(date: string) {
+    return useQuery({
+        queryKey: ['eod-report', date],
+        queryFn: () => fetchEODReportByDateAPI(date),
+        enabled: !!date,
+    });
+}
 
-function getStoredReports(): EODReport[] {
-    const savedReports = localStorage.getItem(MOCK_EOD_REPORTS_KEY);
-
-    if (!savedReports) {
-        return [];
+export async function fetchEODReportByDateAPI(date: string) {
+    const intern_id = await getAuthUserId();
+    if (!intern_id) {
+        throw new Error(`You must be logged in to fetch a report.`);
     }
 
-    return JSON.parse(savedReports) as EODReport[];
+    const { data: reportData, error: fetchError } = await supabase
+        .from('eod_reports')
+        .select('*')
+        .eq('date_written', date)
+        .eq('intern_id', intern_id)
+        .single();
+
+    if (fetchError) {
+        throw new Error(`Error fetching report: ${fetchError.message}`);
+    }
+    return reportData;
 }
 
-function saveStoredReports(reports: EODReport[]) {
-    localStorage.setItem(MOCK_EOD_REPORTS_KEY, JSON.stringify(reports));
-}
-
-function createMockReport(
+export async function insertEODDraftAPI(
     payload: EODReportPayload,
-    status: 'draft' | 'submitted'
-): EODReport {
-    return {
-        id: crypto.randomUUID(),
-        intern_id: 'mock-intern-id',
+    reportStatus: EODReportStatus
+): Promise<EODReportResponse> {
+    const intern_id = await getAuthUserId();
+    if (!intern_id) {
+        throw new Error(`You must be logged in to save a ${reportStatus}.`);
+    }
+
+    const report: EODReport = {
+        intern_id: intern_id,
         date_written: payload.dateWritten,
-        created_at: new Date().toISOString(),
         project_name: payload.projectName,
         task_accomplished: payload.taskAccomplished,
         hours_spent: payload.hoursSpent,
-        status,
-        admin_id: null,
-        reviewed_at: null,
-        admin_notes: null,
+        status: reportStatus,
+    };
+
+    const { data: newReportData, error: insertError } = await supabase
+        .from('eod_reports')
+        .insert(report)
+        .select()
+        .single();
+
+    if (insertError) {
+        console.error('Error inserting report:', insertError.message);
+        throw insertError;
+    }
+
+    return {
+        message: `EOD ${reportStatus} saved successfully`,
+        data: newReportData,
     };
 }
 
-export async function saveEODDraftAPI(
-    payload: EODReportPayload
+export async function updateEODReportAPI(
+    reportId: string,
+    payload: EODReportPayload,
+    reportStatus: EODReportStatus
 ): Promise<EODReportResponse> {
-    await new Promise((resolve) => setTimeout(resolve, 300));
-
-    if (FORCE_SAVE_ERROR) {
-        throw new Error('Save failed. Please try again.');
+    const intern_id = await getAuthUserId();
+    if (!intern_id) {
+        throw new Error(`You must be logged in to update a ${reportStatus}.`);
     }
 
-    const reports = getStoredReports();
-    const newReport = createMockReport(payload, 'draft');
-
-    saveStoredReports([newReport, ...reports]);
-
-    return {
-        message: 'EOD draft saved successfully',
-        data: newReport,
+    const report: EODReport = {
+        intern_id: intern_id,
+        date_written: payload.dateWritten,
+        project_name: payload.projectName,
+        task_accomplished: payload.taskAccomplished,
+        hours_spent: payload.hoursSpent,
+        status: reportStatus,
     };
-}
 
-export async function submitEODReportAPI(
-    payload: EODReportPayload
-): Promise<EODReportResponse> {
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    const { data: updatedReportData, error: updateError } = await supabase
+        .from('eod_reports')
+        .update(report)
+        .eq('id', reportId)
+        .select()
+        .single();
 
-    if (FORCE_SUBMIT_ERROR) {
-        throw new Error('Submission failed. Please try again.');
+    if (updateError) {
+        console.error('Error updating report:', updateError.message);
+        throw updateError;
     }
 
-    const reports = getStoredReports();
-    const newReport = createMockReport(payload, 'submitted');
-
-    saveStoredReports([newReport, ...reports]);
-
     return {
-        message: 'EOD report submitted successfully',
-        data: newReport,
+        message: `EOD ${reportStatus} updated successfully`,
+        data: updatedReportData,
     };
 }

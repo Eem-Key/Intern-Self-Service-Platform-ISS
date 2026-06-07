@@ -22,6 +22,22 @@ export async function getActiveAttendanceAPI(): Promise<AttendanceRecord | null>
     return data;
 }
 
+export async function getAttendanceByDateAPI(date: string): Promise<AttendanceRecord | null> {
+    const intern_id = await getAuthUserId();
+    if (!intern_id) return null;
+
+    const { data, error } = await supabase
+        .from('attendance_logs')
+        .select('*')
+        .eq('intern_id', intern_id)
+        .gte('clock_in', `${date} 00:00:00`)
+        .lte('clock_in', `${date} 23:59:59`)
+        .single();
+
+    if (error) throw error;
+    return data;
+}
+
 export async function timeInAPI(
     setup: WorkSetup
 ): Promise<TimeInResponse> {

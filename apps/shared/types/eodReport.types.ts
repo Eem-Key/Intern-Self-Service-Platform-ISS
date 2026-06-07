@@ -1,17 +1,24 @@
-export type EODReportStatus = 'DRAFT' | 'APPROVED' | 'PENDING' | 'SUBMITTED' | 'DECLINED';
+export type EODReportStatus = 'draft' | 'approved' | 'submitted' | 'denied';
 
 export type EODReportPayload = {
     dateWritten: string;
-    hoursSpent: string;
+    hoursSpent: number;
     projectName: string;
     taskAccomplished: string;
 };
 
 export type EODReport = {
-    id: string;
     intern_id: string;
     date_written: string;
-    created_at: string;
+    project_name: string;
+    task_accomplished: string;
+    hours_spent: number;
+    status: EODReportStatus;
+};
+
+export type EODReportWithAdminNotes = {
+    intern_id: string;
+    date_written: string;
     project_name: string;
     task_accomplished: string;
     hours_spent: string;
