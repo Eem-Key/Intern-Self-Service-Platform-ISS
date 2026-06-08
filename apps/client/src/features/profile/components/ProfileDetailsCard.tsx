@@ -1,5 +1,5 @@
-import { useMutation } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useQueryClient, useMutation } from '@tanstack/react-query';
+import { useState, useEffect } from 'react';
 import type {
     Profile,
     ProfileUpdateRequest,
@@ -7,26 +7,14 @@ import type {
 import { requestProfileUpdateAPI } from '../../../api/profile.api';
 import StatusMessage from '../../../components/feedback/StatusMessage';
 
-type ExtendedProfile = Profile & {
-    year_level?: string | null;
-    program?: string | null;
-    university?: string | null;
-    supervisor?: string | null;
-    required_hours?: number | string | null;
-    work_setup?: string | null;
-    start_date?: string | null;
-};
-
 type ProfileDetailsCardProps = {
-    profile: ExtendedProfile;
+    profile: Profile;
 };
 
-type ProfileUpdateRequestPayload = Omit<
-    ProfileUpdateRequest,
-    'id' | 'submitted_at' | 'admin_id' | 'reviewed_at' | 'admin_feedback'
->;
-
-function ProfileDetailsCard({ profile }: ProfileDetailsCardProps) {
+function ProfileDetailsCard(
+    { profile }: ProfileDetailsCardProps
+) {
+    const queryClient = useQueryClient();
     const [statusMessage, setStatusMessage] = useState<{
     variant: 'success' | 'error';
     title: string;
@@ -45,50 +33,54 @@ function ProfileDetailsCard({ profile }: ProfileDetailsCardProps) {
         contact_number: profile.contact_number || '',
         address: profile.address || '',
 
-        year_level: profile.year_level || '',
-        program: profile.program || '',
-        university: profile.university || '',
+        year_level: profile.intern_info?.year_level ? String(profile.intern_info.year_level) : '',
+        program: profile.intern_info?.program || '',
+        university: profile.intern_info?.university || '',
 
         position: profile.position || '',
         department: profile.department || '',
-        supervisor: profile.supervisor || '',
-        required_hours: profile.required_hours ? String(profile.required_hours) : '',
-        work_setup: profile.work_setup || '',
+        // supervisor: profile.intern_info?.supervisor || '',
+        required_hours: profile.intern_info?.required_hours ? String(profile.intern_info.required_hours) : '',
+        // work_setup: profile.intern_info?.work_setup || '',
         office: profile.office || '',
-        start_date: profile.start_date || '',
+        start_date: profile.intern_info?.start_date || '',
     });
 
+    useEffect(() => {
+        resetFormValues();
+    }, [profile]);
+
     const updateRequestMutation = useMutation({
-    mutationFn: (payload: ProfileUpdateRequestPayload) =>
-        requestProfileUpdateAPI(payload as unknown as ProfileUpdateRequest),
+        mutationFn: (payload: ProfileUpdateRequest) => requestProfileUpdateAPI(payload),
+        
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['intern-profile'] });
+            setIsEditing(false);
 
-    onSuccess: () => {
-        setIsEditing(false);
+            setStatusMessage({
+            variant: 'success',
+            title: 'Request Submitted Successfully!',
+            message: 'Your changes are now waiting for admin approval.',
+            });
 
-        setStatusMessage({
-        variant: 'success',
-        title: 'Request Submitted Successfully!',
-        message: 'Your changes are now waiting for admin approval.',
-        });
+            setTimeout(() => {
+            setStatusMessage(null);
+            }, 5000);
+        },
 
-        setTimeout(() => {
-        setStatusMessage(null);
-        }, 5000);
-    },
+        onError: (error: Error) => {
+            setStatusMessage({
+            variant: 'error',
+            title: 'Request Submission Failed',
+            message:
+                error.message ||
+                'We could not process your request. Please review your information and try again.',
+            });
 
-    onError: (error: Error) => {
-        setStatusMessage({
-        variant: 'error',
-        title: 'Request Submission Failed',
-        message:
-            error.message ||
-            'We could not process your request. Please review your information and try again.',
-        });
-
-        setTimeout(() => {
-        setStatusMessage(null);
-        }, 5000);
-    },
+            setTimeout(() => {
+            setStatusMessage(null);
+            }, 5000);
+        },
     });
 
     const handleChange = (field: keyof typeof formValues, value: string) => {
@@ -110,17 +102,17 @@ function ProfileDetailsCard({ profile }: ProfileDetailsCardProps) {
         contact_number: profile.contact_number || '',
         address: profile.address || '',
 
-        year_level: profile.year_level || '',
-        program: profile.program || '',
-        university: profile.university || '',
+        year_level: profile.intern_info?.year_level ? String(profile.intern_info.year_level) : '',
+        program: profile.intern_info?.program || '',
+        university: profile.intern_info?.university || '',
 
         position: profile.position || '',
         department: profile.department || '',
-        supervisor: profile.supervisor || '',
-        required_hours: profile.required_hours ? String(profile.required_hours) : '',
-        work_setup: profile.work_setup || '',
+        // supervisor: profile.supervisor || '',
+        required_hours: profile.intern_info?.required_hours ? String(profile.intern_info.required_hours) : '',
+        // work_setup: profile.work_setup || '',
         office: profile.office || '',
-        start_date: profile.start_date || '',
+        start_date: profile.intern_info?.start_date || '',
     });
     };
 
@@ -130,8 +122,7 @@ function ProfileDetailsCard({ profile }: ProfileDetailsCardProps) {
     };
 
     const handleSubmitRequest = () => {
-        updateRequestMutation.mutate({
-        intern_id: profile.id,
+    updateRequestMutation.mutate({
         update_type: 'profile_information_update',
         requested_data: {
             first_name: formValues.first_name,
@@ -149,7 +140,7 @@ function ProfileDetailsCard({ profile }: ProfileDetailsCardProps) {
             },
         reason: 'Intern requested profile information update.',
         status: 'pending',
-        });
+        } as ProfileUpdateRequest);
     };
 
     return (
@@ -320,12 +311,12 @@ function ProfileDetailsCard({ profile }: ProfileDetailsCardProps) {
             onChange={(value) => handleChange('department', value)}
             />
 
-            <ProfileField
+            {/* <ProfileField
             label="Supervisor"
             value={formValues.supervisor}
             disabled
             onChange={(value) => handleChange('supervisor', value)}
-            />
+            /> */}
 
             <div className="grid grid-cols-2 gap-3">
             <ProfileField
@@ -335,12 +326,12 @@ function ProfileDetailsCard({ profile }: ProfileDetailsCardProps) {
                 onChange={(value) => handleChange('required_hours', value)}
             />
 
-            <ProfileField
+            {/* <ProfileField
                 label="Work Set-Up"
                 value={formValues.work_setup}
                 disabled
                 onChange={(value) => handleChange('work_setup', value)}
-            />
+            /> */}
             </div>
 
             <ProfileField

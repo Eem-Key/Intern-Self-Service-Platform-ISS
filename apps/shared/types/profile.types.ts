@@ -39,9 +39,9 @@ export type Profile = {
 }
 
 export type ProfileUpdateRequest = {
-  id: string; 
-  intern_id: string;
-  submitted_at: string;
+  id?: string; 
+  intern_id?: string;
+  submitted_at?: string;
   update_type: ProfileUpdateType;
   requested_data: Record<string, any>; 
   reason?: string | null; 
@@ -56,5 +56,5 @@ export type AdminReviewProfileUpdateRequest = Pick<
   ProfileUpdateRequest, 
   'status' | 'admin_id' | 'reviewed_at' | 'admin_feedback'
 > & {
-  requestId: string;
+  id: string;
 };

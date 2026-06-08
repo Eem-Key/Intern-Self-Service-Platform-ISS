@@ -171,7 +171,7 @@ export async function adminReviewProfileUpdateAPI(
             reviewed_at: new Date().toISOString(),
             admin_feedback: review.admin_feedback || null,
         })
-        .eq('id', review.requestId)
+        .eq('id', review.id)
         .select()
         .single();
 
