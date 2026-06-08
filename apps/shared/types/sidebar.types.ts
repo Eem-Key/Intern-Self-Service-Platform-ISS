@@ -1,4 +1,4 @@
-export type UserRole = 'intern' | 'admin' | string;
+import type { UserRole } from './enums.types';
 
 export type SidebarProfile = {
     id: string;

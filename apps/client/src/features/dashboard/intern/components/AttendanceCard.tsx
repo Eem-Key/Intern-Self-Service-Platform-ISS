@@ -8,7 +8,7 @@ import {
   timeOutAPI,
 } from '../../../../api/attendance.api';
 import { useAttendanceTimer } from './attendance/useAttendanceTimer';
-import type { WorkSetup } from '../../../../../../shared/types/attendance.types';
+import type { WorkSetupType } from '../../../../../../shared/types/enums.types';
 
 function formatToday() {
   return new Date().toLocaleDateString('en-US', {
@@ -20,7 +20,7 @@ function formatToday() {
 }
 
 function AttendanceCard() {
-  const [selectedWorkSetup, setSelectedWorkSetup] = useState<WorkSetup | ''>('');
+  const [selectedWorkSetup, setSelectedWorkSetup] = useState<WorkSetupType | ''>('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [statusMessage, setStatusMessage] = useState<{
     variant: 'success' | 'error';
@@ -56,7 +56,7 @@ function AttendanceCard() {
   );
 
   const timeInMutation = useMutation({
-    mutationFn: (setup: WorkSetup) => timeInAPI(setup), 
+    mutationFn: (setup: WorkSetupType) => timeInAPI(setup), 
     
     onSuccess: async () => {
       setStatusMessage({
@@ -105,7 +105,7 @@ function AttendanceCard() {
     },
   });
 
-  const handleSelectWorkSetup = (workSetup: WorkSetup) => {
+  const handleSelectWorkSetup = (workSetup: WorkSetupType) => {
     if (hasAttendanceForToday) {
       showWorkSetupLockedError();
       return;

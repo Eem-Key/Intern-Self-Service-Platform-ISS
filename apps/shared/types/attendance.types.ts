@@ -1,4 +1,4 @@
-export type WorkSetup = 'wfh' | 'onsite';
+import type { WorkSetupType } from './enums.types';
 
 export type AttendanceRecord = {
     id: string;
@@ -7,7 +7,7 @@ export type AttendanceRecord = {
     clock_out: string | null;
     work_date: string;
     hours_logged: number | null;
-    work_setup: WorkSetup;
+    work_setup: WorkSetupType;
 };
 
 export type TimeInResponse = {
