@@ -1,7 +1,7 @@
 import { supabase } from '../config/supabase';
 import { getAuthUserId } from '../utils/auth';
-import type { ReportStatus } from '../../../shared/types/enums.types';
 import type {
+    EODReportStatus,
     EODReport,
     EODReportPayload,
     EODReportResponse,
@@ -44,9 +44,9 @@ export async function fetchEODReportByDateAPI(date: string) {
     return reportData;
 }
 
-export async function insertEODReportAPI(
+export async function insertEODDraftAPI(
     payload: EODReportPayload,
-    reportStatus: ReportStatus
+    reportStatus: EODReportStatus
 ): Promise<EODReportResponse> {
     const intern_id = await getAuthUserId();
     if (!intern_id) {
@@ -82,7 +82,7 @@ export async function insertEODReportAPI(
 export async function updateEODReportAPI(
     reportId: string,
     payload: EODReportPayload,
-    reportStatus: ReportStatus
+    reportStatus: EODReportStatus
 ): Promise<EODReportResponse> {
     const intern_id = await getAuthUserId();
     if (!intern_id) {

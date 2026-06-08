@@ -3,7 +3,7 @@ import { Clock } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import StatusMessage from '../../../../components/feedback/StatusMessage';
 import {
-  insertEODReportAPI,
+  insertEODDraftAPI,
   updateEODReportAPI,
   useEODAttendance,
   useEODReport,
@@ -110,7 +110,7 @@ function EODReportCard() {
     mutationFn: (payload: EODReportPayload) => 
       reportId 
         ? updateEODReportAPI(reportId, payload, 'draft') 
-        : insertEODReportAPI(payload, 'draft'),
+        : insertEODDraftAPI(payload, 'draft'),
     onSuccess: () => { 
       showStatusMessage('success', 'Saved', 'Draft saved successfully.'); 
       queryClient.invalidateQueries({ queryKey: ['eod-report', formValues.dateWritten] });
@@ -122,7 +122,7 @@ function EODReportCard() {
     mutationFn: (payload: EODReportPayload) => 
       reportId 
         ? updateEODReportAPI(reportId, payload, 'submitted') 
-        : insertEODReportAPI(payload, 'submitted'),
+        : insertEODDraftAPI(payload, 'submitted'),
     onSuccess: () => { 
       showStatusMessage('success', 'Submitted', 'Report sent successfully.'); 
       queryClient.invalidateQueries({ queryKey: ['eod-report', formValues.dateWritten] });
