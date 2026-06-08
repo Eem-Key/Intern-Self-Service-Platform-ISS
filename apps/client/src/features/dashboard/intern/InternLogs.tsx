@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import InternSidebar from './components/InternSidebar';
+import InternSidebar from '../../InternSidebar';
 import Banner from './components/banner/LogsBanner';
 
 function InternLogs() {

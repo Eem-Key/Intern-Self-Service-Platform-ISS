@@ -1,8 +1,8 @@
 import { Calendar, FileClock, Home, LogOut, User } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { logoutUserAPI } from '../../../../api/auth.api';
-import type { UserProfile } from '../../../../../../shared/types/login.types';
-import profilepic from '../../../../assets/images/default_pic.png';
+import profilepic from "../assets/images/default_pic.png";
+import type { UserProfile } from '../../../shared/types/login.types';
+import { logoutUserAPI } from '../api/auth.api';
 
 const navItems = [
   {
@@ -94,7 +94,7 @@ function InternSidebar() {
       <div className="flex items-center gap-4 lg:flex-col lg:gap-0">
         {userAvatar ? (
           <img
-            src={user?.avatar_url || userAvatar}
+            src={userAvatar}
             alt={`${fullName} profile`}
             className="h-16 w-16 rounded-full object-cover sm:h-20 sm:w-20 lg:h-28 lg:w-28"
           />

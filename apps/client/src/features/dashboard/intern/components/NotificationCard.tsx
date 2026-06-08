@@ -82,9 +82,11 @@ function NotificationCard() {
           <div className="flex items-center gap-3">
             <h2 className="text-xl font-bold xl:text-2xl">Notification</h2>
 
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#FFBF10] text-sm font-bold text-white">
-              {unreadCount}
-            </span>
+            {unreadCount > 0 && (
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#FFBF10] text-sm font-bold text-white">
+                {unreadCount}
+              </span>
+            )}
           </div>
 
           <ChevronsDown size={28} strokeWidth={3} />

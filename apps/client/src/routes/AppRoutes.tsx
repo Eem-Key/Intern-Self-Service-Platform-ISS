@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { supabase } from '../config/supabase';
-import { LoginPage } from '../features/login/Index';
-import InternDashboard from '../features/dashboard/intern/InternDashboard';
 import AdminDashboard from '../features/dashboard/admin/AdminDashboard';
-import InternProfile from '../features/dashboard/intern/InternProfile';
+import InternDashboard from '../features/dashboard/intern/InternDashboard';
 import InternLeave from '../features/dashboard/intern/InternLeaveForm';
 import InternLogs from '../features/dashboard/intern/InternLogs';
+import { LoginPage } from '../features/login/Index';
+import InternProfile from '../features/profile/InternProfile';
 
-import AdminInternList from '../features/dashboard/admin/AdminInternList';
-import AdminApprovals from '../features/dashboard/admin/AdminApprovals';
-import AdminActivityRecords from '../features/dashboard/admin/AdminActivityRecords';
 import type { Session } from '@supabase/supabase-js';
+import AdminActivityRecords from '../features/dashboard/admin/AdminActivityRecords';
+import AdminApprovals from '../features/dashboard/admin/AdminApprovals';
+import AdminInternList from '../features/dashboard/admin/AdminInternList';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);

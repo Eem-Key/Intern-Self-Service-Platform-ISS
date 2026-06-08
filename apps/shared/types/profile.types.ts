@@ -4,6 +4,14 @@ export type ProfileInsert = Omit<Profile, 'id' | 'created_at' | 'updated_at'>;
 
 export type ProfileUpdate = Partial<ProfileInsert>;
 
+export type InternInfo = {
+  university: string;
+  year_level: number;
+  program: string;
+  required_hours: number;
+  start_date: string;
+};
+
 export type Profile = {
     id: string;
     first_name: string;
@@ -26,12 +34,14 @@ export type Profile = {
     created_at: string;
     updated_at: string;
     requires_password_change: boolean;
+
+    intern_info?: InternInfo | null;
 }
 
 export type ProfileUpdateRequest = {
-  id: string; 
-  intern_id: string;
-  submitted_at: string;
+  id?: string; 
+  intern_id?: string;
+  submitted_at?: string;
   update_type: ProfileUpdateType;
   requested_data: Record<string, any>; 
   reason?: string | null; 
@@ -46,5 +56,5 @@ export type AdminReviewProfileUpdateRequest = Pick<
   ProfileUpdateRequest, 
   'status' | 'admin_id' | 'reviewed_at' | 'admin_feedback'
 > & {
-  requestId: string;
+  id: string;
 };
