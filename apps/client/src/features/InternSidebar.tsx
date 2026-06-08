@@ -1,8 +1,8 @@
 import { Calendar, FileClock, Home, LogOut, User } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { logoutUserAPI } from '../../../../api/auth.api';
-import type { UserProfile } from '../../../../../../shared/types/login.types';
-import profilepic from '../../../../assets/images/default_pic.png';
+import profilepic from "../assets/images/default_pic.png";
+import type { UserProfile } from '../../../shared/types/login.types';
+import { logoutUserAPI } from '../api/auth.api';
 
 const navItems = [
   {

@@ -1,12 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import InternSidebar from './components/InternSidebar';
-import Banner from './components/banner/ProfileBanner';
-import { fetchProfileAPI } from '../../../api/profile.api';
+import { fetchProfileAPI } from '../../api/profile.api';
+import InternSidebar from '../InternSidebar';
+import Banner from './banner/ProfileBanner';
 
+import ProfileChangePasswordCard from './components/ChangePassword';
 import ProfileDetailsCard from './components/ProfileDetailsCard';
 import ProfilePictureCard from './components/ProfilePictureCard';
-import ProfileChangePasswordCard from './components/ChangePassword';
 
 function InternProfile() {
 

@@ -1,15 +1,15 @@
 import { Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 
-import PasswordStrength from '../../../../components/ui/passwordStrength';
-import ChangePassButton from '../../../../components/ui/changePassButton';
-import validateChangePassword from '../../../login/validateChangePassword';
-import type { ChangePasswordErrors } from '../../../login/validateChangePassword';
-import type { ChangePasswordFormValues } from '../../../../../../shared/schemas/changePassword.schema';
-import type { Profile } from '../../../../../../shared/types/profile.types';
+import type { ChangePasswordFormValues } from '../../../../../shared/schemas/changePassword.schema';
+import type { Profile } from '../../../../../shared/types/profile.types';
+import ChangePassButton from '../../../components/ui/changePassButton';
+import PasswordStrength from '../../../components/ui/passwordStrength';
+import type { ChangePasswordErrors } from '../../login/validateChangePassword';
+import validateChangePassword from '../../login/validateChangePassword';
 
-import { updatePasswordAPI } from '../../../../api/auth.api';
-import { supabase } from '../../../../config/supabase';
+import { updatePasswordAPI } from '../../../api/auth.api';
+import { supabase } from '../../../config/supabase';
 import PasswordStatusModal from './PasswordStatusModal';
 
 type ProfileChangePasswordCardProps = {

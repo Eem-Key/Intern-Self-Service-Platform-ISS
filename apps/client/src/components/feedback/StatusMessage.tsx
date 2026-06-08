@@ -26,7 +26,7 @@ function StatusMessage({
 
   const messageContent = (
     <div
-      className={`w-full max-w-[580px] overflow-hidden rounded-xl text-white shadow-lg ${className}`}
+      className={`w-full max-w-[650px] overflow-hidden rounded-xl text-white shadow-lg ${className}`}
     >
       <div className={`${headerColor} px-6 py-3`}>
         <h3 className="text-lg font-bold sm:text-xl">{title}</h3>

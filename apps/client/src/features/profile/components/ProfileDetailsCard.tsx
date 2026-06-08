@@ -1,16 +1,16 @@
-import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import StatusMessage from '../../../../components/feedback/StatusMessage';
-import { requestProfileUpdateAPI } from '../../../../api/profile.api';
+import { useState } from 'react';
 import type {
     Profile,
     ProfileUpdateRequest,
-} from '../../../../../../shared/types/profile.types';
+} from '../../../../../shared/types/profile.types';
+import { requestProfileUpdateAPI } from '../../../api/profile.api';
+import StatusMessage from '../../../components/feedback/StatusMessage';
 
 type ExtendedProfile = Profile & {
     year_level?: string | null;
     program?: string | null;
-    educational_institution?: string | null;
+    university?: string | null;
     supervisor?: string | null;
     required_hours?: number | string | null;
     work_setup?: string | null;
@@ -47,7 +47,7 @@ function ProfileDetailsCard({ profile }: ProfileDetailsCardProps) {
 
         year_level: profile.year_level || '',
         program: profile.program || '',
-        educational_institution: profile.educational_institution || '',
+        university: profile.university || '',
 
         position: profile.position || '',
         department: profile.department || '',
@@ -112,7 +112,7 @@ function ProfileDetailsCard({ profile }: ProfileDetailsCardProps) {
 
         year_level: profile.year_level || '',
         program: profile.program || '',
-        educational_institution: profile.educational_institution || '',
+        university: profile.university || '',
 
         position: profile.position || '',
         department: profile.department || '',
@@ -145,7 +145,7 @@ function ProfileDetailsCard({ profile }: ProfileDetailsCardProps) {
 
             year_level: formValues.year_level,
             program: formValues.program,
-            educational_institution: formValues.educational_institution,
+            university: formValues.university,
             },
         reason: 'Intern requested profile information update.',
         status: 'pending',
@@ -153,6 +153,18 @@ function ProfileDetailsCard({ profile }: ProfileDetailsCardProps) {
     };
 
     return (
+        <>
+        
+            {statusMessage && (
+        <StatusMessage
+            variant={statusMessage.variant}
+            title={statusMessage.title}
+            message={statusMessage.message}
+            isFixed
+            onClose={() => setStatusMessage(null)}
+        />
+        )}
+   
         <section className="rounded-xl bg-white px-6 py-5 shadow-md">
         <div className="mb-4 flex items-center justify-between">
             <h2 className="border-l-4 border-[#FFBF10] pl-2 text-2xl font-bold">
@@ -281,10 +293,10 @@ function ProfileDetailsCard({ profile }: ProfileDetailsCardProps) {
 
             <div className="md:col-span-2">
             <ProfileField
-                label="Educational Institution"
-                value={formValues.educational_institution}
+                label="University"
+                value={formValues.university}
                 disabled={!isEditing}
-                onChange={(value) => handleChange('educational_institution', value)}
+                onChange={(value) => handleChange('university', value)}
             />
             </div>
         </div>
@@ -347,6 +359,7 @@ function ProfileDetailsCard({ profile }: ProfileDetailsCardProps) {
             />
         </div>
         </section>
+        </>
     );
 }
 
