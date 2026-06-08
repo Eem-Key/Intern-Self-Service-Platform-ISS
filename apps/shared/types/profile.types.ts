@@ -4,6 +4,14 @@ export type ProfileInsert = Omit<Profile, 'id' | 'created_at' | 'updated_at'>;
 
 export type ProfileUpdate = Partial<ProfileInsert>;
 
+export type InternInfo = {
+  university: string;
+  year_level: number;
+  program: string;
+  required_hours: number;
+  start_date: string;
+};
+
 export type Profile = {
     id: string;
     first_name: string;
@@ -26,6 +34,8 @@ export type Profile = {
     created_at: string;
     updated_at: string;
     requires_password_change: boolean;
+
+    intern_info?: InternInfo | null;
 }
 
 export type ProfileUpdateRequest = {

@@ -36,7 +36,7 @@ function EODReportCard() {
   const [errors, setErrors] = useState<EODReportErrors>({});
   const [statusMessage, setStatusMessage] = useState<any>(null);
   const hasTimedOut = !!attendanceData?.clock_out;
-  const isSubmitted = existingReport?.status === 'submitted';
+  const isSubmitted = existingReport?.status === 'pending';
 
   const openDatePicker = () => {
     if (dateInputRef.current?.showPicker) {
@@ -121,8 +121,8 @@ function EODReportCard() {
   const submitMutation = useMutation({
     mutationFn: (payload: EODReportPayload) => 
       reportId 
-        ? updateEODReportAPI(reportId, payload, 'submitted') 
-        : insertEODReportAPI(payload, 'submitted'),
+        ? updateEODReportAPI(reportId, payload, 'pending') 
+        : insertEODReportAPI(payload, 'pending'),
     onSuccess: () => { 
       showStatusMessage('success', 'Submitted', 'Report sent successfully.'); 
       queryClient.invalidateQueries({ queryKey: ['eod-report', formValues.dateWritten] });

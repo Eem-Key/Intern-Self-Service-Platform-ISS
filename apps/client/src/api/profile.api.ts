@@ -5,7 +5,8 @@ import type {
     ProfileInsert,
     ProfileUpdate,
     ProfileUpdateRequest,
-    AdminReviewProfileUpdateRequest
+    AdminReviewProfileUpdateRequest,
+    InternInfo
 } from '../../../shared/types/profile.types';
 
 export async function fetchProfileAPI(): Promise<Profile> {
@@ -18,7 +19,10 @@ export async function fetchProfileAPI(): Promise<Profile> {
 
     const { data: profileData, error: fetchError } = await supabase
         .from('profiles')
-        .select('*')
+        .select(`
+            *,
+            intern_info:interns(*)
+        `)
         .eq('id', userId)
         .single();
 
@@ -34,7 +38,8 @@ export async function fetchProfileAPI(): Promise<Profile> {
 }
 
 export async function adminInsertProfileAPI(
-    profile: ProfileInsert
+    profile: ProfileInsert,
+    internInfo: InternInfo
 ): Promise<Profile> {
     const adminId = await getAuthUserId();
     if (!adminId) {
@@ -45,22 +50,26 @@ export async function adminInsertProfileAPI(
         throw new Error('You must be an admin to review profile update requests.');
     }
 
-    const { data: insertedProfile, error: insertError } = await supabase
-        .from('profiles')
-        .insert(profile)
-        .select()
+    const { data, error: insertError } = await supabase
+        .rpc('create_intern_profile', {
+            profile_data: profile,
+            intern_data: internInfo
+        })
         .single();
 
     if (insertError) {
         throw new Error(`Error inserting profile: ${insertError.message}`);
     }
 
+    const insertedProfile = data as Profile;
+
     return insertedProfile;
 }
 
 export async function adminUpdateProfileAPI(
     profileId: string,
-    profile: ProfileUpdate
+    profile: ProfileUpdate,
+    internInfo: InternInfo
 ): Promise<Profile> {
     const adminId = await getAuthUserId();
     if (!adminId) {
@@ -71,16 +80,19 @@ export async function adminUpdateProfileAPI(
         throw new Error('You must be an admin to update profiles.');
     }
 
-    const { data: updatedProfile, error: updateError } = await supabase
-        .from('profiles')
-        .update(profile)
-        .eq('id', profileId)
-        .select()
+    const { data, error: updateError } = await supabase
+        .rpc('update_intern_profile', {
+            p_id: profileId,
+            profile_data: profile as unknown as Record<string, any>,
+            intern_data: internInfo as unknown as Record<string, any>
+        })
         .single();
 
     if (updateError) {
         throw new Error(`Error updating profile: ${updateError.message}`);
     }
+
+    const updatedProfile = data as Profile;
 
     return updatedProfile;
 }
