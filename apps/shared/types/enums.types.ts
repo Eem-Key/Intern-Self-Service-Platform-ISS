@@ -17,7 +17,7 @@ export type InternshipStatus = 'active' | 'completed' | 'extended' | 'terminated
 export type AdminAccess = 'project_manager' | 'human_resource';
 
 // EOD Report
-export type ReportStatus = 'draft' | 'submitted' | 'approved' | 'denied';
+export type ReportStatus = 'draft' | 'pending' | 'approved' | 'denied';
 
 // Profile update
 export type ProfileUpdateType = 'avatar_update' | 'profile_information_update';

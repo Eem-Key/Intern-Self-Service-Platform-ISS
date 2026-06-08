@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import FormInput from '../../components/ui/formInput';
-import PrimaryButton from '../../components/ui/primaryButton';
+import FormInput from '../../../components/ui/formInput';
+import PrimaryButton from '../../../components/ui/primaryButton';
 import FirstLoginPrompt from './FirstLogin';
 import ChangePasswordModal from './ChangePassword';
-import { loginUserAPI } from '../../api/auth.api';
-import validateForm from './ValidateForm';
-import type { LoginFormValues, LoginResponse } from '../../../../shared/types/login.types';
+import { loginUserAPI } from '../../../api/auth.api';
+import validateForm from '../../../utils/ValidateForm';
+import type { LoginFormValues, LoginResponse } from '../../../../../shared/types/login.types';
 
 type LoginErrors = Partial<Record<keyof LoginFormValues, string>>;
 

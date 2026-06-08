@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import React from 'react';
 
-import FormInput from '../../components/ui/formInput';
-import PasswordStrength from '../../components/ui/passwordStrength';
+import FormInput from '../../../components/ui/formInput';
+import PasswordStrength from '../../../components/ui/passwordStrength';
 
-import validateChangePassword from './validateChangePassword';
-import type { ChangePasswordErrors,} from './validateChangePassword';
-import type { ChangePasswordFormValues,} from '../../../../shared/schemas/changePassword.schema';
+import validateChangePassword from '../../../utils/validateChangePassword';
+import type { ChangePasswordErrors,} from '../../../utils/validateChangePassword';
+import type { ChangePasswordFormValues,} from '../../../../../shared/schemas/changePassword.schema';
 
-import { updatePasswordAPI } from '../../api/auth.api';
-import { supabase } from '../../config/supabase';
-import ChangePassButton from '../../components/ui/changePassButton';
+import { updatePasswordAPI } from '../../../api/auth.api';
+import { supabase } from '../../../config/supabase';
+import ChangePassButton from '../../../components/ui/changePassButton';
 
 type ChangePasswordModalProps = {
     onSuccess: () => void;

@@ -1,5 +1,5 @@
-import { changePasswordSchema } from '../../../../shared/schemas/changePassword.schema';
-import type { ChangePasswordFormValues } from '../../../../shared/schemas/changePassword.schema';
+import { changePasswordSchema } from '../../../shared/schemas/changePassword.schema';
+import type { ChangePasswordFormValues } from '../../../shared/schemas/changePassword.schema';
 
 export type ChangePasswordErrors = Partial<
     Record<keyof ChangePasswordFormValues, string>

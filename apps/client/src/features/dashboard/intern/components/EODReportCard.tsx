@@ -9,6 +9,7 @@ import {
   useEODReport,
 } from '../../../../api/eodReport.api';
 import type { EODReportPayload } from '../../../../../../shared/types/eodReport.types';
+import { validateEodReport } from '../../../../utils/validateEodReport';
 
 const getTodayDate = () => new Date().toISOString().slice(0, 10);
 const getYesterdayDate = () => {
@@ -36,7 +37,7 @@ function EODReportCard() {
   const [errors, setErrors] = useState<EODReportErrors>({});
   const [statusMessage, setStatusMessage] = useState<any>(null);
   const hasTimedOut = !!attendanceData?.clock_out;
-  const isSubmitted = existingReport?.status === 'submitted';
+  const isSubmitted = existingReport?.status === 'pending';
 
   const openDatePicker = () => {
     if (dateInputRef.current?.showPicker) {
@@ -79,33 +80,6 @@ function EODReportCard() {
     }));
   };
 
-  const validateForm = (mode: 'save' | 'submit') => {
-    const validationErrors: EODReportErrors = {};
-
-    if (!formValues.dateWritten) {
-      validationErrors.dateWritten = 'Date is required.';
-    } else if (
-      formValues.dateWritten !== today &&
-      formValues.dateWritten !== yesterday
-    ) {
-      validationErrors.dateWritten = 'Only today or yesterday can be selected.';
-    }
-
-    if (mode === 'submit' && !formValues.hoursSpent) {
-      validationErrors.hoursSpent = 'Hours spent is required. Please time out first.';
-    }
-
-    if (!formValues.projectName.trim()) {
-      validationErrors.projectName = 'Project name is required.';
-    }
-
-    if (!formValues.taskAccomplished.trim()) {
-      validationErrors.taskAccomplished = 'Task accomplished is required.';
-    }
-
-    return validationErrors;
-  };
-
   const saveMutation = useMutation({
     mutationFn: (payload: EODReportPayload) => 
       reportId 
@@ -121,8 +95,8 @@ function EODReportCard() {
   const submitMutation = useMutation({
     mutationFn: (payload: EODReportPayload) => 
       reportId 
-        ? updateEODReportAPI(reportId, payload, 'submitted') 
-        : insertEODReportAPI(payload, 'submitted'),
+        ? updateEODReportAPI(reportId, payload, 'pending') 
+        : insertEODReportAPI(payload, 'pending'),
     onSuccess: () => { 
       showStatusMessage('success', 'Submitted', 'Report sent successfully.'); 
       queryClient.invalidateQueries({ queryKey: ['eod-report', formValues.dateWritten] });
@@ -143,22 +117,23 @@ function EODReportCard() {
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    if (existingReport?.status === 'submitted') {
+    if (isSubmitted) {
       showStatusMessage('error', 'Cannot Edit', 'This report has already been submitted and cannot be changed.');
       return;
     }
-    const validationErrors = validateForm('save');
+    
+    const validationErrors = validateEodReport(formValues, 'save');
     if (Object.keys(validationErrors).length > 0) return setErrors(validationErrors);
     saveMutation.mutate(formValues);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (existingReport?.status === 'submitted') {
+    if (isSubmitted) {
       showStatusMessage('error', 'Cannot Submit', 'This report has already been submitted.');
       return;
     }
-    const validationErrors = validateForm('submit');
+    const validationErrors = validateEodReport(formValues, 'submit');
     if (Object.keys(validationErrors).length > 0) return setErrors(validationErrors);
     submitMutation.mutate(formValues);
   };
@@ -214,7 +189,7 @@ function EODReportCard() {
             disabled={
               saveMutation.isPending || 
               submitMutation.isPending || 
-              existingReport?.status === 'submitted'
+              isSubmitted
             }
             className="rounded-full bg-[#eeeeee] px-7 py-1.5 text-sm font-bold text-gray-500 disabled:cursor-not-allowed disabled:opacity-70 sm:min-w-[85px]"
           >
@@ -227,7 +202,7 @@ function EODReportCard() {
               !hasTimedOut ||
               saveMutation.isPending ||
               submitMutation.isPending || 
-              existingReport?.status === 'submitted'
+              isSubmitted
             }
             className="rounded-full bg-[#FFBF10] px-7 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:bg-[#eeeeee] disabled:text-gray-500 disabled:opacity-70 sm:min-w-[100px]"
           >

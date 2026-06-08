@@ -1,5 +1,5 @@
-import PrimaryButton from '../../components/ui/primaryButton';
-import SecondaryButton from '../../components/ui/secondaryButton';
+import PrimaryButton from '../../../components/ui/primaryButton';
+import SecondaryButton from '../../../components/ui/secondaryButton';
 
 type FirstLoginPromptProps = {
     internName?: string;

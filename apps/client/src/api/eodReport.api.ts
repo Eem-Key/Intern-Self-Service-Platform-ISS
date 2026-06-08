@@ -14,6 +14,7 @@ export function useEODAttendance(date: string) {
         queryKey: ['attendance-report', date],
         queryFn: () => getAttendanceByDateAPI(date),
         enabled: !!date,
+        retry: false,
     });
 }
 
@@ -115,3 +116,8 @@ export async function updateEODReportAPI(
         data: updatedReportData,
     };
 }
+
+// export async function adminReviewEODReportAPI(
+//     reportId: string,
+//     newStatus: ReportStatus,
+    

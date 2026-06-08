@@ -1,6 +1,6 @@
 import logo from '../../assets/images/logo.png';
 import bg1 from '../../assets/images/bg1.png';
-import LoginForm from './LoginForm';
+import LoginForm from './components/LoginForm';
 import { useEffect } from 'react';
 
 function LoginPage() {
