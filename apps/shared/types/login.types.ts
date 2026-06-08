@@ -1,9 +1,9 @@
+import type { UserRole } from './enums.types';
+
 export type LoginFormValues = {
     email: string;
     password: string;
 };
-
-export type UserRole = 'intern' | 'admin' | string;
 
 export type UserProfile = {
     id: string;

@@ -1,4 +1,4 @@
-export type EODReportStatus = 'draft' | 'approved' | 'submitted' | 'denied';
+import type { ReportStatus } from './enums.types';
 
 export type EODReportPayload = {
     dateWritten: string;
@@ -13,7 +13,7 @@ export type EODReport = {
     project_name: string;
     task_accomplished: string;
     hours_spent: number;
-    status: EODReportStatus;
+    status: ReportStatus;
 };
 
 export type EODReportWithAdminNotes = {
@@ -22,7 +22,7 @@ export type EODReportWithAdminNotes = {
     project_name: string;
     task_accomplished: string;
     hours_spent: string;
-    status: EODReportStatus;
+    status: ReportStatus;
     admin_id: string | null;
     reviewed_at: string | null;
     admin_notes: string | null;
