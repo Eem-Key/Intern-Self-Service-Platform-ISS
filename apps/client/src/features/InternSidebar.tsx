@@ -87,7 +87,7 @@ function InternSidebar() {
     navigate('/login', { replace: true });
   };
 
-  const userAvatar = user?.avatar_url ? user.avatar_url : profilepic;
+  const userAvatar = user?.avatar_url || profilepic;
 
   return (
     <aside className="w-full bg-[#002D6F] px-4 py-5 text-white lg:fixed lg:left-0 lg:top-0 lg:flex lg:h-screen lg:w-[270px] lg:flex-col lg:px-6 lg:py-8">

@@ -1,7 +1,9 @@
 import { useRef, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-
+import { supabase } from '../../../config/supabase';
 import StatusMessage from '../../../components/feedback/StatusMessage';
+import ConfirmationModal from '../../../components/feedback/confirmationModal';
+import profilepic from '../../../assets/images/default_pic.png';
 import { requestProfileUpdateAPI } from '../../../api/profile.api';
 import type {
   Profile,
@@ -13,13 +15,11 @@ type ProfilePictureCardProps = {
 };
 
 function ProfilePictureCard({ profile }: ProfilePictureCardProps) {
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
     const queryClient = useQueryClient();
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-    const [previewUrl, setPreviewUrl] = useState<string | null>(
-        profile.avatar_url || null
-    );
-
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [selectedAvatarUrl, setSelectedAvatarUrl] = useState<string | null>(
         null
     );
@@ -50,7 +50,7 @@ function ProfilePictureCard({ profile }: ProfilePictureCardProps) {
         },
 
     onError: (error: Error) => {
-        setPreviewUrl(profile.avatar_url || null);
+        setPreviewUrl(null);
         setSelectedAvatarUrl(null);
 
         setStatusMessage({
@@ -81,7 +81,7 @@ function ProfilePictureCard({ profile }: ProfilePictureCardProps) {
     };
 
     const handleCancel = () => {
-        setPreviewUrl(profile.avatar_url || null);
+        setPreviewUrl(null);
         setSelectedAvatarUrl(null);
 
         if (fileInputRef.current) {
@@ -89,19 +89,52 @@ function ProfilePictureCard({ profile }: ProfilePictureCardProps) {
         }
     };
 
-    const handleSubmit = () => {
-        if (!selectedAvatarUrl) return;
+    const handleSubmit = async () => {
+    const file = fileInputRef.current?.files?.[0];
 
-        avatarUpdateMutation.mutate({
+    if (!file) return;
+
+    const fileExt = file.name.split('.').pop();
+    const filePath = `${profile.id}/avatar-${Date.now()}.${fileExt}`;
+
+    const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: true,
+        });
+
+    if (uploadError) {
+        setStatusMessage({
+        variant: 'error',
+        title: 'Upload Failed',
+        message: uploadError.message,
+        });
+
+        setTimeout(() => {
+        setStatusMessage(null);
+        }, 5000);
+
+        return;
+    }
+
+    const { data } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+    const avatarUrl = data.publicUrl;
+
+    avatarUpdateMutation.mutate({
         update_type: 'avatar_update',
         requested_data: {
-            avatar_url: selectedAvatarUrl,
+        avatar_url: avatarUrl,
         },
         reason: 'Intern requested profile picture update.',
-        } as unknown as ProfileUpdateRequest);
+    } as unknown as ProfileUpdateRequest);
     };
 
     const hasSelectedNewPhoto = Boolean(selectedAvatarUrl);
+    const displayedAvatar = previewUrl || profile.avatar_url || profilepic;
 
     return (
         <>
@@ -115,17 +148,29 @@ function ProfilePictureCard({ profile }: ProfilePictureCardProps) {
             />
         )}
 
+        <ConfirmationModal
+        isOpen={showConfirmModal}
+        title="Confirm Changes?"
+        message="Are you sure you want to upload this photo? Your new profile picture will be reviewed by the Admin before it is displayed on your portal."
+        confirmText="Yes, Submit"
+        cancelText="Cancel"
+        isLoading={avatarUpdateMutation.isPending}
+        onCancel={() => setShowConfirmModal(false)}
+        onConfirm={() => {
+            setShowConfirmModal(false);
+            handleSubmit();
+        }}
+        />
+
         <section className="rounded-xl bg-white px-6 py-5 text-center shadow-md">
             <h2 className="mb-5 text-2xl font-bold">Profile Picture</h2>
 
             <div className="mx-auto flex h-44 w-44 items-center justify-center overflow-hidden rounded-full border-4 border-[#FFBF10] bg-[#d9d9d9] shadow-md">
-            {previewUrl ? (
                 <img
-                src={previewUrl}
+                src={displayedAvatar}
                 alt="Profile preview"
                 className="h-full w-full object-cover"
                 />
-            ) : null}
             </div>
 
             <input
@@ -159,7 +204,7 @@ function ProfilePictureCard({ profile }: ProfilePictureCardProps) {
 
                 <button
                 type="button"
-                onClick={handleSubmit}
+                onClick={() => setShowConfirmModal(true)}
                 disabled={avatarUpdateMutation.isPending}
                 className="min-w-[120px] rounded-full bg-[#FFBF10] px-6 py-2 text-sm font-semibold text-black transition hover:bg-[#e8a900] disabled:cursor-not-allowed disabled:opacity-60"
                 >
