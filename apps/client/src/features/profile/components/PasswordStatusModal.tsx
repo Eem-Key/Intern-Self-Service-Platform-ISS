@@ -23,7 +23,7 @@ function PasswordStatusModal({
     const isSuccess = variant === 'success';
 
     return (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/55 px-4 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/55 px-4 backdrop-blur-sm lg:left-[270px]">
         <div className="w-full max-w-[430px] overflow-hidden rounded-xl bg-white shadow-xl">
             <div className="flex items-center gap-3 bg-[#003D8F] px-6 py-4 text-white">
             {isSuccess ? (
