@@ -237,7 +237,7 @@ function AttendanceCard() {
       : 'bg-[#E60000] text-white disabled:bg-[#eeeeee] disabled:text-gray-500';
 
   return (
-    <section className="relative mx-auto h-fit w-full max-w-xl rounded-xl bg-white px-4 py-6 shadow-md sm:px-8">
+    <section className="relative h-fit w-full rounded-xl bg-white px-5 py-5 shadow-md sm:px-7 xl:px-8">
       {statusMessage && (
         <StatusMessage
           variant={statusMessage.variant}
@@ -261,8 +261,8 @@ function AttendanceCard() {
           {formatToday()}
         </p>
 
-        <div className="mt-7 flex flex-col items-center justify-center gap-4 sm:flex-row">
-          <div className="relative w-full max-w-[260px]">
+        <div className="mx-auto mt-7 grid w-full max-w-[520px] grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_160px] xl:max-w-[1440px]">
+          <div className="relative w-full">
             <button
               type="button"
               onClick={handleWorkSetupClick}
@@ -310,7 +310,7 @@ function AttendanceCard() {
             type="button"
             onClick={handleMainAction}
             disabled={isMainButtonDisabled}
-            className={`flex h-12 w-full max-w-[160px] items-center justify-center gap-2 rounded-full px-6 text-sm font-bold transition-all active:scale-95 disabled:pointer-events-none ${mainButtonClass}`}
+            className={`flex h-12 w-full items-center justify-center gap-2 rounded-full px-6 text-sm font-bold transition-all active:scale-95 disabled:pointer-events-none ${mainButtonClass}`}
           >
             {!hasTimedIn ? (
               <span className="text-xs">▶</span>
@@ -322,15 +322,15 @@ function AttendanceCard() {
           </button>
         </div>
 
-        <div className="mx-auto mt-5 flex w-full max-w-[430px] overflow-hidden rounded-md bg-[#eeeeee] text-sm shadow">
-          <div className="flex flex-1 items-center justify-center border-r border-gray-300 px-4 py-3">
+        <div className="mx-auto mt-5 flex w-full max-w-[520px] overflow-hidden rounded-md bg-[#eeeeee] text-sm shadow xl:max-w-[1440px]">
+          <div className="flex flex-1 items-center justify-start border-r border-gray-300 px-4 py-3">
             <span className="font-bold">Time in:</span>
             <span className="ml-1">
               {formatTime(todayAttendance?.clock_in)}
             </span>
           </div>
 
-          <div className="flex flex-1 items-center justify-center px-4 py-3">
+          <div className="flex flex-1 items-center justify-start px-4 py-3">
             <span className="font-bold">Time out:</span>
             <span className="ml-1">
               {formatTime(todayAttendance?.clock_out)}

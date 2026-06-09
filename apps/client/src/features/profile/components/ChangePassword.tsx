@@ -173,7 +173,7 @@ function ProfileChangePasswordCard({ profile }: ProfileChangePasswordCardProps) 
 
     return (
         <>
-        <section className="w-full max-w-xl mx-auto rounded-xl bg-white px-4 py-6 shadow-md sm:px-8 sm:py-7">
+        <section className="flex flex-1 flex-col rounded-xl bg-white px-6 py-5 shadow-md">
             <div className="mb-4">
             <h2 className="border-l-4 border-[#FFBF10] pl-2 text-2xl font-bold">
                 Change Password
@@ -185,7 +185,7 @@ function ProfileChangePasswordCard({ profile }: ProfileChangePasswordCardProps) 
             </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4 overflow-visible">
+            <form onSubmit={handleSubmit} className="flex flex-1 flex-col">
             <div className="space-y-3 overflow-visible">
                 <PasswordField
                 id="currentPassword"

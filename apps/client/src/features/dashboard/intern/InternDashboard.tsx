@@ -1,33 +1,29 @@
-import { useEffect } from 'react';
 import InternSidebar from '../../InternSidebar';
-import AttendanceCard from './components/AttendanceCard';
 import WelcomeBanner from './components/banner/WelcomeBanner';
-import EODReportCard from './components/EODReportCard';
-import NotificationCard from './components/NotificationCard';
+import AttendanceCard from './components/AttendanceCard';
 import ProgramProgressCard from './components/ProgramProgressCard';
+import NotificationCard from './components/NotificationCard';
+import EODReportCard from './components/EODReportCard';
 
 function InternDashboard() {
-
-    useEffect(() => {
-        document.title = 'Dashboard | Intern Self Service';
-        }, []);
-
     return (
         <main className="min-h-screen bg-[#eeeeee] text-black lg:flex">
         <InternSidebar />
 
-        <section className="w-full px-4 py-4 sm:px-5 lg:ml-[270px] lg:px-6 lg:py-5">
+        <section className="w-full px-4 py-4 sm:px-5 lg:ml-[270px] lg:px-6 xl:px-8">
+            <div className="mx-auto flex w-full max-w-[2560px] flex-col gap-5">
             <WelcomeBanner />
 
-            <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-[1fr_0.95fr] xl:items-stretch">
-            <div className="grid gap-5 xl:grid-rows-[1fr_1fr]">
+            <div className="grid w-full grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(360px,0.95fr)] 2xl:grid-cols-[minmax(0,1fr)_minmax(420px,0.85fr)]">
+                <div className="flex min-w-0 flex-col gap-5">
                 <AttendanceCard />
                 <ProgramProgressCard />
-            </div>
+                </div>
 
-            <div className="grid gap-5 xl:grid-rows-[auto_1fr]">
+                <div className="flex min-w-0 flex-col gap-5">
                 <NotificationCard />
                 <EODReportCard />
+                </div>
             </div>
             </div>
         </section>

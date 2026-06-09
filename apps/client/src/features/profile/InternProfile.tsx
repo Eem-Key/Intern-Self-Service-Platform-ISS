@@ -52,7 +52,7 @@ function InternProfile() {
         <InternSidebar />
 
         <section className="w-full px-4 py-4 sm:px-5 lg:ml-[270px] lg:px-6 lg:py-5">
-            <div className="mx-auto max-w-[1120px]">
+            <div className="mx-auto max-w-[2560px]">
             <Banner />
 
             <div className="mt-5 grid grid-cols-1 items-stretch gap-5 xl:grid-cols-[1fr_0.62fr]">
