@@ -152,7 +152,7 @@ function NotificationCard() {
       </section>
 
       {selectedNotification && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/55 px-4 backdrop-blur-sm lg:left-[270px]">
           <div className="w-full max-w-[560px] overflow-hidden rounded-2xl bg-white shadow-2xl">
             <div className="flex items-start justify-between bg-[#002D6F] px-6 py-5 text-white">
               <div>

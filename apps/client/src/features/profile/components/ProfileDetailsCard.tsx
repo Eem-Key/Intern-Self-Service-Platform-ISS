@@ -6,6 +6,7 @@ import type {
 } from '../../../../../shared/types/profile.types';
 import { requestProfileUpdateAPI } from '../../../api/profile.api';
 import StatusMessage from '../../../components/feedback/StatusMessage';
+import ConfirmationModal from '../../../components/feedback/confirmationModal';
 
 type ProfileDetailsCardProps = {
     profile: Profile;
@@ -14,6 +15,7 @@ type ProfileDetailsCardProps = {
 function ProfileDetailsCard(
     { profile }: ProfileDetailsCardProps
 ) {
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
     const queryClient = useQueryClient();
     const [statusMessage, setStatusMessage] = useState<{
     variant: 'success' | 'error';
@@ -155,7 +157,21 @@ function ProfileDetailsCard(
             onClose={() => setStatusMessage(null)}
         />
         )}
-   
+
+        <ConfirmationModal
+        isOpen={showConfirmModal}
+        title="Confirm Changes?"
+        message="Are you sure you want to save these changes? Please note that your updated personal information will be subject to Admin review and approval before it is permanently saved to your profile."
+        confirmText="Yes, Submit"
+        cancelText="Cancel"
+        isLoading={updateRequestMutation.isPending}
+        onCancel={() => setShowConfirmModal(false)}
+        onConfirm={() => {
+            setShowConfirmModal(false);
+            handleSubmitRequest();
+        }}
+        />
+
         <section className="rounded-xl bg-white px-6 py-5 shadow-md">
         <div className="mb-4 flex items-center justify-between">
             <h2 className="border-l-4 border-[#FFBF10] pl-2 text-2xl font-bold">
@@ -182,7 +198,7 @@ function ProfileDetailsCard(
 
                 <button
                 type="button"
-                onClick={handleSubmitRequest}
+                onClick={() => setShowConfirmModal(true)}
                 disabled={updateRequestMutation.isPending}
                 className="rounded-full bg-[#FFBF10] px-5 py-2 text-sm font-semibold text-black disabled:cursor-not-allowed disabled:opacity-60"
                 >
