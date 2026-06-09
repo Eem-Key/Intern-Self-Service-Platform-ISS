@@ -22,8 +22,8 @@ export type ReportStatus = 'draft' | 'pending' | 'approved' | 'denied';
 // Profile update
 export type ProfileUpdateType = 'avatar_update' | 'information_update' | 'password_update';
 
-// Leave Request
-export type LeaveReason = 'sick_medical' | 'personal' | 'academic';
+// Leave Request (remove personal)
+export type LeaveReason = 'sick_medical' | 'school_academic';
 
 // Attendance Logs
 export type WorkSetupType = 'onsite' | 'wfh';
