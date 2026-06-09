@@ -335,6 +335,15 @@ function ProfileDetailsCard(
             /> */}
 
             <div className="grid grid-cols-2 gap-3">
+
+            <ProfileField
+                label="Start Date"
+                type="date"
+                value={formValues.start_date}
+                disabled
+                onChange={(value) => handleChange('start_date', value)}
+            />
+            
             <ProfileField
                 label="Required Hours"
                 value={formValues.required_hours}
@@ -355,14 +364,6 @@ function ProfileDetailsCard(
             value={formValues.office}
             disabled
             onChange={(value) => handleChange('office', value)}
-            />
-
-            <ProfileField
-            label="Start Date"
-            type="date"
-            value={formValues.start_date}
-            disabled
-            onChange={(value) => handleChange('start_date', value)}
             />
         </div>
         </section>
