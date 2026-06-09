@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import InternSidebar from '../../InternSidebar';
-import Banner from './components/banner/LeaveFormBanner';
+import InternSidebar from '../InternSidebar';
+import Banner from './banner/LeaveFormBanner';
 
 function InternLeave() {
 

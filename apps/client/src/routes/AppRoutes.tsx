@@ -3,7 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { supabase } from '../config/supabase';
 import AdminDashboard from '../features/dashboard/admin/AdminDashboard';
 import InternDashboard from '../features/dashboard/intern/InternDashboard';
-import InternLeave from '../features/dashboard/intern/InternLeaveForm';
+import InternLeave from '../features/file-a-leave/InternLeaveForm';
 import InternLogs from '../features/dashboard/intern/InternLogs';
 import { LoginPage } from '../features/login/Index';
 import InternProfile from '../features/profile/InternProfile';
