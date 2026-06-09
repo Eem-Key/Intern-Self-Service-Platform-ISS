@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useRef, useState} from 'react';
+import { useMutation, useQueryClient, useQuery  } from '@tanstack/react-query';
 import { supabase } from '../../../config/supabase';
 import StatusMessage from '../../../components/feedback/StatusMessage';
 import ConfirmationModal from '../../../components/feedback/confirmationModal';
@@ -30,23 +30,36 @@ function ProfilePictureCard({ profile }: ProfilePictureCardProps) {
         message: string;
     } | null>(null);
 
+    const { data: signedUrlData } = useQuery({
+        queryKey: ['avatar-url', profile.avatar_url],
+        queryFn: async () => {
+            if (!profile.avatar_url) return null;
+            const { data } = await supabase.storage
+                .from('avatars')
+                .createSignedUrl(profile.avatar_url, 3600);
+            return data?.signedUrl;
+        },
+        enabled: !!profile.avatar_url,
+        refetchInterval: 1000 * 60 * 50,
+    });
+
     const avatarUpdateMutation = useMutation({
         mutationFn: requestProfileUpdateAPI,
 
         onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['intern-profile'] });
+            queryClient.invalidateQueries({ queryKey: ['intern-profile'] });
 
-        setSelectedAvatarUrl(null);
+            setSelectedAvatarUrl(null);
 
-        setStatusMessage({
-            variant: 'success',
-            title: 'Request Submitted Successfully!',
-            message: 'Your profile picture update is now waiting for admin approval.',
-        });
+            setStatusMessage({
+                variant: 'success',
+                title: 'Request Submitted Successfully!',
+                message: 'Your profile picture update is now waiting for admin approval.',
+            });
 
-        setTimeout(() => {
-            setStatusMessage(null);
-        }, 5000);
+            setTimeout(() => {
+                setStatusMessage(null);
+            }, 5000);
         },
 
     onError: (error: Error) => {
@@ -90,51 +103,65 @@ function ProfilePictureCard({ profile }: ProfilePictureCardProps) {
     };
 
     const handleSubmit = async () => {
-    const file = fileInputRef.current?.files?.[0];
+        const file = fileInputRef.current?.files?.[0];
 
-    if (!file) return;
+        if (!file) return;
 
-    const fileExt = file.name.split('.').pop();
-    const filePath = `${profile.id}/avatar-${Date.now()}.${fileExt}`;
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    
+        if (!allowedTypes.includes(file.type)) {
+            setStatusMessage({
+                variant: 'error',
+                title: 'Invalid File Type',
+                message: 'Please upload a JPEG, PNG, or WebP image.',
+            });
+            return;
+        }
 
-    const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: true,
-        });
+        const fileExt = file.name.split('.').pop();
+        const filePath = `${profile.id}/avatar-${Date.now()}.${fileExt}`;
 
-    if (uploadError) {
-        setStatusMessage({
-        variant: 'error',
-        title: 'Upload Failed',
-        message: uploadError.message,
-        });
+        const { error: uploadError } = await supabase.storage
+            .from('avatars')
+            .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: true,
+            });
 
-        setTimeout(() => {
-        setStatusMessage(null);
-        }, 5000);
+        if (uploadError) {
+            setStatusMessage({
+            variant: 'error',
+            title: 'Upload Failed',
+            message: uploadError.message,
+            });
 
-        return;
-    }
+            setTimeout(() => {
+            setStatusMessage(null);
+            }, 5000);
 
-    const { data } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath);
+            return;
+        }
 
-    const avatarUrl = data.publicUrl;
+        const { data: auth, error: signedUrlError } = await supabase.storage
+            .from('avatars')
+            .createSignedUrl(filePath, 60);
 
-    avatarUpdateMutation.mutate({
-        update_type: 'avatar_update',
-        requested_data: {
-        avatar_url: avatarUrl,
-        },
-        reason: 'Intern requested profile picture update.',
-    } as unknown as ProfileUpdateRequest);
+        if (signedUrlError || !auth.signedUrl) {
+            setStatusMessage({ variant: 'error', title: 'Error', message: 'Could not generate access link.' });
+            return;
+        }
+
+        avatarUpdateMutation.mutate({
+            update_type: 'avatar_update',
+            requested_data: {
+                avatar_url: filePath,
+            },
+            reason: 'Intern requested profile picture update.',
+        } as unknown as ProfileUpdateRequest);
     };
 
     const hasSelectedNewPhoto = Boolean(selectedAvatarUrl);
-    const displayedAvatar = previewUrl || profile.avatar_url || profilepic;
+    const displayedAvatar = previewUrl || signedUrlData || profilepic;
 
     return (
         <>
@@ -176,7 +203,7 @@ function ProfilePictureCard({ profile }: ProfilePictureCardProps) {
             <input
             ref={fileInputRef}
             type="file"
-            accept="image/*"
+            accept="image/jpeg, image/png, image/webp"
             disabled={avatarUpdateMutation.isPending}
             className="hidden"
             onChange={(event) => handleUploadPreview(event.target.files?.[0])}

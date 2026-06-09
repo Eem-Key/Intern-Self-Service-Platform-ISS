@@ -1,10 +1,10 @@
 import { supabase } from '../config/supabase';
 import { getAuthUserId } from '../utils/auth';
+import type { WorkSetupType } from '../../../shared/types/enums.types';
 import type {
     AttendanceRecord,
     TimeInResponse,
-    TimeOutResponse,
-    WorkSetup,
+    TimeOutResponse
 } from '../../../shared/types/attendance.types';
 
 export async function getActiveAttendanceAPI(): Promise<AttendanceRecord | null> {
@@ -33,13 +33,13 @@ export async function getAttendanceByDateAPI(date: string): Promise<AttendanceRe
         .gte('clock_in', `${date} 00:00:00`)
         .lte('clock_in', `${date} 23:59:59`)
         .single();
-
+    
     if (error) throw error;
     return data;
 }
 
 export async function timeInAPI(
-    setup: WorkSetup
+    setup: WorkSetupType
 ): Promise<TimeInResponse> {
     const intern_id = await getAuthUserId();
     

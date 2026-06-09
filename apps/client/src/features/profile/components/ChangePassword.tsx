@@ -5,8 +5,8 @@ import type { ChangePasswordFormValues } from '../../../../../shared/schemas/cha
 import type { Profile } from '../../../../../shared/types/profile.types';
 import ChangePassButton from '../../../components/ui/changePassButton';
 import PasswordStrength from '../../../components/ui/passwordStrength';
-import type { ChangePasswordErrors } from '../../login/validateChangePassword';
-import validateChangePassword from '../../login/validateChangePassword';
+import type { ChangePasswordErrors } from '../../../utils/validateChangePassword';
+import validateChangePassword from '../../../utils/validateChangePassword';
 
 import { updatePasswordAPI } from '../../../api/auth.api';
 import { supabase } from '../../../config/supabase';
