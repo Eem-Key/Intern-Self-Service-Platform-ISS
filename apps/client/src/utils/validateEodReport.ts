@@ -11,7 +11,7 @@ export const validateEodReport = (
     hoursSpent: mode === 'submit' 
       ? z.coerce
           .number({ message: 'Hours spent must be a number.' })
-          .min(0, { message: 'Hours spent is required. Please time out first.' }) 
+          .min(0.1, { message: 'Hours spent is required. Please time out first.' }) 
       : z.any().optional(),
   });
 
