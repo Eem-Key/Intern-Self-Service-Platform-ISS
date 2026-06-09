@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Building2, ChevronDown, Square } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
 import StatusMessage from '../../../../components/feedback/StatusMessage';
 import {
-  getActiveAttendanceAPI,
+  getAttendanceByDateAPI,
   timeInAPI,
   timeOutAPI,
 } from '../../../../api/attendance.api';
@@ -19,6 +20,19 @@ function formatToday() {
   });
 }
 
+function getTodayDateKey() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function formatTime(time?: string | null) {
+  if (!time) return '--:--';
+
+  return new Date(time).toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
 function AttendanceCard() {
   const [selectedWorkSetup, setSelectedWorkSetup] = useState<WorkSetupType | ''>('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -28,7 +42,42 @@ function AttendanceCard() {
     message: string;
   } | null>(null);
 
-    useEffect(() => {
+  const queryClient = useQueryClient();
+  const todayDateKey = getTodayDateKey();
+
+  const {
+    data: todayAttendance,
+    refetch,
+    isLoading,
+  } = useQuery({
+    queryKey: ['attendance-by-date', todayDateKey],
+    queryFn: async () => {
+      try {
+        return await getAttendanceByDateAPI(todayDateKey);
+      } catch (error: any) {
+        if (
+          error?.code === 'PGRST116' ||
+          error?.message?.includes('JSON object requested')
+        ) {
+          return null;
+        }
+
+        throw error;
+      }
+    },
+  });
+
+  const hasTimedIn = Boolean(todayAttendance?.clock_in);
+  const hasTimedOut = Boolean(todayAttendance?.clock_out);
+  const hasAttendanceForToday = Boolean(todayAttendance);
+  const currentWorkSetup = todayAttendance?.work_setup || selectedWorkSetup;
+
+  const elapsedTime = useAttendanceTimer(
+    todayAttendance?.clock_in ?? null,
+    todayAttendance?.clock_out ?? null
+  );
+
+  useEffect(() => {
     if (!statusMessage) return;
 
     const timer = window.setTimeout(() => {
@@ -38,63 +87,61 @@ function AttendanceCard() {
     return () => window.clearTimeout(timer);
   }, [statusMessage]);
 
-  const queryClient = useQueryClient();
-  
-  const { data: activeAttendance, refetch, isLoading } = useQuery({
-    queryKey: ['active-attendance'],
-    queryFn: getActiveAttendanceAPI,
-  });
-
-  const hasAttendanceForToday = Boolean(activeAttendance); 
-  const hasTimedIn = Boolean(activeAttendance); 
-  const hasTimedOut = false;
-  const currentWorkSetup = activeAttendance?.work_setup || selectedWorkSetup;
-
-  const elapsedTime = useAttendanceTimer(
-    activeAttendance?.clock_in ?? null,
-    activeAttendance?.clock_out ?? null
-  );
-
   const timeInMutation = useMutation({
-    mutationFn: (setup: WorkSetupType) => timeInAPI(setup), 
-    
+    mutationFn: (setup: WorkSetupType) => timeInAPI(setup),
+
     onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ['attendance-by-date', todayDateKey],
+      });
+
       setStatusMessage({
         variant: 'success',
         title: 'Time In Successful!',
         message: 'Your attendance has been recorded for today.',
       });
+
       await refetch();
     },
-    
-    onError: (error: any) => {
+
+    onError: (error: Error) => {
       setStatusMessage({
         variant: 'error',
         title: 'Time In Error',
-        message: error.message || 'We could not record your time in. Please try again.',
+        message:
+          error.message || 'We could not record your time in. Please try again.',
       });
     },
   });
 
   const timeOutMutation = useMutation({
     mutationFn: () => {
-      if (!activeAttendance?.id) throw new Error("No active session found.");
-      return timeOutAPI(activeAttendance.id);
+      if (!todayAttendance?.id) {
+        throw new Error('No attendance record found.');
+      }
+
+      return timeOutAPI(todayAttendance.id);
     },
+
     onSuccess: async () => {
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['active-attendance'] }),
+        queryClient.invalidateQueries({
+          queryKey: ['attendance-by-date', todayDateKey],
+        }),
         queryClient.invalidateQueries({ queryKey: ['program-progress'] }),
-        queryClient.invalidateQueries({ queryKey: ['attendance-report'] })
+        queryClient.invalidateQueries({ queryKey: ['attendance-report'] }),
       ]);
+
       setStatusMessage({
         variant: 'success',
         title: 'Time Out Successful!',
         message: 'Your total rendered hours have been recorded.',
       });
+
       await refetch();
     },
-    onError: (error) => {
+
+    onError: (error: Error) => {
       setStatusMessage({
         variant: 'error',
         title: 'Time Out Error',
@@ -105,6 +152,17 @@ function AttendanceCard() {
     },
   });
 
+  const showWorkSetupLockedError = () => {
+    setStatusMessage({
+      variant: 'error',
+      title: 'Work Setup Cannot Be Changed',
+      message:
+        'Please contact your immediate supervisor to change it or note it in your EOD report.',
+    });
+
+    setIsDropdownOpen(false);
+  };
+
   const handleSelectWorkSetup = (workSetup: WorkSetupType) => {
     if (hasAttendanceForToday) {
       showWorkSetupLockedError();
@@ -114,17 +172,6 @@ function AttendanceCard() {
     setSelectedWorkSetup(workSetup);
     setIsDropdownOpen(false);
   };
-
-  const showWorkSetupLockedError = () => {
-  setStatusMessage({
-    variant: 'error',
-    title: 'Work Setup Cannot Be Changed',
-    message:
-      'Please contact your immediate supervisor to change it or note it in your EOD report.',
-  });
-
-  setIsDropdownOpen(false);
-};
 
   const handleWorkSetupClick = () => {
     if (hasAttendanceForToday) {
@@ -152,8 +199,45 @@ function AttendanceCard() {
     timeOutMutation.mutate();
   };
 
+  const handleMainAction = () => {
+    if (!hasTimedIn) {
+      handleTimeIn();
+      return;
+    }
+
+    if (hasTimedIn && !hasTimedOut) {
+      handleTimeOut();
+    }
+  };
+
+  const isTimeInDisabled =
+    !selectedWorkSetup || timeInMutation.isPending || isLoading;
+
+  const isTimeOutDisabled =
+    !hasTimedIn || hasTimedOut || timeOutMutation.isPending || isLoading;
+
+  const isMainButtonDisabled = !hasTimedIn
+    ? isTimeInDisabled
+    : isTimeOutDisabled;
+
+  const mainButtonLabel = !hasTimedIn
+    ? timeInMutation.isPending
+      ? 'TIMING IN...'
+      : 'TIME IN'
+    : timeOutMutation.isPending
+      ? 'TIMING OUT...'
+      : hasTimedOut
+        ? 'COMPLETED'
+        : 'TIME OUT';
+
+  const mainButtonClass = !hasTimedIn
+    ? 'bg-[#0058DD] text-white disabled:bg-[#eeeeee] disabled:text-gray-500'
+    : hasTimedOut
+      ? 'bg-[#eeeeee] text-gray-500'
+      : 'bg-[#E60000] text-white disabled:bg-[#eeeeee] disabled:text-gray-500';
+
   return (
-    <section className="relative h-full rounded-xl bg-white px-6 py-4 shadow-md sm:px-9">
+    <section className="relative mx-auto h-fit w-full max-w-xl rounded-xl bg-white px-4 py-6 shadow-md sm:px-8">
       {statusMessage && (
         <StatusMessage
           variant={statusMessage.variant}
@@ -164,77 +248,94 @@ function AttendanceCard() {
         />
       )}
 
-      <h2 className="border-b-4 border-[#FFBF10] pb-1 text-xl font-bold xl:text-2xl">
+      <h2 className="border-b-4 border-[#FFBF10] pb-1 text-lg font-bold sm:text-xl xl:text-2xl">
         Online Attendance
       </h2>
 
-      <div className="mt-7 text-center">
-        <p className="text-5xl font-bold leading-none xl:text-[56px]">
+      <div className="mt-6 text-center">
+        <p className="text-5xl font-bold leading-none tracking-tight sm:text-5xl xl:text-[56px]">
           {isLoading ? '00:00:00' : elapsedTime}
         </p>
 
-        <p className="mt-2 text-base xl:text-lg">{formatToday()}</p>
+        <p className="mt-2 text-sm text-gray-700 sm:text-base">
+          {formatToday()}
+        </p>
 
-        <div className="relative mx-auto mt-4 w-full max-w-[240px]">
-          <button
+        <div className="mt-7 flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <div className="relative w-full max-w-[260px]">
+            <button
               type="button"
               onClick={handleWorkSetupClick}
               aria-disabled={hasAttendanceForToday}
-              className={`flex w-full items-center justify-between rounded-full px-5 py-2.5 font-bold shadow ${
+              className={`flex h-12 w-full items-center justify-between rounded-full border border-gray-300 px-5 font-bold shadow-sm transition ${
                 hasAttendanceForToday
                   ? 'cursor-not-allowed bg-[#eeeeee] text-gray-500'
-                  : 'bg-[#eeeeee] text-black'
+                  : 'bg-[#eeeeee] text-black hover:bg-gray-200'
               }`}
             >
-            <span className="flex items-center gap-3 text-sm">
-              <Building2 size={20} />
-              {currentWorkSetup || 'WORK SETUP'}
-            </span>
+              <span className="flex min-w-0 items-center gap-3 text-xs sm:text-sm">
+                <Building2 size={18} className="shrink-0" />
+                <span className="truncate">
+                  {currentWorkSetup
+                    ? currentWorkSetup.toUpperCase()
+                    : 'WORK SETUP'}
+                </span>
+              </span>
 
-            <ChevronDown size={20} />
+              <ChevronDown size={18} className="shrink-0" />
+            </button>
+
+            {isDropdownOpen && !hasAttendanceForToday && (
+              <div className="absolute left-0 top-full z-20 mt-1 w-full overflow-hidden rounded-2xl bg-[#eeeeee] shadow-lg">
+                <button
+                  type="button"
+                  onClick={() => handleSelectWorkSetup('wfh')}
+                  className="w-full border-b border-gray-300 px-5 py-3 text-left text-xs font-bold transition hover:bg-gray-200 sm:text-sm"
+                >
+                  WORK FROM HOME (WFH)
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleSelectWorkSetup('onsite')}
+                  className="w-full px-5 py-3 text-left text-xs font-bold transition hover:bg-gray-200 sm:text-sm"
+                >
+                  ONSITE
+                </button>
+              </div>
+            )}
+          </div>
+
+          <button
+            type="button"
+            onClick={handleMainAction}
+            disabled={isMainButtonDisabled}
+            className={`flex h-12 w-full max-w-[160px] items-center justify-center gap-2 rounded-full px-6 text-sm font-bold transition-all active:scale-95 disabled:pointer-events-none ${mainButtonClass}`}
+          >
+            {!hasTimedIn ? (
+              <span className="text-xs">▶</span>
+            ) : (
+              <Square size={9} fill="currentColor" />
+            )}
+
+            {mainButtonLabel}
           </button>
-
-          {isDropdownOpen && !hasAttendanceForToday && (
-            <div className="absolute left-0 top-full z-20 mt-1 w-full overflow-hidden rounded-b-3xl bg-[#eeeeee] shadow-md">
-              <button
-                type="button"
-                onClick={() => handleSelectWorkSetup('wfh')}
-                className="w-full border-b border-gray-300 px-5 py-3 text-sm font-bold hover:bg-gray-200"
-              >
-                WORK FROM HOME (WFH)
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleSelectWorkSetup('onsite')}
-                className="w-full px-5 py-3 text-sm font-bold hover:bg-gray-200"
-              >
-                ONSITE
-              </button>
-            </div>
-          )}
         </div>
 
-        <div className="mt-4 flex flex-col justify-center gap-3 sm:flex-row">
-          <button
-            type="button"
-            disabled={hasTimedIn || timeInMutation.isPending}
-            onClick={handleTimeIn}
-            className="flex min-w-[115px] items-center justify-center gap-2 rounded-full bg-[#0058DD] px-5 py-2 text-sm font-bold text-white disabled:bg-[#eeeeee] disabled:text-gray-500"
-          >
-            <span>▶</span>
-            TIME IN
-          </button>
+        <div className="mx-auto mt-5 flex w-full max-w-[430px] overflow-hidden rounded-md bg-[#eeeeee] text-sm shadow">
+          <div className="flex flex-1 items-center justify-center border-r border-gray-300 px-4 py-3">
+            <span className="font-bold">Time in:</span>
+            <span className="ml-1">
+              {formatTime(todayAttendance?.clock_in)}
+            </span>
+          </div>
 
-          <button
-            type="button"
-            disabled={!hasTimedIn || hasTimedOut || timeOutMutation.isPending}
-            onClick={handleTimeOut}
-            className="flex min-w-[115px] items-center justify-center gap-2 rounded-full bg-[#0058DD] px-5 py-2 text-sm font-bold text-white disabled:bg-[#eeeeee] disabled:text-gray-500"
-          >
-            <Square size={9} fill="currentColor" />
-            TIME OUT
-          </button>
+          <div className="flex flex-1 items-center justify-center px-4 py-3">
+            <span className="font-bold">Time out:</span>
+            <span className="ml-1">
+              {formatTime(todayAttendance?.clock_out)}
+            </span>
+          </div>
         </div>
       </div>
     </section>
