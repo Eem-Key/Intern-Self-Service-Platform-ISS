@@ -46,7 +46,7 @@ export type ProfileUpdateRequest = {
   requested_data: Record<string, any>; 
   reason?: string | null; 
   
-  status: ReportStatus | 'pending';
+  status?: ReportStatus | 'pending';
   admin_id?: string | null;
   reviewed_at?: string | null;
   admin_feedback?: string | null;

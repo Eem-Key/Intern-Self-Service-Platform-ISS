@@ -7,6 +7,7 @@ import type {
 import { requestProfileUpdateAPI } from '../../../api/profile.api';
 import StatusMessage from '../../../components/feedback/StatusMessage';
 import ConfirmationModal from '../../../components/feedback/confirmationModal';
+import { validateProfileUpdateRequest } from '../../../utils/validateProfile.ts';
 
 type ProfileDetailsCardProps = {
     profile: Profile;
@@ -124,25 +125,38 @@ function ProfileDetailsCard(
     };
 
     const handleSubmitRequest = () => {
-    updateRequestMutation.mutate({
-        update_type: 'information_update',
-        requested_data: {
-            first_name: formValues.first_name,
-            middle_name: formValues.middle_name,
-            last_name: formValues.last_name,
-            suffix: formValues.suffix,
-            birth_date: formValues.birth_date,
-            gender: formValues.gender,
-            contact_number: formValues.contact_number,
-            address: formValues.address,
+        const payload: ProfileUpdateRequest = {
+            update_type: 'information_update',
+            requested_data: {
+                    first_name: formValues.first_name,
+                    middle_name: formValues.middle_name,
+                    last_name: formValues.last_name,
+                    suffix: formValues.suffix,
+                    birth_date: formValues.birth_date,
+                    gender: formValues.gender,
+                    contact_number: formValues.contact_number,
+                    address: formValues.address,
 
-            year_level: formValues.year_level,
-            program: formValues.program,
-            university: formValues.university,
-            },
-        reason: 'Intern requested profile information update.',
-        status: 'pending',
-        } as ProfileUpdateRequest);
+                    year_level: formValues.year_level,
+                    program: formValues.program,
+                    university: formValues.university,
+                },
+            reason: 'Intern requested profile information update.',
+        };
+
+        const validationErrors = validateProfileUpdateRequest(payload);
+    
+        if (Object.keys(validationErrors).length > 0) {
+            console.error("Validation Errors:", validationErrors);
+            setStatusMessage({ 
+                variant: 'error', 
+                title: 'Validation Error', 
+                message: Object.values(validationErrors)[0] 
+            });
+            return;
+        }
+
+        updateRequestMutation.mutate(payload);
     };
 
     return (
