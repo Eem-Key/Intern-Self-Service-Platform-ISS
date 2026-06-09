@@ -31,6 +31,7 @@ function ProfileChangePasswordCard({ profile }: ProfileChangePasswordCardProps) 
         confirmNewPassword: '',
     });
 
+    const [isNewPasswordFocused, setIsNewPasswordFocused] = useState(false);
     const [errors, setErrors] = useState<ChangePasswordErrors>({});
     const [isLoading, setIsLoading] = useState(false);
     const [modalState, setModalState] = useState<ModalState>(null);
@@ -172,7 +173,7 @@ function ProfileChangePasswordCard({ profile }: ProfileChangePasswordCardProps) 
 
     return (
         <>
-        <section className="flex flex-1 flex-col rounded-xl bg-white px-6 py-5 shadow-md">
+        <section className="w-full max-w-xl mx-auto rounded-xl bg-white px-4 py-6 shadow-md sm:px-8 sm:py-7">
             <div className="mb-4">
             <h2 className="border-l-4 border-[#FFBF10] pl-2 text-2xl font-bold">
                 Change Password
@@ -184,7 +185,7 @@ function ProfileChangePasswordCard({ profile }: ProfileChangePasswordCardProps) 
             </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="flex flex-1 flex-col">
+            <form onSubmit={handleSubmit} className="space-y-4 overflow-visible">
             <div className="space-y-3 overflow-visible">
                 <PasswordField
                 id="currentPassword"
@@ -205,9 +206,16 @@ function ProfileChangePasswordCard({ profile }: ProfileChangePasswordCardProps) 
                     showPassword={showPassword.newPassword}
                     onToggle={() => togglePasswordVisibility('newPassword')}
                     onChange={(value) => handleChange('newPassword', value)}
+                    onFocus={() => setIsNewPasswordFocused(true)}
+                    onBlur={() => setIsNewPasswordFocused(false)}
+                    onKeyDown={(event) => {
+                    if (event.key === 'Enter') {
+                        setIsNewPasswordFocused(false);
+                    }
+                    }}
                 />
 
-                {formValues.newPassword && (
+                {formValues.newPassword && isNewPasswordFocused && (
                     <div className="absolute left-0 right-0 top-full z-30 mt-1 rounded-md bg-white shadow-lg">
                     <PasswordStrength password={formValues.newPassword} />
                     </div>
@@ -260,6 +268,9 @@ type PasswordFieldProps = {
     showPassword: boolean;
     onToggle: () => void;
     onChange: (value: string) => void;
+    onFocus?: () => void;
+    onBlur?: () => void;
+    onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
 };
 
 function PasswordField({
@@ -270,6 +281,9 @@ function PasswordField({
     showPassword,
     onToggle,
     onChange,
+    onFocus,
+    onBlur,
+    onKeyDown,
 }: PasswordFieldProps) {
     const canToggle = value.length > 0;
 
@@ -281,11 +295,14 @@ function PasswordField({
 
         <div className="relative">
             <input
-            id={id}
-            type={showPassword ? 'text' : 'password'}
-            value={value}
-            onChange={(event) => onChange(event.target.value)}
-            className="h-9 w-full rounded bg-[#eeeeee] px-3 pr-10 text-sm outline-none"
+                id={id}
+                type={showPassword ? 'text' : 'password'}
+                value={value}
+                onChange={(event) => onChange(event.target.value)}
+                onFocus={onFocus}
+                onBlur={onBlur}
+                onKeyDown={onKeyDown}
+                className="h-9 w-full rounded bg-[#eeeeee] px-3 pr-10 text-sm outline-none"
             />
 
             <button

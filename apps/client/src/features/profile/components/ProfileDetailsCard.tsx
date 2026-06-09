@@ -172,8 +172,8 @@ function ProfileDetailsCard(
         }}
         />
 
-        <section className="rounded-xl bg-white px-6 py-5 shadow-md">
-        <div className="mb-4 flex items-center justify-between">
+        <section className="w-full rounded-xl bg-white px-4 py-5 shadow-md sm:px-6 sm:py-6">
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h2 className="border-l-4 border-[#FFBF10] pl-2 text-2xl font-bold">
             Personal Information
             </h2>
@@ -187,7 +187,7 @@ function ProfileDetailsCard(
                 Edit Info
             </button>
             ) : (
-            <div className="flex gap-2">
+            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:gap-3">
                 <button
                 type="button"
                 onClick={handleCancel}

@@ -139,12 +139,12 @@ function EODReportCard() {
   };
 
   return (
-    <section className="relative h-full rounded-xl bg-white px-8 py-3 shadow-md sm:px-6">
+    <section className="relative h-fit w-full max-w-2xl mx-auto rounded-xl bg-white px-4 py-5 shadow-md sm:px-8 sm:py-6">
       {statusMessage && <StatusMessage {...statusMessage} isFixed onClose={() => setStatusMessage(null)} />}
       
       <h2 className="border-b-4 border-[#FFBF10] pb-1 text-xl font-bold xl:text-2xl">End of Day (EOD) Report</h2>
 
-      <form onSubmit={handleSubmit} className="mt-3 flex h-[calc(100%-44px)] flex-col space-y-2.5">
+      <form onSubmit={handleSubmit} className="mt-5 flex flex-col space-y-4">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label className="text-sm">Date</label>
@@ -182,7 +182,7 @@ function EODReportCard() {
           <textarea disabled={isSubmitted} value={formValues.taskAccomplished} onChange={(e) => handleChange('taskAccomplished', e.target.value)} className="h-[200px] w-full resize-none rounded bg-[#eeeeee] p-3 text-sm outline-none" />
         </div>
 
-        <div className="flex justify-end gap-3">
+        <div className="pt-2 flex flex-col-reverse sm:flex-row justify-end gap-3">
           <button
             type="button"
             onClick={handleSave}
