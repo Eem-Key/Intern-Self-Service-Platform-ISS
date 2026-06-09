@@ -185,7 +185,7 @@ function ProfileChangePasswordCard({ profile }: ProfileChangePasswordCardProps) 
             </div>
 
             <form onSubmit={handleSubmit} className="flex flex-1 flex-col">
-            <div className="space-y-3">
+            <div className="space-y-3 overflow-visible">
                 <PasswordField
                 id="currentPassword"
                 label="Current Password"
@@ -196,7 +196,7 @@ function ProfileChangePasswordCard({ profile }: ProfileChangePasswordCardProps) 
                 onChange={(value) => handleChange('currentPassword', value)}
                 />
 
-                <div>
+                <div className="relative">
                 <PasswordField
                     id="newPassword"
                     label="New Password"
@@ -208,7 +208,7 @@ function ProfileChangePasswordCard({ profile }: ProfileChangePasswordCardProps) 
                 />
 
                 {formValues.newPassword && (
-                    <div className="mt-2">
+                    <div className="absolute left-0 right-0 top-full z-30 mt-1 rounded-md bg-white shadow-lg">
                     <PasswordStrength password={formValues.newPassword} />
                     </div>
                 )}
