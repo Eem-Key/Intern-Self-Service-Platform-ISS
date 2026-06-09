@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../../../config/supabase';
 import StatusMessage from '../../../components/feedback/StatusMessage';
 import ConfirmationModal from '../../../components/feedback/confirmationModal';
+import profilepic from '../../../assets/images/default_pic.png';
 import { requestProfileUpdateAPI } from '../../../api/profile.api';
 import type {
   Profile,
@@ -18,10 +19,7 @@ function ProfilePictureCard({ profile }: ProfilePictureCardProps) {
     const queryClient = useQueryClient();
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-    const [previewUrl, setPreviewUrl] = useState<string | null>(
-        profile.avatar_url || null
-    );
-
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [selectedAvatarUrl, setSelectedAvatarUrl] = useState<string | null>(
         null
     );
@@ -52,7 +50,7 @@ function ProfilePictureCard({ profile }: ProfilePictureCardProps) {
         },
 
     onError: (error: Error) => {
-        setPreviewUrl(profile.avatar_url || null);
+        setPreviewUrl(null);
         setSelectedAvatarUrl(null);
 
         setStatusMessage({
@@ -83,7 +81,7 @@ function ProfilePictureCard({ profile }: ProfilePictureCardProps) {
     };
 
     const handleCancel = () => {
-        setPreviewUrl(profile.avatar_url || null);
+        setPreviewUrl(null);
         setSelectedAvatarUrl(null);
 
         if (fileInputRef.current) {
@@ -136,6 +134,7 @@ function ProfilePictureCard({ profile }: ProfilePictureCardProps) {
     };
 
     const hasSelectedNewPhoto = Boolean(selectedAvatarUrl);
+    const displayedAvatar = previewUrl || profile.avatar_url || profilepic;
 
     return (
         <>
@@ -167,13 +166,11 @@ function ProfilePictureCard({ profile }: ProfilePictureCardProps) {
             <h2 className="mb-5 text-2xl font-bold">Profile Picture</h2>
 
             <div className="mx-auto flex h-44 w-44 items-center justify-center overflow-hidden rounded-full border-4 border-[#FFBF10] bg-[#d9d9d9] shadow-md">
-            {previewUrl ? (
                 <img
-                src={previewUrl}
+                src={displayedAvatar}
                 alt="Profile preview"
                 className="h-full w-full object-cover"
                 />
-            ) : null}
             </div>
 
             <input
