@@ -125,7 +125,7 @@ function ProfileDetailsCard(
 
     const handleSubmitRequest = () => {
     updateRequestMutation.mutate({
-        update_type: 'profile_information_update',
+        update_type: 'information_update',
         requested_data: {
             first_name: formValues.first_name,
             middle_name: formValues.middle_name,

@@ -20,7 +20,7 @@ export type AdminAccess = 'project_manager' | 'human_resource';
 export type ReportStatus = 'draft' | 'pending' | 'approved' | 'denied';
 
 // Profile update
-export type ProfileUpdateType = 'avatar_update' | 'profile_information_update';
+export type ProfileUpdateType = 'avatar_update' | 'information_update' | 'password_update';
 
 // Leave Request
 export type LeaveReason = 'sick_medical' | 'personal' | 'academic';
