@@ -38,18 +38,29 @@ export type Profile = {
     intern_info?: InternInfo | null;
 }
 
+export type ProfileUpdateRequestInsert = Omit<
+  ProfileUpdateRequest, 
+  'id' | 
+  'submitted_at' | 
+  'admin_id' |
+  'reviewed_at' |
+  'admin_feedback'
+>
+
+export type ProfileUpdateRequestForm = Omit<ProfileUpdateRequestInsert, 'intern_id' | 'status'>
+
 export type ProfileUpdateRequest = {
-  id?: string; 
-  intern_id?: string;
-  submitted_at?: string;
+  id: string; 
+  intern_id: string;
+  submitted_at: string;
   update_type: ProfileUpdateType;
   requested_data: Record<string, any>; 
   reason?: string | null; 
   
-  status?: ReportStatus | 'pending';
-  admin_id?: string | null;
-  reviewed_at?: string | null;
-  admin_feedback?: string | null;
+  status: ReportStatus | 'pending';
+  admin_id: string | null;
+  reviewed_at: string | null;
+  admin_feedback: string | null;
 }
 
 export type AdminReviewProfileUpdateRequest = Pick<

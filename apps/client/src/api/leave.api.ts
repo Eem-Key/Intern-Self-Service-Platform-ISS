@@ -53,7 +53,7 @@ export const insertLeaveRequest = async (formData: LeaveForm) => {
     return newLeaveData;
 };
 
-export const checkLeaveRequest = async (
+export const checkLeaveRequestDates = async (
     startDate: string, 
     endDate: string
 ): Promise<boolean> => {

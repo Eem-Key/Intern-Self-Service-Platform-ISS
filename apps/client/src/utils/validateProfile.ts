@@ -1,7 +1,7 @@
 import { profileUpdateRequestSchema } from '../../../shared/schemas/profile.schema';
-import type { ProfileUpdateRequest } from '../../../shared/types/profile.types';
+import type { ProfileUpdateRequestForm } from '../../../shared/types/profile.types';
 
-export const validateProfileUpdateRequest = (data: ProfileUpdateRequest) => {
+export const validateProfileUpdateRequest = (data: ProfileUpdateRequestForm) => {
     const result = profileUpdateRequestSchema.safeParse(data);
     
     if (result.success) {

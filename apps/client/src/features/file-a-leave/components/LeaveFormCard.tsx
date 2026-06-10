@@ -9,7 +9,7 @@ import type {
 import type { LeaveReason } from '../../../../../shared/types/enums.types';
 import { 
     insertLeaveRequest,
-    checkLeaveRequest
+    checkLeaveRequestDates
  } from '../../../api/leave.api';
 import { useMutation } from '@tanstack/react-query';
 import { validateLeaveForm } from '../../../utils/validateLeave.ts';
@@ -125,7 +125,7 @@ function LeaveFormCard() {
             return;
         }
         try {
-            const hasOverlap = await checkLeaveRequest(formValues.start_date, formValues.end_date);
+            const hasOverlap = await checkLeaveRequestDates(formValues.start_date, formValues.end_date);
             
             if (hasOverlap) {
                 setErrors({ 

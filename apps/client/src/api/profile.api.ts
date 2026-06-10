@@ -5,6 +5,8 @@ import type {
     ProfileInsert,
     ProfileUpdate,
     ProfileUpdateRequest,
+    ProfileUpdateRequestForm,
+    ProfileUpdateRequestInsert,
     AdminReviewProfileUpdateRequest,
     InternInfo
 } from '../../../shared/types/profile.types';
@@ -125,22 +127,24 @@ export async function fetchProfileUpdateRequestAPI(
 }
 
 export async function requestProfileUpdateAPI(
-    updateRequest: ProfileUpdateRequest
+    updateRequest: ProfileUpdateRequestForm
 ): Promise<ProfileUpdateRequest> {
     const userId = await getAuthUserId();
     if (!userId) {
         throw new Error('You must be logged in to request a profile update.');
     }
 
+    const requestProfileUpdateInsert: ProfileUpdateRequestInsert = {
+        intern_id: userId,
+        update_type: updateRequest.update_type,
+        requested_data: updateRequest.requested_data,
+        reason: updateRequest.reason || null,
+        status: 'pending',
+    }
+
     const { data: insertedUpdateRequest, error: insertError } = await supabase
         .from('profile_update_requests')
-        .insert({
-            intern_id: userId,
-            update_type: updateRequest.update_type,
-            requested_data: updateRequest.requested_data,
-            reason: updateRequest.reason || null,
-            status: 'pending',
-        })
+        .insert([requestProfileUpdateInsert])
         .select()
         .single();
 
