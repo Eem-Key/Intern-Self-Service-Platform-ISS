@@ -237,7 +237,7 @@ function AttendanceCard() {
       : 'bg-[#E60000] text-white disabled:bg-[#eeeeee] disabled:text-gray-500';
 
   return (
-    <section className="relative h-fit w-full rounded-xl bg-white px-5 py-5 shadow-md sm:px-7 xl:px-8">
+    <section className="rounded-xl bg-white px-4 py-4 shadow-md sm:px-6 sm:py-5 xl:px-8 xl:py-6">
       {statusMessage && (
         <StatusMessage
           variant={statusMessage.variant}

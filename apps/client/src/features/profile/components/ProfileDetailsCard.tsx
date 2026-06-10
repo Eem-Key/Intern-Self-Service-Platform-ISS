@@ -172,7 +172,7 @@ function ProfileDetailsCard(
         }}
         />
 
-        <section className="w-full rounded-xl bg-white px-4 py-5 shadow-md sm:px-6 sm:py-6">
+        <section className="rounded-xl bg-white px-4 py-4 shadow-md sm:px-6 sm:py-5 xl:px-8 xl:py-6">
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h2 className="border-l-4 border-[#FFBF10] pl-2 text-2xl font-bold">
             Personal Information

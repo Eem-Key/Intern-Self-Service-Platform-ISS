@@ -189,7 +189,7 @@ function ProfilePictureCard({ profile }: ProfilePictureCardProps) {
         }}
         />
 
-        <section className="rounded-xl bg-white px-6 py-5 text-center shadow-md">
+        <section className="rounded-xl bg-white px-4 py-4 shadow-md sm:px-6 sm:py-5 xl:px-8 xl:py-6 text-center">
             <h2 className="mb-5 text-2xl font-bold">Profile Picture</h2>
 
             <div className="mx-auto flex h-44 w-44 items-center justify-center overflow-hidden rounded-full border-4 border-[#FFBF10] bg-[#d9d9d9] shadow-md">

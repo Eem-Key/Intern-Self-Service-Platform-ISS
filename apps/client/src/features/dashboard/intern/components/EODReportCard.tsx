@@ -139,7 +139,7 @@ function EODReportCard() {
   };
 
   return (
-    <section className="relative h-full rounded-xl bg-white px-8 py-3 shadow-md sm:px-6">
+    <section className="rounded-xl bg-white px-4 py-4 shadow-md sm:px-6 sm:py-5 xl:px-8 xl:py-6">
       {statusMessage && <StatusMessage {...statusMessage} isFixed onClose={() => setStatusMessage(null)} />}
       
       <h2 className="border-b-4 border-[#FFBF10] pb-1 text-xl font-bold xl:text-2xl">End of Day (EOD) Report</h2>
@@ -165,7 +165,7 @@ function EODReportCard() {
           <div>
             <label className="text-sm">Hours Spent</label>
             <div className="relative">
-              <input type="number" value={formValues.hoursSpent} disabled className="h-10 w-full rounded bg-[#eeeeee] px-4 text-sm text-gray-600 outline-none" />
+              <input type="text" value={hasTimedOut ? formValues.hoursSpent : '--'} disabled className="h-10 w-full rounded bg-[#eeeeee] px-4 text-sm text-gray-600 outline-none"/>
               <Clock size={17} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500" />
             </div>
             {!hasTimedOut && <p className="mt-1 text-[10px] text-gray-500">Available after time out.</p>}

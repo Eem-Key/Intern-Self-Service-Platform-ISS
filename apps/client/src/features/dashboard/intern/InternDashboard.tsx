@@ -14,17 +14,17 @@ function InternDashboard() {
             <div className="mx-auto flex w-full max-w-[2560px] flex-col gap-5">
             <WelcomeBanner />
 
-            <div className="grid w-full grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(360px,0.95fr)] 2xl:grid-cols-[minmax(0,1fr)_minmax(420px,0.85fr)]">
-                <div className="flex min-w-0 flex-col gap-5">
-                <AttendanceCard />
-                <ProgramProgressCard />
+            <div className="grid w-full grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(360px,0.95fr)]">
+                <div className="grid min-w-0 grid-rows-[auto_auto] gap-5">
+                    <AttendanceCard />
+                    <ProgramProgressCard />
                 </div>
 
-                <div className="flex min-w-0 flex-col gap-5">
-                <NotificationCard />
-                <EODReportCard />
+                <div className="grid min-w-0 grid-rows-[auto_1fr] gap-5">
+                    <NotificationCard />
+                    <EODReportCard />
                 </div>
-            </div>
+                </div>
             </div>
         </section>
         </main>
