@@ -3,23 +3,27 @@ import { useRef, useState } from 'react';
 
 import StatusMessage from '../../../components/feedback/StatusMessage';
 import type {
-    LeaveFormPayload,
-} from '../../../../../shared/types/leaveForm.types';
+    LeaveForm,
+    LeaveFormErrors,
+} from '../../../../../shared/types/leave.types';
 import type { LeaveReason } from '../../../../../shared/types/enums.types';
+import { 
+    insertLeaveRequest,
+    checkLeaveRequest
+ } from '../../../api/leave.api';
+import { useMutation } from '@tanstack/react-query';
+import { validateLeaveForm } from '../../../utils/validateLeave.ts';
 
-
-type LeaveFormErrors = Partial<Record<keyof LeaveFormPayload, string>>;
-
-    const leaveTypeOptions: { label: string; value: LeaveReason }[] = [
-        {
-            label: 'School Activity / Academic Leave',
-            value: 'school_academic',
-        },
-        {
-            label: 'Sick Leave / Medical Leave',
-            value: 'sick_medical',
-        },
-    ];
+const leaveTypeOptions: { label: string; value: LeaveReason }[] = [
+    {
+        label: 'School Activity / Academic Leave',
+        value: 'academic',
+    },
+    {
+        label: 'Sick Leave / Medical Leave',
+        value: 'sick_medical',
+    },
+];
 
 function LeaveFormCard() {
     const startDateRef = useRef<HTMLInputElement | null>(null);
@@ -27,7 +31,7 @@ function LeaveFormCard() {
 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-    const [formValues, setFormValues] = useState<LeaveFormPayload>({
+    const [formValues, setFormValues] = useState<LeaveForm>({
         reason_category: '',
         start_date: '',
         end_date: '',
@@ -58,7 +62,7 @@ function LeaveFormCard() {
         }, 5000);
     };
 
-    const handleChange = (field: keyof LeaveFormPayload, value: string) => {
+    const handleChange = (field: keyof LeaveForm, value: string) => {
         setFormValues((prev) => ({
             ...prev,
             [field]: value,
@@ -79,36 +83,6 @@ function LeaveFormCard() {
         ref.current?.focus();
     };
 
-    const validateForm = () => {
-        const newErrors: LeaveFormErrors = {};
-
-        if (!formValues.reason_category) {
-        newErrors.reason_category = 'Please select a leave type.';
-        }
-
-        if (!formValues.start_date) {
-        newErrors.start_date = 'Start date is required.';
-        }
-
-        if (!formValues.end_date) {
-        newErrors.end_date = 'End date is required.';
-        }
-
-        if (
-        formValues.start_date &&
-        formValues.end_date &&
-        formValues.end_date < formValues.start_date
-        ) {
-        newErrors.end_date = 'End date cannot be earlier than start date.';
-        }
-
-        if (!formValues.description.trim()) {
-        newErrors.description = 'Description is required.';
-        }
-
-        return newErrors;
-    };
-
     const handleCancel = () => {
         setFormValues({
         reason_category: '',
@@ -121,30 +95,50 @@ function LeaveFormCard() {
         setIsDropdownOpen(false);
     };
 
-    const handleSubmitClick = (event: React.FormEvent) => {
+    const submitMutation = useMutation({
+        mutationFn: insertLeaveRequest,
+        onSuccess: () => {
+            showStatusMessage(
+                'success',
+                'Leave Filed!',
+                'Your request is now waiting for supervisor approval.'
+            );
+            handleCancel();
+        },
+        onError: (error: Error) => {
+            showStatusMessage('error', 'Submission Failed', error.message);
+        }
+    });
+
+    const handleSubmitClick = async (event: React.FormEvent) => {
         event.preventDefault();
 
-        const validationErrors = validateForm();
+        const validationErrors = validateLeaveForm(formValues);
 
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);
-
             showStatusMessage(
-            'error',
-            'Submission Failed',
-            'You couldn’t file your leave. Please check your entries and try again.'
+                'error',
+                'Submission Failed',
+                'You couldn’t file your leave. Please check your entries and try again.'
             );
-
             return;
         }
+        try {
+            const hasOverlap = await checkLeaveRequest(formValues.start_date, formValues.end_date);
+            
+            if (hasOverlap) {
+                setErrors({ 
+                    end_date: 'You already have a leave request during this period.' 
+                });
+                showStatusMessage('error', 'Overlap Detected', 'Please choose different dates.');
+                return;
+            }
 
-    showStatusMessage(
-        'success',
-        'Leave Filed!',
-        'Your request is now waiting for supervisor approval.'
-    );
-
-    handleCancel();
+            submitMutation.mutate(formValues);
+        } catch (err) {
+            showStatusMessage('error', 'Error', 'Could not verify your dates.');
+        }
     };
 
 
@@ -271,10 +265,11 @@ function LeaveFormCard() {
                 </button>
 
                 <button
+                disabled={submitMutation.isPending}
                 type="submit"
                 className="h-11 w-full sm:w-auto sm:min-w-[110px] rounded-full bg-[#FFBF10] px-6 text-sm font-semibold text-black hover:bg-[#e8a900] transition-colors"
                 >
-                Submit
+                {submitMutation.isPending ? 'Submitting...' : 'Submit'}
                 </button>
             </div>
             </form>

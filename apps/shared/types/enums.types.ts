@@ -28,7 +28,8 @@ export const PROFILE_UPDATE_TYPE_VALUES = ['avatar_update', 'information_update'
 export type ProfileUpdateType = typeof PROFILE_UPDATE_TYPE_VALUES[number];
 
 // Leave Request (remove personal)
-export type LeaveReason = 'sick_medical' | 'school_academic';
+export const LEAVE_REASON_VALUES = ['sick_medical', 'academic'] as const;
+export type LeaveReason = typeof LEAVE_REASON_VALUES[number];
 
 // Attendance Logs
 export type WorkSetupType = 'onsite' | 'wfh';

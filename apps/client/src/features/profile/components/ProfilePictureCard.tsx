@@ -62,21 +62,21 @@ function ProfilePictureCard({ profile }: ProfilePictureCardProps) {
             }, 5000);
         },
 
-    onError: (error: Error) => {
-        setPreviewUrl(null);
-        setSelectedAvatarUrl(null);
+        onError: (error: Error) => {
+            setPreviewUrl(null);
+            setSelectedAvatarUrl(null);
 
-        setStatusMessage({
-            variant: 'error',
-            title: 'Request Submission Failed',
-            message:
-            error.message ||
-            'We could not process your profile picture update. Please try again.',
-        });
+            setStatusMessage({
+                variant: 'error',
+                title: 'Request Submission Failed',
+                message:
+                error.message ||
+                'We could not process your profile picture update. Please try again.',
+            });
 
-        setTimeout(() => {
-            setStatusMessage(null);
-        }, 5000);
+            setTimeout(() => {
+                setStatusMessage(null);
+            }, 5000);
         },
     });
 
