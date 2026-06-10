@@ -1,5 +1,8 @@
 export type UserRole = 'intern' | 'admin' | string;
-export type UserGender = 'male' | 'female' | 'non-binary' | 'prefer_not_to_say';
+
+export const USER_GENDER_VALUES = ['male', 'female', 'non-binary', 'prefer_not_to_say'] as const;
+export type UserGender = typeof USER_GENDER_VALUES[number];
+
 export type OfficeLocation = 'binondo' | 'makati';
 export type JobPosition = 
   | 'Quality Assurance' 
@@ -17,10 +20,12 @@ export type InternshipStatus = 'active' | 'completed' | 'extended' | 'terminated
 export type AdminAccess = 'project_manager' | 'human_resource';
 
 // EOD Report
-export type ReportStatus = 'draft' | 'pending' | 'approved' | 'denied';
+export const REPORT_STATUS_VALUES = ['draft', 'pending', 'approved', 'denied'] as const;
+export type ReportStatus = typeof REPORT_STATUS_VALUES[number];
 
 // Profile update
-export type ProfileUpdateType = 'avatar_update' | 'information_update' | 'password_update';
+export const PROFILE_UPDATE_TYPE_VALUES = ['avatar_update', 'information_update', 'password_update'] as const;
+export type ProfileUpdateType = typeof PROFILE_UPDATE_TYPE_VALUES[number];
 
 // Leave Request (remove personal)
 export type LeaveReason = 'sick_medical' | 'school_academic';
