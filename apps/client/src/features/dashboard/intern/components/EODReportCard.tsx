@@ -165,10 +165,10 @@ function EODReportCard() {
           <div>
             <label className="text-sm">Hours Spent</label>
             <div className="relative">
-              <input type="text" value={hasTimedOut ? formValues.hoursSpent : '--'} disabled className="h-10 w-full rounded bg-[#eeeeee] px-4 text-sm text-gray-600 outline-none"/>
+              <input type="text" value={hasTimedOut ? formValues.hoursSpent : 'Available after time out.'} disabled className="h-10 w-full rounded bg-[#eeeeee] px-4 text-[8px] text-gray-300 outline-none"/>
               <Clock size={17} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500" />
             </div>
-            {!hasTimedOut && <p className="mt-1 text-[10px] text-gray-500">Available after time out.</p>}
+            
           </div>
         </div>
 
