@@ -8,14 +8,34 @@ import { requestProfileUpdateAPI } from '../../../api/profile.api';
 import StatusMessage from '../../../components/feedback/StatusMessage';
 import ConfirmationModal from '../../../components/feedback/confirmationModal';
 import { validateProfileUpdateRequest } from '../../../utils/validateProfile.ts';
+import {
+    USER_GENDER_VALUES,
+    type UserGender,
+} from '../../../../../shared/types/enums.types';
+import { ChevronDown } from 'lucide-react';
 
 type ProfileDetailsCardProps = {
     profile: Profile;
 };
 
+
 function ProfileDetailsCard(
     { profile }: ProfileDetailsCardProps
 ) {
+    const formatGenderLabel = (gender: UserGender) => {
+    switch (gender) {
+        case 'male':
+        return 'Male';
+        case 'female':
+        return 'Female';
+        case 'non-binary':
+        return 'Non-binary';
+        case 'prefer_not_to_say':
+        return 'Prefer not to say';
+        default:
+        return gender;
+    }
+    };
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const queryClient = useQueryClient();
     const [statusMessage, setStatusMessage] = useState<{
@@ -252,10 +272,15 @@ function ProfileDetailsCard(
             onChange={(value) => handleChange('birth_date', value)}
             />
 
-            <ProfileField
+            <ProfileSelectField
             label="Gender"
             value={formValues.gender}
             disabled={!isEditing}
+            options={USER_GENDER_VALUES.map((gender) => ({
+                label: formatGenderLabel(gender),
+                value: gender,
+            }))}
+            placeholder="Select gender"
             onChange={(value) => handleChange('gender', value)}
             />
 
@@ -414,5 +439,54 @@ function ProfileField({
         </div>
     );
 }
+    function ProfileSelectField({
+        label,
+        value,
+        disabled = false,
+        placeholder = 'Select option',
+        options,
+        onChange,
+        }: ProfileSelectFieldProps) {
+        return (
+            <div>
+            <label className="text-xs font-medium">{label}</label>
+
+            <div className="relative">
+                <select
+                value={value}
+                disabled={disabled}
+                onChange={(event) => onChange(event.target.value)}
+                className="h-9 w-full appearance-none rounded bg-[#eeeeee] px-3 pr-9 text-sm outline-none disabled:cursor-not-allowed disabled:text-gray-600"
+                >
+                <option value="">{placeholder}</option>
+
+                {options.map((option) => (
+                    <option key={option.value} value={option.value}>
+                    {option.label}
+                    </option>
+                ))}
+                </select>
+
+                <ChevronDown
+                size={16}
+                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-600"
+                />
+            </div>
+            </div>
+        );
+        }
+
+    type ProfileSelectFieldProps = {
+    label: string;
+    value: string;
+    disabled?: boolean;
+    placeholder?: string;
+    options: {
+        label: string;
+        value: string;
+    }[];
+    onChange: (value: string) => void;
+    };
+
 
 export default ProfileDetailsCard;

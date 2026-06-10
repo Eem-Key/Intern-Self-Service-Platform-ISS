@@ -5,7 +5,6 @@ import StatusMessage from '../../../components/feedback/StatusMessage';
 import ConfirmationModal from '../../../components/feedback/confirmationModal';
 import profilepic from '../../../assets/images/default_pic.png';
 import { requestProfileUpdateAPI } from '../../../api/profile.api';
-import { validateProfileUpdateRequest } from '../../../utils/validateProfile.ts';
 import type {
   Profile,
   ProfileUpdateRequest,
@@ -152,27 +151,13 @@ function ProfilePictureCard({ profile }: ProfilePictureCardProps) {
             return;
         }
 
-        const payload: ProfileUpdateRequest = {
+        avatarUpdateMutation.mutate({
             update_type: 'avatar_update',
             requested_data: {
                 avatar_url: filePath,
             },
             reason: 'Intern requested profile picture update.',
-        };
-
-        const validationErrors = validateProfileUpdateRequest(payload);
-    
-        if (Object.keys(validationErrors).length > 0) {
-            console.error("Validation Errors:", validationErrors);
-            setStatusMessage({ 
-                variant: 'error', 
-                title: 'Validation Error', 
-                message: Object.values(validationErrors)[0] 
-            });
-            return;
-        }
-
-        avatarUpdateMutation.mutate(payload);
+        } as unknown as ProfileUpdateRequest);
     };
 
     const hasSelectedNewPhoto = Boolean(selectedAvatarUrl);
