@@ -37,7 +37,7 @@ function EODReportCard() {
   const [statusMessage, setStatusMessage] = useState<any>(null);
   const hasTimedOut = !!attendanceData?.clock_out;
   const isSubmitted = existingReport?.status === 'pending';
-  
+
   const openDatePicker = () => {
     if (dateInputRef.current?.showPicker) {
       dateInputRef.current.showPicker();
@@ -48,23 +48,26 @@ function EODReportCard() {
   };
 
   useEffect(() => {
-    if (existingReport) {
+    setReportId(null);
+    setFormValues(prev => ({
+      ...prev,
+      hours_spent: attendanceData?.hours_logged ? attendanceData.hours_logged : 0,
+      project_name: '',
+      task_accomplished: '',
+    }));
+
+    if (existingReport){
       setReportId(existingReport.id);
-      setFormValues({
-        date_written: existingReport.date_written,
-        hours_spent: existingReport.hours_spent,
-        project_name: existingReport.project_name,
-        task_accomplished: existingReport.task_accomplished,
-      });
-    } else {
-      setReportId(null);
       setFormValues(prev => ({
         ...prev,
-        hours_spent: attendanceData?.hours_logged ? attendanceData.hours_logged : 0,
-        project_name: '',
-        task_accomplished: '',
+        hours_spent: hasTimedOut 
+          ? (attendanceData?.hours_logged ? attendanceData.hours_logged : 0) 
+          : existingReport.hours_spent,
+        project_name: existingReport.project_name,
+        task_accomplished: existingReport.task_accomplished,
       }));
     }
+    
   }, [existingReport, attendanceData]);
 
   const handleChange = (field: keyof EODReportForm, value: string) => {
