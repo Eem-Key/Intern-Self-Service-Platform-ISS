@@ -36,6 +36,8 @@ function ProfileDetailsCard(
         return gender;
     }
     };
+
+    const [isGenderDropdownOpen, setIsGenderDropdownOpen] = useState(false);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const queryClient = useQueryClient();
     const [statusMessage, setStatusMessage] = useState<{
@@ -142,6 +144,7 @@ function ProfileDetailsCard(
     const handleCancel = () => {
         resetFormValues();
         setIsEditing(false);
+        setIsGenderDropdownOpen(false);
     };
 
     const handleSubmitRequest = () => {
@@ -272,16 +275,21 @@ function ProfileDetailsCard(
             onChange={(value) => handleChange('birth_date', value)}
             />
 
-            <ProfileSelectField
+            <ProfileDropdownField
             label="Gender"
             value={formValues.gender}
             disabled={!isEditing}
+            isOpen={isGenderDropdownOpen}
             options={USER_GENDER_VALUES.map((gender) => ({
                 label: formatGenderLabel(gender),
                 value: gender,
             }))}
             placeholder="Select gender"
-            onChange={(value) => handleChange('gender', value)}
+            onToggle={() => setIsGenderDropdownOpen((prev) => !prev)}
+            onSelect={(value) => {
+                handleChange('gender', value);
+                setIsGenderDropdownOpen(false);
+            }}
             />
 
             <ProfileField
@@ -439,54 +447,69 @@ function ProfileField({
         </div>
     );
 }
-    function ProfileSelectField({
-        label,
-        value,
-        disabled = false,
-        placeholder = 'Select option',
-        options,
-        onChange,
-        }: ProfileSelectFieldProps) {
-        return (
-            <div>
-            <label className="text-xs font-medium">{label}</label>
 
-            <div className="relative">
-                <select
-                value={value}
-                disabled={disabled}
-                onChange={(event) => onChange(event.target.value)}
-                className="h-9 w-full appearance-none rounded bg-[#eeeeee] px-3 pr-9 text-sm outline-none disabled:cursor-not-allowed disabled:text-gray-600"
-                >
-                <option value="">{placeholder}</option>
-
-                {options.map((option) => (
-                    <option key={option.value} value={option.value}>
-                    {option.label}
-                    </option>
-                ))}
-                </select>
-
-                <ChevronDown
-                size={16}
-                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-600"
-                />
-            </div>
-            </div>
-        );
-        }
-
-    type ProfileSelectFieldProps = {
+type ProfileDropdownFieldProps = {
     label: string;
     value: string;
     disabled?: boolean;
     placeholder?: string;
+    isOpen: boolean;
     options: {
         label: string;
         value: string;
     }[];
-    onChange: (value: string) => void;
-    };
+    onToggle: () => void;
+    onSelect: (value: string) => void;
+};
+
+function ProfileDropdownField({
+    label,
+    value,
+    disabled = false,
+    placeholder = 'Select option',
+    isOpen,
+    options,
+    onToggle,
+    onSelect,
+}: ProfileDropdownFieldProps) {
+    const selectedLabel =
+        options.find((option) => option.value === value)?.label || placeholder;
+
+    return (
+        <div>
+        <label className="text-xs font-medium">{label}</label>
+
+        <div className="relative">
+            <button
+            type="button"
+            disabled={disabled}
+            onClick={onToggle}
+            className={`flex h-9 w-full items-center justify-between rounded bg-[#eeeeee] px-3 text-left text-sm outline-none disabled:cursor-not-allowed disabled:text-gray-600 ${
+                value ? 'text-black' : 'text-gray-400'
+            }`}
+            >
+            <span className="truncate">{selectedLabel}</span>
+            <ChevronDown size={16} className="shrink-0 text-gray-600" />
+            </button>
+
+            {isOpen && !disabled && (
+            <div className="absolute left-0 top-full z-30 mt-1 w-full overflow-hidden rounded bg-white shadow-lg">
+                {options.map((option) => (
+                <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => onSelect(option.value)}
+                    className="w-full px-3 py-2.5 text-left text-sm hover:bg-[#eeeeee]"
+                >
+                    {option.label}
+                </button>
+                ))}
+            </div>
+            )}
+        </div>
+        </div>
+    );
+}
 
 
 export default ProfileDetailsCard;
