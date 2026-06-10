@@ -85,7 +85,7 @@ function ProgramProgressCard() {
               <span>Breakdown of Rendered Hours</span>
             </div>
 
-            <div className="flex h-2 w-full overflow-hidden rounded-full bg-gray-200">
+            {/*<div className="flex h-2 w-full overflow-hidden rounded-full bg-gray-200">
               <div
                 className="h-full bg-[#FFDB4A]"
                 style={{ width: `${wfhRenderedPercentage}%` }}
@@ -95,17 +95,17 @@ function ProgramProgressCard() {
                 className="h-full bg-[#0058DD]"
                 style={{ width: `${onsiteRenderedPercentage}%` }}
               />
-            </div>
+            </div>*/}
           </div>
 
           <div className="mt-3 flex flex-col gap-2 text-xs sm:flex-row sm:flex-wrap sm:gap-x-5 sm:gap-y-2">
             <p className="flex items-center gap-2">
-              <span className="h-3 w-3 rounded-full bg-[#FFDB4A]" />
+              {/*<span className="h-3 w-3 rounded-full bg-[#FFDB4A]" />*/}
               WFH - {isLoading ? '--' : wfhHours} hrs 
             </p>
 
             <p className="flex items-center gap-2">
-              <span className="h-3 w-3 rounded-full bg-[#0058DD]" />
+              {/*<span className="h-3 w-3 rounded-full bg-[#0058DD]" /> */}
               Onsite - {isLoading ? '--' : onsiteHours} hrs 
             </p>
           </div>
