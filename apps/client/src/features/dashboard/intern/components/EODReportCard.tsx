@@ -10,6 +10,7 @@ import {
 } from '../../../../api/eodReport.api';
 import type { EODReportPayload } from '../../../../../../shared/types/eodReport.types';
 import { validateEodReport } from '../../../../utils/validateEodReport';
+import RequiredMark from '../../../../components/ui/RequiredMark';
 
 const getTodayDate = () => new Date().toISOString().slice(0, 10);
 const getYesterdayDate = () => {
@@ -173,12 +174,12 @@ function EODReportCard() {
         </div>
 
         <div>
-          <label className="text-sm">Project Name</label>
+          <label className="text-sm">Project Name</label> <RequiredMark/>
           <input disabled={isSubmitted} type="text" value={formValues.projectName} onChange={(e) => handleChange('projectName', e.target.value)} className="h-10 w-full rounded bg-[#eeeeee] px-4 text-sm outline-none" />
         </div>
 
         <div>
-          <label className="text-sm">Task Accomplished</label>
+          <label className="text-sm">Task Accomplished</label> <RequiredMark/>
           <textarea disabled={isSubmitted} value={formValues.taskAccomplished} onChange={(e) => handleChange('taskAccomplished', e.target.value)} className="h-[200px] w-full resize-none rounded bg-[#eeeeee] p-3 text-sm outline-none" />
         </div>
 
