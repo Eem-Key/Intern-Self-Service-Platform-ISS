@@ -1,8 +1,13 @@
 import InternSidebar from '../../features/InternSidebar';
 import LeaveFormCard from './components/LeaveFormCard';
 import Banner from './banner/LeaveFormBanner';
+import { useEffect } from 'react';
 
 function InternLeave() {
+    useEffect(() => {
+                    document.title = 'File a Leave | Intern Self Service';
+                    }, []);
+
     return (
         <main className="min-h-screen bg-[#eeeeee] text-black lg:flex">
         <InternSidebar />
