@@ -13,6 +13,7 @@ import {
     type UserGender,
 } from '../../../../../shared/types/enums.types';
 import { ChevronDown } from 'lucide-react';
+import RequiredMark from '../../../components/ui/RequiredMark.tsx';
 
 type ProfileDetailsCardProps = {
     profile: Profile;
