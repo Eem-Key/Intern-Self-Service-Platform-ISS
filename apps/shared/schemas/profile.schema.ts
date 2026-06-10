@@ -36,11 +36,23 @@ export const profileUpdateRequestSchema = z.object({
         }
     } else if (data.update_type === 'information_update') {
         const result = z.object({
-            first_name: z.string().optional(),
-            last_name: z.string().optional(),
-            gender: emptyToNull.pipe(z.enum(USER_GENDER_VALUES).nullable().optional()),
-            contact_number: z.string().nullable().optional(),
-            intern_info: internInfoSchema.nullable().optional()
+            first_name: z.string(),
+            middle_name: z.string().optional(),
+            last_name: z.string(),
+            suffix: z.string().optional(),
+            birth_date: z.string(),
+            gender: emptyToNull.pipe(z.enum(USER_GENDER_VALUES)),
+            contact_number: z
+                .string()
+                .transform((val) => val.replace(/[\s\-\(\)\+]/g, ''))
+                .refine((val) => /^\d+$/.test(val), {
+                    message: "Contact number must contain only digits.",
+                })
+                .refine((val) => val.length >= 10 && val.length <= 12, {
+                    message: "Contact number must be between 10 and 13 digits.",
+                }),
+            address: z.string(),
+            intern_info: internInfoSchema
         }).safeParse(data.requested_data);
         
         if (!result.success) {

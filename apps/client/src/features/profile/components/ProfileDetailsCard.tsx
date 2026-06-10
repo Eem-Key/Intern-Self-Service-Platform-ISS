@@ -1,8 +1,9 @@
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import type {
+    InternInfo,
     Profile,
-    ProfileUpdateRequest,
+    ProfileUpdateRequestForm,
 } from '../../../../../shared/types/profile.types';
 import { requestProfileUpdateAPI } from '../../../api/profile.api';
 import StatusMessage from '../../../components/feedback/StatusMessage';
@@ -76,7 +77,7 @@ function ProfileDetailsCard(
     }, [profile]);
 
     const updateRequestMutation = useMutation({
-        mutationFn: (payload: ProfileUpdateRequest) => requestProfileUpdateAPI(payload),
+        mutationFn: (payload: ProfileUpdateRequestForm) => requestProfileUpdateAPI(payload),
         
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['intern-profile'] });
@@ -148,7 +149,14 @@ function ProfileDetailsCard(
     };
 
     const handleSubmitRequest = () => {
-        const payload: ProfileUpdateRequest = {
+        const intern_info: InternInfo = {
+            university: formValues.university,
+            year_level: Number(formValues.year_level),
+            program: formValues.program,
+            required_hours: Number(formValues.required_hours),
+            start_date: formValues.start_date,
+        }
+        const payload: ProfileUpdateRequestForm = {
             update_type: 'information_update',
             requested_data: {
                     first_name: formValues.first_name,
@@ -160,9 +168,7 @@ function ProfileDetailsCard(
                     contact_number: formValues.contact_number,
                     address: formValues.address,
 
-                    year_level: formValues.year_level,
-                    program: formValues.program,
-                    university: formValues.university,
+                    intern_info: intern_info
                 },
             reason: 'Intern requested profile information update.',
         };
