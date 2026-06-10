@@ -4,8 +4,14 @@ import AttendanceCard from './components/AttendanceCard';
 import ProgramProgressCard from './components/ProgramProgressCard';
 import NotificationCard from './components/NotificationCard';
 import EODReportCard from './components/EODReportCard';
+import {useEffect} from 'react';
 
 function InternDashboard() {
+
+    useEffect(() => {
+                    document.title = 'Dashboard | Intern Self Service';
+                    }, []);
+
     return (
         <main className="min-h-screen bg-[#eeeeee] text-black lg:flex">
         <InternSidebar />
