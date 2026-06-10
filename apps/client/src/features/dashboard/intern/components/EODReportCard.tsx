@@ -8,7 +8,7 @@ import {
   useEODAttendance,
   useEODReport,
 } from '../../../../api/eodReport.api';
-import type { EODReportPayload } from '../../../../../../shared/types/eodReport.types';
+import type { EODReportForm, EODReportFormErrors } from '../../../../../../shared/types/eodReport.types';
 import { validateEodReport } from '../../../../utils/validateEodReport';
 import RequiredMark from '../../../../components/ui/RequiredMark';
 
@@ -19,27 +19,25 @@ const getYesterdayDate = () => {
   return d.toISOString().slice(0, 10);
 };
 
-type EODReportErrors = Partial<Record<keyof EODReportPayload, string>>;
-
 function EODReportCard() {
   const queryClient = useQueryClient();
   const today = getTodayDate();
   const yesterday = getYesterdayDate();
   const dateInputRef = useRef<HTMLInputElement | null>(null);
   const [reportId, setReportId] = useState<string | null>(null);
-  const [formValues, setFormValues] = useState<EODReportPayload>({
-    dateWritten: getTodayDate(),
-    hoursSpent: 0,
-    projectName: '',
-    taskAccomplished: '',
+  const [formValues, setFormValues] = useState<EODReportForm>({
+    date_written: getTodayDate(),
+    hours_spent: 0,
+    project_name: '',
+    task_accomplished: '',
   });
-  const { data: attendanceData } = useEODAttendance(formValues.dateWritten);
-  const { data: existingReport } = useEODReport(formValues.dateWritten);
-  const [errors, setErrors] = useState<EODReportErrors>({});
+  const { data: attendanceData } = useEODAttendance(formValues.date_written);
+  const { data: existingReport } = useEODReport(formValues.date_written);
+  const [errors, setErrors] = useState<EODReportFormErrors>({});
   const [statusMessage, setStatusMessage] = useState<any>(null);
   const hasTimedOut = !!attendanceData?.clock_out;
   const isSubmitted = existingReport?.status === 'pending';
-
+  
   const openDatePicker = () => {
     if (dateInputRef.current?.showPicker) {
       dateInputRef.current.showPicker();
@@ -53,23 +51,23 @@ function EODReportCard() {
     if (existingReport) {
       setReportId(existingReport.id);
       setFormValues({
-        dateWritten: existingReport.date_written,
-        hoursSpent: existingReport.hours_spent,
-        projectName: existingReport.project_name,
-        taskAccomplished: existingReport.task_accomplished,
+        date_written: existingReport.date_written,
+        hours_spent: existingReport.hours_spent,
+        project_name: existingReport.project_name,
+        task_accomplished: existingReport.task_accomplished,
       });
     } else {
       setReportId(null);
       setFormValues(prev => ({
         ...prev,
-        hoursSpent: attendanceData?.hours_logged ? attendanceData.hours_logged : 0,
-        projectName: '',
-        taskAccomplished: '',
+        hours_spent: attendanceData?.hours_logged ? attendanceData.hours_logged : 0,
+        project_name: '',
+        task_accomplished: '',
       }));
     }
   }, [existingReport, attendanceData]);
 
-  const handleChange = (field: keyof EODReportPayload, value: string) => {
+  const handleChange = (field: keyof EODReportForm, value: string) => {
     setFormValues((prev) => ({
       ...prev,
       [field]: value,
@@ -82,25 +80,25 @@ function EODReportCard() {
   };
 
   const saveMutation = useMutation({
-    mutationFn: (payload: EODReportPayload) => 
+    mutationFn: (payload: EODReportForm) => 
       reportId 
         ? updateEODReportAPI(reportId, payload, 'draft') 
         : insertEODReportAPI(payload, 'draft'),
     onSuccess: () => { 
       showStatusMessage('success', 'Saved', 'Draft saved successfully.'); 
-      queryClient.invalidateQueries({ queryKey: ['eod-report', formValues.dateWritten] });
+      queryClient.invalidateQueries({ queryKey: ['eod-report', formValues.date_written] });
     },
     onError: () => showStatusMessage('error', 'Error', 'Failed to save draft.'),
   });
 
   const submitMutation = useMutation({
-    mutationFn: (payload: EODReportPayload) => 
+    mutationFn: (payload: EODReportForm) => 
       reportId 
         ? updateEODReportAPI(reportId, payload, 'pending') 
         : insertEODReportAPI(payload, 'pending'),
     onSuccess: () => { 
       showStatusMessage('success', 'Submitted', 'Report sent successfully.'); 
-      queryClient.invalidateQueries({ queryKey: ['eod-report', formValues.dateWritten] });
+      queryClient.invalidateQueries({ queryKey: ['eod-report', formValues.date_written] });
       // clearForm(); 
     },
     onError: () => showStatusMessage('error', 'Error', 'Submission failed.'),
@@ -112,7 +110,7 @@ function EODReportCard() {
   };
 
   // const clearForm = () => {
-  //   setFormValues({ dateWritten: getTodayDate(), hoursSpent: 0, projectName: '', taskAccomplished: '' });
+  //   setFormValues({ date_written: getTodayDate(), hours_spent: 0, project_name: '', task_accomplished: '' });
   //   setErrors({});
   // };
 
@@ -154,19 +152,19 @@ function EODReportCard() {
                 type="date"
                 min={yesterday}
                 max={today}
-                value={formValues.dateWritten}
+                value={formValues.date_written}
                 onClick={openDatePicker}
                 onChange={(event) =>
-                  handleChange('dateWritten', event.target.value)
+                  handleChange('date_written', event.target.value)
                 }
                 className="h-10 w-full rounded bg-[#eeeeee] px-4 text-sm outline-none"
               />
-            {errors.dateWritten && <p className="text-xs text-red-600">{errors.dateWritten}</p>}
+            {errors.date_written && <p className="text-xs text-red-600">{errors.date_written}</p>}
           </div>
           <div>
             <label className="text-sm">Hours Spent</label>
             <div className="relative">
-              <input type="text" value={hasTimedOut ? formValues.hoursSpent : 'Available after time out.'} disabled className="h-10 w-full rounded bg-[#eeeeee] px-4 text-[8px] text-gray-300 outline-none"/>
+              <input type="text" value={hasTimedOut ? formValues.hours_spent : 'Available after time out.'} disabled className="h-10 w-full rounded bg-[#eeeeee] px-4 text-[8px] text-gray-300 outline-none"/>
               <Clock size={17} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500" />
             </div>
             
@@ -175,12 +173,12 @@ function EODReportCard() {
 
         <div>
           <label className="text-sm">Project Name</label> <RequiredMark/>
-          <input disabled={isSubmitted} type="text" value={formValues.projectName} onChange={(e) => handleChange('projectName', e.target.value)} className="h-10 w-full rounded bg-[#eeeeee] px-4 text-sm outline-none" />
+          <input disabled={isSubmitted} type="text" value={formValues.project_name} onChange={(e) => handleChange('project_name', e.target.value)} className="h-10 w-full rounded bg-[#eeeeee] px-4 text-sm outline-none" />
         </div>
 
         <div>
           <label className="text-sm">Task Accomplished</label> <RequiredMark/>
-          <textarea disabled={isSubmitted} value={formValues.taskAccomplished} onChange={(e) => handleChange('taskAccomplished', e.target.value)} className="h-[200px] w-full resize-none rounded bg-[#eeeeee] p-3 text-sm outline-none" />
+          <textarea disabled={isSubmitted} value={formValues.task_accomplished} onChange={(e) => handleChange('task_accomplished', e.target.value)} className="h-[200px] w-full resize-none rounded bg-[#eeeeee] p-3 text-sm outline-none" />
         </div>
 
         <div className="pt-2 flex flex-col-reverse sm:flex-row justify-end gap-3">
