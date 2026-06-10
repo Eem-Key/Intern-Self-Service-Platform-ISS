@@ -239,7 +239,7 @@ function ProfileDetailsCard(
                 disabled={updateRequestMutation.isPending}
                 className="rounded-full bg-[#FFBF10] px-5 py-2 text-sm font-semibold text-black disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                {updateRequestMutation.isPending ? 'Sending...' : 'Submit Request'}
+                {updateRequestMutation.isPending ? 'Sending...' : 'Save'}
                 </button>
             </div>
             )}
