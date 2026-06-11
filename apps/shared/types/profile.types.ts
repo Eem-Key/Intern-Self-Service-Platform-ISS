@@ -1,9 +1,5 @@
 import type { CompanyDepartment, JobPosition, OfficeLocation, ProfileUpdateType, ReportStatus, UserGender, UserRole } from './enums.types';
 
-export type ProfileInsert = Omit<Profile, 'id' | 'created_at' | 'updated_at'>;
-
-export type ProfileUpdate = Partial<ProfileInsert>;
-
 export type InternInfo = {
   university: string;
   year_level: number;
@@ -38,16 +34,36 @@ export type Profile = {
     intern_info?: InternInfo | null;
 }
 
-export type ProfileUpdateRequestInsert = Omit<
-  ProfileUpdateRequest, 
-  'id' | 
-  'submitted_at' | 
-  'admin_id' |
-  'reviewed_at' |
-  'admin_feedback'
->
+export type ProfileInsert = Omit<Profile, 'id' | 'created_at' | 'updated_at'>;
 
-export type ProfileUpdateRequestForm = Omit<ProfileUpdateRequestInsert, 'intern_id' | 'status'>
+export type ProfileUpdate = Partial<ProfileInsert>;
+
+export type UserProfile = Omit<
+  Profile, 
+  // 'id' |
+  // 'first_name' |
+  'middle_name' |
+  // 'last_name' |
+  'suffix' |
+
+  // 'role' |
+  // 'position' |
+  'department' |
+  'office' |
+
+  'birth_date' |
+  'gender' |
+  // 'avatar_url' |
+
+  'contact_number' |
+  'address' |
+  // 'email' |
+  'created_at' |
+  'updated_at' |
+  // 'requires_password_change' |
+
+  'intern_info'
+>
 
 export type ProfileUpdateRequest = {
   id: string; 
@@ -62,6 +78,17 @@ export type ProfileUpdateRequest = {
   reviewed_at: string | null;
   admin_feedback: string | null;
 }
+
+export type ProfileUpdateRequestInsert = Omit<
+  ProfileUpdateRequest, 
+  'id' | 
+  'submitted_at' | 
+  'admin_id' |
+  'reviewed_at' |
+  'admin_feedback'
+>
+
+export type ProfileUpdateRequestForm = Omit<ProfileUpdateRequestInsert, 'intern_id' | 'status'>
 
 export type AdminReviewProfileUpdateRequest = Pick<
   ProfileUpdateRequest, 

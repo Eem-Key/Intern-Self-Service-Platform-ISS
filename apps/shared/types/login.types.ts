@@ -1,19 +1,11 @@
-import type { UserRole } from './enums.types';
+import type { UserProfile } from './profile.types';
 
 export type LoginFormValues = {
     email: string;
     password: string;
 };
 
-export type UserProfile = {
-    id: string;
-    first_name: string;
-    last_name: string;
-    role: UserRole;
-    position: string;
-    avatar_url?: string | null;
-    email: string;
-};
+export type LoginErrors = Partial<Record<keyof LoginFormValues, string>>;
 
 export type LoginResponse = {
     message: string;
@@ -21,6 +13,13 @@ export type LoginResponse = {
         accessToken: string;
         refreshToken?: string;
         user: UserProfile;
-        requiresPasswordChange: boolean;
     };
 };
+
+export type ChangePasswordValues = {
+    current_password: string;
+    new_password: string;
+    confirm_new_password: string;
+}
+
+export type ChangePasswordErrors = Partial<Record<keyof ChangePasswordValues, string>>;

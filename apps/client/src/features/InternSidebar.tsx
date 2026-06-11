@@ -1,7 +1,7 @@
 import { Calendar, FileClock, Home, LogOut, User } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import profilepic from "../assets/images/default_pic.png";
-import type { UserProfile } from '../../../shared/types/login.types';
+import type { UserProfile } from '../../../shared/types/profile.types';
 import { logoutUserAPI } from '../api/auth.api';
 
 const navItems = [
@@ -72,19 +72,18 @@ function InternSidebar() {
   const position = getPosition(user);
 
   const handleLogout = async () => {
-    const { error } = await logoutUserAPI();
+    try {
+      await logoutUserAPI();
 
-    if (error) {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('authUser');
+
+      navigate('/login', { replace: true });
+    } catch (error) {
       console.error('Logout failed:', error);
       alert('Failed to log out. Please try again.');
-      return;
     }
-
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('authUser');
-
-    navigate('/login', { replace: true });
   };
 
   const userAvatar = user?.avatar_url || profilepic;

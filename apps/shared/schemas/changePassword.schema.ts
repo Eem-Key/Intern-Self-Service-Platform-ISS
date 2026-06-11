@@ -2,9 +2,9 @@ import { z } from 'zod';
 
 export const changePasswordSchema = z
     .object({
-    currentPassword: z.string().trim().min(1, 'This field is required'),
+    current_password: z.string().trim().min(1, 'This field is required'),
 
-    newPassword: z
+    new_password: z
         .string()
         .trim()
         .min(1, 'This field is required')
@@ -13,15 +13,13 @@ export const changePasswordSchema = z
         .regex(/[A-Z]/, 'Password must include an uppercase letter')
         .regex(/\d/, 'Password must include at least one number'),
 
-        confirmNewPassword: z.string().trim().min(1, 'This field is required'),
+        confirm_new_password: z.string().trim().min(1, 'This field is required'),
     })
-    .refine((data) => data.newPassword === data.confirmNewPassword, {
+    .refine((data) => data.new_password === data.confirm_new_password, {
         message: 'Passwords do not match',
-        path: ['confirmNewPassword'],
+        path: ['confirm_new_password'],
     })
-    .refine((data) => data.currentPassword !== data.newPassword, {
+    .refine((data) => data.current_password !== data.new_password, {
         message: 'New password must be different from current password',
-        path: ['newPassword'],
+        path: ['new_password'],
     });
-
-export type ChangePasswordFormValues = z.infer<typeof changePasswordSchema>;

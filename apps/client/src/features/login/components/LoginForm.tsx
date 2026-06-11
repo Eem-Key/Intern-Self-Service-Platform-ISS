@@ -7,9 +7,11 @@ import FirstLoginPrompt from './FirstLogin';
 import ChangePasswordModal from './ChangePassword';
 import { loginUserAPI } from '../../../api/auth.api';
 import validateForm from '../../../utils/ValidateForm';
-import type { LoginFormValues, LoginResponse } from '../../../../../shared/types/login.types';
-
-type LoginErrors = Partial<Record<keyof LoginFormValues, string>>;
+import type { 
+    LoginFormValues, 
+    LoginErrors,
+    LoginResponse 
+} from '../../../../../shared/types/login.types';
 
 function LoginForm() {
     const navigate = useNavigate();
@@ -44,30 +46,30 @@ function LoginForm() {
     const loginMutation = useMutation({
     mutationFn: loginUserAPI,
 
-    onSuccess: (response) => {
-        const { accessToken, refreshToken, user, requiresPasswordChange } =
-            response.data;
+        onSuccess: (response) => {
+            const { accessToken, refreshToken, user } =
+                response.data;
 
-        localStorage.setItem('accessToken', accessToken);
-        localStorage.setItem('authUser', JSON.stringify(user));
+            localStorage.setItem('accessToken', accessToken);
+            localStorage.setItem('authUser', JSON.stringify(user));
 
-        if (refreshToken) {
-            localStorage.setItem('refreshToken', refreshToken);
-        }
+            if (refreshToken) {
+                localStorage.setItem('refreshToken', refreshToken);
+            }
 
-        const role = user.role?.toLowerCase();
-        const isIntern = role === 'intern';
+            const role = user.role?.toLowerCase();
+            const isIntern = role === 'intern';
 
-        if (isIntern && requiresPasswordChange) {
-            setFirstLoginData(response);
-            return;
-        }
+            if (isIntern && user.requires_password_change) {
+                setFirstLoginData(response);
+                return;
+            }
 
-        navigate(getDashboardRoute(role));
+            navigate(getDashboardRoute(role));
         },
 
         onError: (error) => {
-        setServerError(error.message || 'Incorrect email address or password.');
+            setServerError(error.message || 'Incorrect email address or password.');
         },
     });
 

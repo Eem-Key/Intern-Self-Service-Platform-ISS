@@ -1,18 +1,32 @@
 import { supabase } from '../config/supabase';
-import type { LoginFormValues, LoginResponse } from '../../../shared/types/login.types';
-import type { ChangePasswordFormValues } from '../../../shared/schemas/changePassword.schema';
+import type { 
+    LoginFormValues, 
+    LoginResponse, 
+    ChangePasswordValues 
+} from '../../../shared/types/login.types';
+import type { UserProfile } from '../../../shared/types/profile.types';
+import { fetchUserProfileAPI } from './profile.api'
 
 export async function updatePasswordAPI(
-    payload: ChangePasswordFormValues, 
+    payload: ChangePasswordValues, 
     id: string
 ): Promise<{ error: string | null }> {
     try {
+        if (payload.new_password === payload.current_password) {
+            return { error: "New password cannot be the same as the current password." };
+        }
+
+        if (payload.new_password !== payload.confirm_new_password) {
+            return { error: "New password does not match." };
+        }
+
         const { error: authError } = await supabase.auth.updateUser({
-            password: payload.newPassword
+            password: payload.new_password,
+            current_password: payload.current_password
         });
 
         if (authError) {
-            return { error: authError.message };
+            return { error: `Failed to update password: ${authError.message}` };
         }
 
         const { error: profileError } = await supabase
@@ -45,31 +59,14 @@ export async function loginUserAPI(payload: LoginFormValues): Promise<LoginRespo
         throw new Error('Authentication failed. User session empty.');
     }
 
-    const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('first_name, last_name, role, position, avatar_url, requires_password_change')
-        .eq('id', user.id)
-        .single();
-
-    if (profileError) {
-        throw new Error(`Profile synchronization failed: ${profileError.message}`);
-    }
+    const userProfile: UserProfile = await fetchUserProfileAPI(user.id)
 
     return {
         message: 'Login successful',
         data: {
             accessToken: authData.session?.access_token || '',
             refreshToken: authData.session?.refresh_token || '',
-            user: {
-                id: user.id,
-                email: user.email || '',
-                first_name: profileData.first_name,
-                last_name: profileData.last_name,
-                role: profileData.role,
-                position: profileData.position,
-                avatar_url: profileData.avatar_url || '',
-            },
-            requiresPasswordChange: profileData.requires_password_change,
+            user: userProfile,
         },
     };
 }

@@ -1,7 +1,7 @@
 import { Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 
-import type { ChangePasswordFormValues } from '../../../../../shared/schemas/changePassword.schema';
+import type { ChangePasswordValues } from '../../../../../shared/schemas/changePassword.schema';
 import type { Profile } from '../../../../../shared/types/profile.types';
 import ChangePassButton from '../../../components/ui/changePassButton';
 import PasswordStrength from '../../../components/ui/passwordStrength';
@@ -25,25 +25,25 @@ type ModalState =
         };
 
 function ProfileChangePasswordCard({ profile }: ProfileChangePasswordCardProps) {
-    const [formValues, setFormValues] = useState<ChangePasswordFormValues>({
-        currentPassword: '',
-        newPassword: '',
-        confirmNewPassword: '',
+    const [formValues, setFormValues] = useState<ChangePasswordValues>({
+        current_password: '',
+        new_password: '',
+        confirm_new_password: '',
     });
 
-    const [isNewPasswordFocused, setIsNewPasswordFocused] = useState(false);
+    const [isnew_passwordFocused, setIsnew_passwordFocused] = useState(false);
     const [errors, setErrors] = useState<ChangePasswordErrors>({});
     const [isLoading, setIsLoading] = useState(false);
     const [modalState, setModalState] = useState<ModalState>(null);
 
     const [showPassword, setShowPassword] = useState({
-        currentPassword: false,
-        newPassword: false,
-        confirmNewPassword: false,
+        current_password: false,
+        new_password: false,
+        confirm_new_password: false,
     });
 
     const handleChange = (
-        field: keyof ChangePasswordFormValues,
+        field: keyof ChangePasswordValues,
         value: string
     ) => {
         setFormValues((prev) => ({
@@ -57,7 +57,7 @@ function ProfileChangePasswordCard({ profile }: ProfileChangePasswordCardProps) 
         }));
     };
 
-    const togglePasswordVisibility = (field: keyof ChangePasswordFormValues) => {
+    const togglePasswordVisibility = (field: keyof ChangePasswordValues) => {
         if (!formValues[field]) return;
 
         setShowPassword((prev) => ({
@@ -68,15 +68,15 @@ function ProfileChangePasswordCard({ profile }: ProfileChangePasswordCardProps) 
 
     const resetForm = () => {
         setFormValues({
-        currentPassword: '',
-        newPassword: '',
-        confirmNewPassword: '',
+        current_password: '',
+        new_password: '',
+        confirm_new_password: '',
         });
 
         setShowPassword({
-        currentPassword: false,
-        newPassword: false,
-        confirmNewPassword: false,
+        current_password: false,
+        new_password: false,
+        confirm_new_password: false,
         });
 
         setErrors({});
@@ -108,7 +108,7 @@ function ProfileChangePasswordCard({ profile }: ProfileChangePasswordCardProps) 
         try {
         const { error: authError } = await supabase.auth.signInWithPassword({
             email: profile.email,
-            password: formValues.currentPassword,
+            password: formValues.current_password,
         });
 
         if (authError) {
@@ -188,48 +188,48 @@ function ProfileChangePasswordCard({ profile }: ProfileChangePasswordCardProps) 
             <form onSubmit={handleSubmit} className="flex flex-1 flex-col">
             <div className="space-y-3 overflow-visible">
                 <PasswordField
-                id="currentPassword"
+                id="current_password"
                 label="Current Password"
-                value={formValues.currentPassword}
-                error={errors.currentPassword}
-                showPassword={showPassword.currentPassword}
-                onToggle={() => togglePasswordVisibility('currentPassword')}
-                onChange={(value) => handleChange('currentPassword', value)}
+                value={formValues.current_password}
+                error={errors.current_password}
+                showPassword={showPassword.current_password}
+                onToggle={() => togglePasswordVisibility('current_password')}
+                onChange={(value) => handleChange('current_password', value)}
                 />
 
                 <div className="relative">
                 <PasswordField
-                    id="newPassword"
+                    id="new_password"
                     label="New Password"
-                    value={formValues.newPassword}
-                    error={errors.newPassword}
-                    showPassword={showPassword.newPassword}
-                    onToggle={() => togglePasswordVisibility('newPassword')}
-                    onChange={(value) => handleChange('newPassword', value)}
-                    onFocus={() => setIsNewPasswordFocused(true)}
-                    onBlur={() => setIsNewPasswordFocused(false)}
+                    value={formValues.new_password}
+                    error={errors.new_password}
+                    showPassword={showPassword.new_password}
+                    onToggle={() => togglePasswordVisibility('new_password')}
+                    onChange={(value) => handleChange('new_password', value)}
+                    onFocus={() => setIsnew_passwordFocused(true)}
+                    onBlur={() => setIsnew_passwordFocused(false)}
                     onKeyDown={(event) => {
                     if (event.key === 'Enter') {
-                        setIsNewPasswordFocused(false);
+                        setIsnew_passwordFocused(false);
                     }
                     }}
                 />
 
-                {formValues.newPassword && isNewPasswordFocused && (
+                {formValues.new_password && isnew_passwordFocused && (
                     <div className="absolute left-0 right-0 top-full z-30 mt-1 rounded-md bg-white shadow-lg">
-                    <PasswordStrength password={formValues.newPassword} />
+                    <PasswordStrength password={formValues.new_password} />
                     </div>
                 )}
                 </div>
 
                 <PasswordField
-                id="confirmNewPassword"
+                id="confirm_new_password"
                 label="Confirm New Password"
-                value={formValues.confirmNewPassword}
-                error={errors.confirmNewPassword}
-                showPassword={showPassword.confirmNewPassword}
-                onToggle={() => togglePasswordVisibility('confirmNewPassword')}
-                onChange={(value) => handleChange('confirmNewPassword', value)}
+                value={formValues.confirm_new_password}
+                error={errors.confirm_new_password}
+                showPassword={showPassword.confirm_new_password}
+                onToggle={() => togglePasswordVisibility('confirm_new_password')}
+                onChange={(value) => handleChange('confirm_new_password', value)}
                 />
             </div>
 
@@ -261,7 +261,7 @@ function ProfileChangePasswordCard({ profile }: ProfileChangePasswordCardProps) 
 }
 
 type PasswordFieldProps = {
-    id: keyof ChangePasswordFormValues;
+    id: keyof ChangePasswordValues;
     label: string;
     value: string;
     error?: string;

@@ -5,11 +5,12 @@ import FormInput from '../../../components/ui/formInput';
 import PasswordStrength from '../../../components/ui/passwordStrength';
 
 import validateChangePassword from '../../../utils/validateChangePassword';
-import type { ChangePasswordErrors,} from '../../../utils/validateChangePassword';
-import type { ChangePasswordFormValues,} from '../../../../../shared/schemas/changePassword.schema';
+import type { 
+    ChangePasswordValues,
+    ChangePasswordErrors,
+} from '../../../../../shared/types/login.types';
 
 import { updatePasswordAPI } from '../../../api/auth.api';
-import { supabase } from '../../../config/supabase';
 import ChangePassButton from '../../../components/ui/changePassButton';
 
 type ChangePasswordModalProps = {
@@ -19,17 +20,17 @@ type ChangePasswordModalProps = {
 };
 
 function ChangePasswordModal({ onSuccess, id , email}: ChangePasswordModalProps) {
-    const [formValues, setFormValues] = useState<ChangePasswordFormValues>({
-        currentPassword: '',
-        newPassword: '',
-        confirmNewPassword: '',
+    const [formValues, setFormValues] = useState<ChangePasswordValues>({
+        current_password: '',
+        new_password: '',
+        confirm_new_password: '',
     });
 
     const [errors, setErrors] = useState<ChangePasswordErrors>({});
     const [serverError, setServerError] = useState('');
 
     const handleChange = (
-        field: keyof ChangePasswordFormValues,
+        field: keyof ChangePasswordValues,
         value: string
     ) => {
         setFormValues((prev) => ({
@@ -58,15 +59,6 @@ function ChangePasswordModal({ onSuccess, id , email}: ChangePasswordModalProps)
         setErrors({});
 
         try {
-            const { error: authError } = await supabase.auth.signInWithPassword({
-                email: email,
-                password: formValues.currentPassword,
-            });
-
-            if (authError) {
-                setServerError("Incorrect current password.");
-                return;
-            }
             const { error: updateError } = await updatePasswordAPI(formValues, id);
 
             if (updateError) {
@@ -83,6 +75,7 @@ function ChangePasswordModal({ onSuccess, id , email}: ChangePasswordModalProps)
             setServerError("An unexpected error occurred.");
         }
     };
+
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 px-4">
         <div className="w-full max-w-[530px] overflow-hidden rounded-2xl bg-white shadow-xl">
@@ -110,34 +103,34 @@ function ChangePasswordModal({ onSuccess, id , email}: ChangePasswordModalProps)
 
             <form onSubmit={handleSubmit} className="space-y-3 text-left">
                 <FormInput
-                id="currentPassword"
+                id="current_password"
                 label="Current Password"
                 type="password"
-                value={formValues.currentPassword}
-                error={errors.currentPassword}
-                onChange={(value) => handleChange('currentPassword', value)}
+                value={formValues.current_password}
+                error={errors.current_password}
+                onChange={(value) => handleChange('current_password', value)}
                 />
 
                 <div>
                 <FormInput
-                    id="newPassword"
+                    id="new_password"
                     label="New Password"
                     type="password"
-                    value={formValues.newPassword}
-                    error={errors.newPassword}
-                    onChange={(value) => handleChange('newPassword', value)}
+                    value={formValues.new_password}
+                    error={errors.new_password}
+                    onChange={(value) => handleChange('new_password', value)}
                 />
 
-                <PasswordStrength password={formValues.newPassword} />
+                <PasswordStrength password={formValues.new_password} />
                 </div>
 
                 <FormInput
-                id="confirmNewPassword"
+                id="confirm_new_password"
                 label="Confirm New Password"
                 type="password"
-                value={formValues.confirmNewPassword}
-                error={errors.confirmNewPassword}
-                onChange={(value) => handleChange('confirmNewPassword', value)}
+                value={formValues.confirm_new_password}
+                error={errors.confirm_new_password}
+                onChange={(value) => handleChange('confirm_new_password', value)}
                 />
 
                 <ChangePassButton type="submit" className="mt-6">

@@ -8,7 +8,7 @@ import {
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { logoutUserAPI } from '../../../../api/auth.api';
-import type { UserProfile } from '../../../../../../shared/types/login.types';
+import type { UserProfile } from '../../../../../../shared/types/profile.types';
 import profilepic from '../../../../assets/images/default_pic.png';
 
 const navItems = [

@@ -4,6 +4,7 @@ import type {
     Profile,
     ProfileInsert,
     ProfileUpdate,
+    UserProfile,
     ProfileUpdateRequest,
     ProfileUpdateRequestForm,
     ProfileUpdateRequestInsert,
@@ -37,6 +38,32 @@ export async function fetchProfileAPI(): Promise<Profile> {
     }
 
     return profileData;
+}
+
+export async function fetchUserProfileAPI(user_id: string): Promise<UserProfile> {
+    const { data: profileData, error: fetchError } = await supabase
+        .from('profiles')
+        .select(
+            `first_name, 
+            last_name, 
+            role, 
+            position, 
+            avatar_url, 
+            email,
+            requires_password_change`)
+        .eq('id', user_id)
+        .single();
+
+    if (fetchError) {
+        throw new Error(`Error fetching profile: ${fetchError.message}`);
+    }
+
+    const userProfile: UserProfile = {
+        id: user_id,
+        ...profileData
+    }
+
+    return userProfile;
 }
 
 export async function adminInsertProfileAPI(

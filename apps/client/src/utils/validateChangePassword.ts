@@ -1,12 +1,8 @@
 import { changePasswordSchema } from '../../../shared/schemas/changePassword.schema';
-import type { ChangePasswordFormValues } from '../../../shared/schemas/changePassword.schema';
-
-export type ChangePasswordErrors = Partial<
-    Record<keyof ChangePasswordFormValues, string>
->;
+import type { ChangePasswordValues, ChangePasswordErrors } from '../../../shared/types/login.types';
 
 const validateChangePassword = (
-    formData: ChangePasswordFormValues
+    formData: ChangePasswordValues
 ): ChangePasswordErrors => {
     const result = changePasswordSchema.safeParse(formData);
 
@@ -17,7 +13,7 @@ const validateChangePassword = (
     const errors: ChangePasswordErrors = {};
 
     result.error.issues.forEach((issue) => {
-        const field = issue.path[0] as keyof ChangePasswordFormValues;
+        const field = issue.path[0] as keyof ChangePasswordValues;
 
         if (field) {
         errors[field] = issue.message;
