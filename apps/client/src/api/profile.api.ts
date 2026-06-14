@@ -185,3 +185,29 @@ export async function adminReviewProfileUpdateAPI(
 
     return updatedUpdateRequest;
 }
+
+export async function hasPendingProfileUpdateRequestAPI(
+    updateType: 'information_update' | 'avatar_update'
+    ): Promise<boolean> {
+    const userId = await getAuthUserId();
+
+    if (!userId) {
+        throw new Error('You must be logged in to check profile update requests.');
+    }
+
+    const { data, error } = await supabase
+        .from('profile_update_requests')
+        .select('id')
+        .eq('intern_id', userId)
+        .eq('update_type', updateType)
+        .eq('status', 'pending')
+        .limit(1);
+
+    if (error) {
+        throw new Error(
+        `Error checking pending profile update request: ${error.message}`
+        );
+    }
+
+    return data.length > 0;
+}

@@ -1,11 +1,11 @@
-import { useQueryClient, useMutation } from '@tanstack/react-query';
+import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import type {
     InternInfo,
     Profile,
     ProfileUpdateRequestForm,
 } from '../../../../../shared/types/profile.types';
-import { requestProfileUpdateAPI } from '../../../api/profile.api';
+import { requestProfileUpdateAPI, hasPendingProfileUpdateRequestAPI,} from '../../../api/profile.api';
 import StatusMessage from '../../../components/feedback/StatusMessage';
 import ConfirmationModal from '../../../components/feedback/confirmationModal';
 import { validateProfileUpdateRequest } from '../../../utils/validateProfile.ts';
@@ -15,6 +15,7 @@ import {
 } from '../../../../../shared/types/enums.types';
 import { ChevronDown } from 'lucide-react';
 import RequiredMark from '../../../components/ui/RequiredMark.tsx';
+
 
 type ProfileDetailsCardProps = {
     profile: Profile;
@@ -39,6 +40,10 @@ function ProfileDetailsCard(
     }
     };
 
+    const { data: hasPendingProfileRequest = false } = useQuery({
+    queryKey: ['pending-profile-update-request', 'information_update', profile.id],
+    queryFn: () => hasPendingProfileUpdateRequestAPI('information_update'),
+    });
     const [isGenderDropdownOpen, setIsGenderDropdownOpen] = useState(false);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const queryClient = useQueryClient();
@@ -73,6 +78,10 @@ function ProfileDetailsCard(
         start_date: profile.intern_info?.start_date || '',
     });
 
+    const [fieldErrors, setFieldErrors] = useState<
+    Partial<Record<keyof typeof formValues, string>>
+    >({});
+
     useEffect(() => {
         resetFormValues();
     }, [profile]);
@@ -82,6 +91,9 @@ function ProfileDetailsCard(
         
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['intern-profile'] });
+            queryClient.invalidateQueries({
+            queryKey: ['pending-profile-update-request', 'information_update', profile.id],
+            });
             setIsEditing(false);
 
             setStatusMessage({
@@ -111,10 +123,15 @@ function ProfileDetailsCard(
     });
 
     const handleChange = (field: keyof typeof formValues, value: string) => {
-    setFormValues((prev) => ({
-        ...prev,
-        [field]: value,
-    }));
+        setFormValues((prev) => ({
+            ...prev,
+            [field]: value,
+        }));
+
+        setFieldErrors((prev) => ({
+            ...prev,
+            [field]: undefined,
+        }));
     };
 
     const resetFormValues = () => {
@@ -147,9 +164,56 @@ function ProfileDetailsCard(
         resetFormValues();
         setIsEditing(false);
         setIsGenderDropdownOpen(false);
+        setFieldErrors({});
     };
 
+    const validateRequiredFields = () => {
+        const requiredFields: (keyof typeof formValues)[] = [
+            'first_name',
+            'last_name',
+            'birth_date',
+            'gender',
+            'email',
+            'contact_number',
+            'address',
+            'year_level',
+            'program',
+            'university',
+        ];
+
+        const newErrors: Partial<Record<keyof typeof formValues, string>> = {};
+
+        requiredFields.forEach((field) => {
+            if (!String(formValues[field] ?? '').trim()) {
+            newErrors[field] = 'This field is required.';
+            }
+        });
+
+        return newErrors;
+    };
+
+    
+
     const handleSubmitRequest = () => {
+
+        const requiredErrors = validateRequiredFields();
+
+        if (Object.keys(requiredErrors).length > 0) {
+            setFieldErrors(requiredErrors);
+
+            setStatusMessage({
+            variant: 'error',
+            title: 'Incomplete Required Fields',
+            message: 'Please complete all required fields before submitting.',
+            });
+
+            setTimeout(() => {
+            setStatusMessage(null);
+            }, 5000);
+
+            return;
+        }
+
         const intern_info: InternInfo = {
             university: formValues.university,
             year_level: Number(formValues.year_level),
@@ -189,6 +253,19 @@ function ProfileDetailsCard(
         updateRequestMutation.mutate(payload);
     };
 
+    const showPendingRequestMessage = () => {
+    setStatusMessage({
+        variant: 'error',
+        title: 'Pending Request',
+        message:
+        'You already have a pending profile information request. Please check your activity logs to edit or add more changes.',
+    });
+
+    setTimeout(() => {
+        setStatusMessage(null);
+    }, 5000);
+    };
+
     return (
         <>
         
@@ -225,9 +302,20 @@ function ProfileDetailsCard(
         {!isEditing ? (
             <button
                 type="button"
-                onClick={() => setIsEditing(true)}
-                className="rounded-full bg-[#FFBF10] px-5 py-2 text-sm font-semibold text-black"
-            >
+                onClick={() => {
+                    if (hasPendingProfileRequest) {
+                    showPendingRequestMessage();
+                    return;
+                    }
+
+                    setIsEditing(true);
+                }}
+                className={`rounded-full px-5 py-2 text-sm font-semibold transition ${
+                    hasPendingProfileRequest
+                    ? 'cursor-not-allowed bg-[#eeeeee] text-gray-500'
+                    : 'bg-[#FFBF10] text-black hover:bg-[#e8a900]'
+                }`}
+                >
                 Edit Info
             </button>
             ) : (
@@ -242,7 +330,27 @@ function ProfileDetailsCard(
 
                 <button
                 type="button"
-                onClick={() => setShowConfirmModal(true)}
+                onClick={() => {
+                    const requiredErrors = validateRequiredFields();
+
+                    if (Object.keys(requiredErrors).length > 0) {
+                        setFieldErrors(requiredErrors);
+
+                        setStatusMessage({
+                        variant: 'error',
+                        title: 'Incomplete Required Fields',
+                        message: 'Please complete all required fields before submitting.',
+                        });
+
+                        setTimeout(() => {
+                        setStatusMessage(null);
+                        }, 5000);
+
+                        return;
+                    }
+
+                    setShowConfirmModal(true);
+                }}
                 disabled={updateRequestMutation.isPending}
                 className="rounded-full bg-[#FFBF10] px-5 py-2 text-sm font-semibold text-black disabled:cursor-not-allowed disabled:opacity-60"
                 >
@@ -258,6 +366,7 @@ function ProfileDetailsCard(
             value={formValues.first_name}
             disabled={!isEditing}
             required
+            error={fieldErrors.first_name}
             onChange={(value) => handleChange('first_name', value)}
             />
 
@@ -265,6 +374,7 @@ function ProfileDetailsCard(
             label="Middle Name"
             value={formValues.middle_name}
             disabled={!isEditing}
+            error={fieldErrors.middle_name}
             onChange={(value) => handleChange('middle_name', value)}
             />
 
@@ -273,6 +383,7 @@ function ProfileDetailsCard(
             value={formValues.last_name}
             disabled={!isEditing}
             required
+            error={fieldErrors.last_name}
             onChange={(value) => handleChange('last_name', value)}
             />
 
@@ -282,6 +393,7 @@ function ProfileDetailsCard(
             value={formValues.birth_date}
             disabled={!isEditing}
             required
+            error={fieldErrors.birth_date}
             onChange={(value) => handleChange('birth_date', value)}
             />
 
@@ -290,6 +402,7 @@ function ProfileDetailsCard(
             value={formValues.gender}
             disabled={!isEditing}
             required
+            error={fieldErrors.gender}
             isOpen={isGenderDropdownOpen}
             options={USER_GENDER_VALUES.map((gender) => ({
                 label: formatGenderLabel(gender),
@@ -316,6 +429,7 @@ function ProfileDetailsCard(
                 value={formValues.email}
                 disabled={!isEditing}
                 required
+                error={fieldErrors.email}
                 onChange={(value) => handleChange('email', value)}
             />
             </div>
@@ -325,6 +439,7 @@ function ProfileDetailsCard(
             value={formValues.contact_number}
             disabled={!isEditing}
             required
+            error={fieldErrors.contact_number}
             onChange={(value) => handleChange('contact_number', value)}
             />
 
@@ -334,6 +449,7 @@ function ProfileDetailsCard(
                 value={formValues.address}
                 disabled={!isEditing}
                 required
+                error={fieldErrors.address}
                 onChange={(value) => handleChange('address', value)}
             />
             </div>
@@ -349,6 +465,7 @@ function ProfileDetailsCard(
                 value={formValues.year_level}
                 disabled={!isEditing}
                 required
+                error={fieldErrors.year_level}
                 onChange={(value) => handleChange('year_level', value)}
             />
 
@@ -357,6 +474,7 @@ function ProfileDetailsCard(
                 value={formValues.program}
                 disabled={!isEditing}
                 required
+                error={fieldErrors.program}
                 onChange={(value) => handleChange('program', value)}
             />
 
@@ -367,6 +485,7 @@ function ProfileDetailsCard(
                 value={formValues.university}
                 disabled={!isEditing}
                 required
+                error={fieldErrors.university}
                 onChange={(value) => handleChange('university', value)}
             />
             </div>
@@ -446,6 +565,7 @@ type ProfileFieldProps = {
     type?: string;
     disabled?: boolean;
     required?: boolean;
+    error?: string;
     onChange: (value: string) => void;
 };
 
@@ -455,6 +575,7 @@ function ProfileField({
     type = 'text',
     disabled = false,
     required = false,
+    error,
     onChange,
 }: ProfileFieldProps) {
     return (
@@ -471,6 +592,8 @@ function ProfileField({
             onChange={(event) => onChange(event.target.value)}
             className="h-9 w-full rounded bg-[#eeeeee] px-3 text-sm outline-none disabled:cursor-not-allowed disabled:text-gray-600"
         />
+
+        {error && <p className="mt-1 text-xs font-medium text-red-600">{error}</p>}
         </div>
     );
 }
@@ -486,6 +609,7 @@ type ProfileDropdownFieldProps = {
         value: string;
     }[];
     required?: boolean;
+    error?: string;
     onToggle: () => void;
     onSelect: (value: string) => void;
 };
@@ -495,6 +619,7 @@ function ProfileDropdownField({
     value,
     disabled = false,
     required = false,
+    error,
     placeholder = 'Select option',
     isOpen,
     options,
@@ -538,6 +663,7 @@ function ProfileDropdownField({
                 ))}
             </div>
             )}
+            {error && <p className="mt-1 text-xs font-medium text-red-600">{error}</p>}
         </div>
         </div>
     );

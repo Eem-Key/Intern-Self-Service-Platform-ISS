@@ -4,11 +4,12 @@ import { supabase } from '../../../config/supabase';
 import StatusMessage from '../../../components/feedback/StatusMessage';
 import ConfirmationModal from '../../../components/feedback/confirmationModal';
 import profilepic from '../../../assets/images/default_pic.png';
-import { requestProfileUpdateAPI } from '../../../api/profile.api';
+import { requestProfileUpdateAPI, hasPendingProfileUpdateRequestAPI, } from '../../../api/profile.api';
 import type {
   Profile,
   ProfileUpdateRequest,
 } from '../../../../../shared/types/profile.types';
+
 
 type ProfilePictureCardProps = {
     profile: Profile;
@@ -23,6 +24,11 @@ function ProfilePictureCard({ profile }: ProfilePictureCardProps) {
     const [selectedAvatarUrl, setSelectedAvatarUrl] = useState<string | null>(
         null
     );
+
+    const { data: hasPendingAvatarRequest = false } = useQuery({
+    queryKey: ['pending-profile-update-request', 'avatar_update', profile.id],
+    queryFn: () => hasPendingProfileUpdateRequestAPI('avatar_update'),
+    });
 
     const [statusMessage, setStatusMessage] = useState<{
         variant: 'success' | 'error';
@@ -48,6 +54,9 @@ function ProfilePictureCard({ profile }: ProfilePictureCardProps) {
 
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['intern-profile'] });
+            queryClient.invalidateQueries({
+            queryKey: ['pending-profile-update-request', 'avatar_update', profile.id],
+            });
 
             setSelectedAvatarUrl(null);
 
@@ -81,7 +90,12 @@ function ProfilePictureCard({ profile }: ProfilePictureCardProps) {
     });
 
     const handleChooseFile = () => {
-        fileInputRef.current?.click();
+    if (hasPendingAvatarRequest) {
+        showPendingRequestMessage();
+        return;
+    }
+
+    fileInputRef.current?.click();
     };
 
     const handleUploadPreview = (file: File | undefined) => {
@@ -163,6 +177,19 @@ function ProfilePictureCard({ profile }: ProfilePictureCardProps) {
     const hasSelectedNewPhoto = Boolean(selectedAvatarUrl);
     const displayedAvatar = previewUrl || signedUrlData || profilepic;
 
+    const showPendingRequestMessage = () => {
+        setStatusMessage({
+            variant: 'error',
+            title: 'Pending Request',
+            message:
+            'You already have a pending profile picture request. Please check your activity logs to edit or add more changes.',
+    });
+
+        setTimeout(() => {
+            setStatusMessage(null);
+        }, 5000);
+    };
+
     return (
         <>
         {statusMessage && (
@@ -214,8 +241,12 @@ function ProfilePictureCard({ profile }: ProfilePictureCardProps) {
                 type="button"
                 onClick={handleChooseFile}
                 disabled={avatarUpdateMutation.isPending}
-                className="mx-auto mt-5 inline-flex rounded-full bg-[#FFBF10] px-8 py-2 text-sm font-semibold text-black transition hover:bg-[#e8a900] disabled:cursor-not-allowed disabled:opacity-60"
-            >
+                className={`mx-auto mt-5 inline-flex rounded-full px-8 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${
+                    hasPendingAvatarRequest
+                    ? 'cursor-not-allowed bg-[#eeeeee] text-gray-500'
+                    : 'bg-[#FFBF10] text-black hover:bg-[#e8a900]'
+                }`}
+                >
                 Upload Photo
             </button>
             ) : (
