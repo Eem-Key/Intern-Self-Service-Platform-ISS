@@ -14,7 +14,7 @@ export const fetchAllLeaveRequestDatesOfIntern = async (
         .from('leave_requests')
         .select('start_date, end_date') 
         .eq('intern_id', intern_id)
-        .neq('status', 'rejected'); 
+        .neq('status', 'denied'); 
 
     if (fetchError) {
         throw new Error(fetchError.message);
