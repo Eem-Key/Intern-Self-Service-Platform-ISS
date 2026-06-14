@@ -265,9 +265,23 @@ function AttendanceCard() {
     </div>
 
       <div className="mt-6 text-center">
-        <p className="text-5xl font-bold leading-none tracking-tight sm:text-5xl xl:text-[56px]">
-          {isLoading ? '00:00' : elapsedTime}
-        </p>
+        <div className="group relative mx-auto inline-block">
+          <p
+            className={`text-5xl font-bold leading-none tracking-tight sm:text-5xl xl:text-[56px] ${
+              isLunchBreak && hasTimedIn && !hasTimedOut
+                ? 'cursor-help text-gray-700'
+                : 'text-black'
+            }`}
+          >
+            {isLoading ? '00:00' : elapsedTime}
+          </p>
+
+          {isLunchBreak && hasTimedIn && !hasTimedOut && (
+            <div className="pointer-events-none absolute left-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-full bg-[#FFF3C4] px-3 py-1.5 text-xs font-semibold text-[#9A6B00] opacity-0 shadow-md transition-opacity group-hover:opacity-100">
+              On pause during lunch break
+            </div>
+          )}
+        </div>
 
         <p className="mt-2 text-sm text-gray-700 sm:text-base">
           {formatToday()}
