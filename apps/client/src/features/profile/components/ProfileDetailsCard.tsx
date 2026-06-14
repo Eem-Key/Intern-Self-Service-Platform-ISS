@@ -179,6 +179,11 @@ function ProfileDetailsCard(
             'year_level',
             'program',
             'university',
+            'position',
+            'department',
+            'start_date',
+            'required_hours',
+            'office',
         ];
 
         const newErrors: Partial<Record<keyof typeof formValues, string>> = {};
@@ -221,6 +226,7 @@ function ProfileDetailsCard(
             required_hours: Number(formValues.required_hours),
             start_date: formValues.start_date,
         }
+
         const payload: ProfileUpdateRequestForm = {
             update_type: 'information_update',
             requested_data: {
@@ -233,7 +239,11 @@ function ProfileDetailsCard(
                     contact_number: formValues.contact_number,
                     address: formValues.address,
 
-                    intern_info: intern_info
+                    position: formValues.position,
+                    department: formValues.department,
+                    office: formValues.office,
+
+                    intern_info: intern_info,
                 },
             reason: 'Intern requested profile information update.',
         };
@@ -499,16 +509,18 @@ function ProfileDetailsCard(
             <ProfileField
             label="Position"
             value={formValues.position}
-            disabled
+            disabled={!isEditing}
             required
+            error={fieldErrors.position}
             onChange={(value) => handleChange('position', value)}
             />
 
             <ProfileField
             label="Department"
             value={formValues.department}
-            disabled
+            disabled={!isEditing}
             required
+            error={fieldErrors.department}
             onChange={(value) => handleChange('department', value)}
             />
 
@@ -525,16 +537,18 @@ function ProfileDetailsCard(
                 label="Start Date"
                 type="date"
                 value={formValues.start_date}
-                disabled
+                disabled={!isEditing}
                 required
+                error={fieldErrors.start_date}
                 onChange={(value) => handleChange('start_date', value)}
             />
             
             <ProfileField
                 label="Required Hours"
                 value={formValues.required_hours}
-                disabled
+                disabled={!isEditing}
                 required
+                error={fieldErrors.required_hours}
                 onChange={(value) => handleChange('required_hours', value)}
             />
 
@@ -549,8 +563,9 @@ function ProfileDetailsCard(
             <ProfileField
             label="Office"
             value={formValues.office}
-            disabled
+            disabled={!isEditing}
             required
+            error={fieldErrors.office}
             onChange={(value) => handleChange('office', value)}
             />
         </div>
