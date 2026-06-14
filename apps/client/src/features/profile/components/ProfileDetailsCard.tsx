@@ -257,6 +257,7 @@ function ProfileDetailsCard(
             label="First Name"
             value={formValues.first_name}
             disabled={!isEditing}
+            required
             onChange={(value) => handleChange('first_name', value)}
             />
 
@@ -271,6 +272,7 @@ function ProfileDetailsCard(
             label="Last Name"
             value={formValues.last_name}
             disabled={!isEditing}
+            required
             onChange={(value) => handleChange('last_name', value)}
             />
 
@@ -279,6 +281,7 @@ function ProfileDetailsCard(
             type="date"
             value={formValues.birth_date}
             disabled={!isEditing}
+            required
             onChange={(value) => handleChange('birth_date', value)}
             />
 
@@ -286,6 +289,7 @@ function ProfileDetailsCard(
             label="Gender"
             value={formValues.gender}
             disabled={!isEditing}
+            required
             isOpen={isGenderDropdownOpen}
             options={USER_GENDER_VALUES.map((gender) => ({
                 label: formatGenderLabel(gender),
@@ -311,6 +315,7 @@ function ProfileDetailsCard(
                 label="Email"
                 value={formValues.email}
                 disabled={!isEditing}
+                required
                 onChange={(value) => handleChange('email', value)}
             />
             </div>
@@ -319,6 +324,7 @@ function ProfileDetailsCard(
             label="Contact Number"
             value={formValues.contact_number}
             disabled={!isEditing}
+            required
             onChange={(value) => handleChange('contact_number', value)}
             />
 
@@ -327,6 +333,7 @@ function ProfileDetailsCard(
                 label="Address"
                 value={formValues.address}
                 disabled={!isEditing}
+                required
                 onChange={(value) => handleChange('address', value)}
             />
             </div>
@@ -341,6 +348,7 @@ function ProfileDetailsCard(
                 label="Year Level"
                 value={formValues.year_level}
                 disabled={!isEditing}
+                required
                 onChange={(value) => handleChange('year_level', value)}
             />
 
@@ -348,6 +356,7 @@ function ProfileDetailsCard(
                 label="Program"
                 value={formValues.program}
                 disabled={!isEditing}
+                required
                 onChange={(value) => handleChange('program', value)}
             />
 
@@ -357,6 +366,7 @@ function ProfileDetailsCard(
                 label="University"
                 value={formValues.university}
                 disabled={!isEditing}
+                required
                 onChange={(value) => handleChange('university', value)}
             />
             </div>
@@ -371,6 +381,7 @@ function ProfileDetailsCard(
             label="Position"
             value={formValues.position}
             disabled
+            required
             onChange={(value) => handleChange('position', value)}
             />
 
@@ -378,6 +389,7 @@ function ProfileDetailsCard(
             label="Department"
             value={formValues.department}
             disabled
+            required
             onChange={(value) => handleChange('department', value)}
             />
 
@@ -395,6 +407,7 @@ function ProfileDetailsCard(
                 type="date"
                 value={formValues.start_date}
                 disabled
+                required
                 onChange={(value) => handleChange('start_date', value)}
             />
             
@@ -402,6 +415,7 @@ function ProfileDetailsCard(
                 label="Required Hours"
                 value={formValues.required_hours}
                 disabled
+                required
                 onChange={(value) => handleChange('required_hours', value)}
             />
 
@@ -417,6 +431,7 @@ function ProfileDetailsCard(
             label="Office"
             value={formValues.office}
             disabled
+            required
             onChange={(value) => handleChange('office', value)}
             />
         </div>
@@ -430,6 +445,7 @@ type ProfileFieldProps = {
     value: string;
     type?: string;
     disabled?: boolean;
+    required?: boolean;
     onChange: (value: string) => void;
 };
 
@@ -438,11 +454,15 @@ function ProfileField({
     value,
     type = 'text',
     disabled = false,
+    required = false,
     onChange,
 }: ProfileFieldProps) {
     return (
         <div>
-        <label className="text-xs font-medium">{label}</label>
+        <label className="inline-flex items-center gap-1 text-xs font-medium">
+            {label}
+            {required && <RequiredMark />}
+        </label>
 
         <input
             type={type}
@@ -465,6 +485,7 @@ type ProfileDropdownFieldProps = {
         label: string;
         value: string;
     }[];
+    required?: boolean;
     onToggle: () => void;
     onSelect: (value: string) => void;
 };
@@ -473,6 +494,7 @@ function ProfileDropdownField({
     label,
     value,
     disabled = false,
+    required = false,
     placeholder = 'Select option',
     isOpen,
     options,
@@ -484,7 +506,10 @@ function ProfileDropdownField({
 
     return (
         <div>
-        <label className="text-xs font-medium">{label}</label>
+        <label className="inline-flex items-center gap-1 text-xs font-medium">
+            {label}
+            {required && <RequiredMark />}
+        </label>
 
         <div className="relative">
             <button

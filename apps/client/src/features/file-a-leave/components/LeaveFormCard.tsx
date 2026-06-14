@@ -1,17 +1,18 @@
 import { ChevronDown } from 'lucide-react';
 import { useRef, useState } from 'react';
 
-import StatusMessage from '../../../components/feedback/StatusMessage';
+import { useMutation } from '@tanstack/react-query';
+import type { LeaveReason } from '../../../../../shared/types/enums.types';
 import type {
     LeaveForm,
     LeaveFormErrors,
 } from '../../../../../shared/types/leave.types';
-import type { LeaveReason } from '../../../../../shared/types/enums.types';
-import { 
-    insertLeaveRequest,
-    checkLeaveRequestDates
- } from '../../../api/leave.api';
-import { useMutation } from '@tanstack/react-query';
+import {
+    checkLeaveRequestDates,
+    insertLeaveRequest
+} from '../../../api/leave.api';
+import StatusMessage from '../../../components/feedback/StatusMessage';
+import RequiredMark from '../../../components/ui/RequiredMark';
 import { validateLeaveForm } from '../../../utils/validateLeave.ts';
 
 const leaveTypeOptions: { label: string; value: LeaveReason }[] = [
@@ -161,7 +162,7 @@ function LeaveFormCard() {
 
             <form onSubmit={handleSubmitClick} className="mt-5 space-y-4">
             <div>
-                <label className="text-xs font-semibold text-gray-700 sm:text-sm">Type of Leave</label>
+                <label className="text-xs font-semibold text-gray-700 sm:text-sm">Type of Leave <RequiredMark /> </label>
 
                 <div className="relative mt-1.5">
                 <button
@@ -202,7 +203,7 @@ function LeaveFormCard() {
 
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-3">
                 <div className="flex-1">
-                <label className="text-xs font-semibold text-gray-700 sm:text-sm">Start Date</label>
+                <label className="text-xs font-semibold text-gray-700 sm:text-sm">Start Date <RequiredMark /> </label>
                 <input
                     ref={startDateRef}
                     type="date"
@@ -223,7 +224,7 @@ function LeaveFormCard() {
                 </span>
 
                 <div className="flex-1">
-                <label className="text-xs font-semibold text-gray-700 sm:text-sm">End Date</label>
+                <label className="text-xs font-semibold text-gray-700 sm:text-sm">End Date <RequiredMark /> </label>
                 <input
                     ref={endDateRef}
                     type="date"
@@ -241,7 +242,7 @@ function LeaveFormCard() {
             </div>
 
             <div>
-                <label className="text-xs font-semibold text-gray-700 sm:text-sm">Description</label>
+                <label className="text-xs font-semibold text-gray-700 sm:text-sm">Description <RequiredMark /> </label>
                 <textarea
                 value={formValues.description}
                 onChange={(event) =>
