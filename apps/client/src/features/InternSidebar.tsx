@@ -1,8 +1,18 @@
-import { Calendar, FileClock, Home, LogOut, User } from 'lucide-react';
+import { 
+  Calendar, 
+  FileClock, 
+  Home, 
+  LogOut, 
+  User 
+} from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import profilepic from "../assets/images/default_pic.png";
-import type { UserProfile } from '../../../shared/types/profile.types';
 import { logoutUserAPI } from '../api/auth.api';
+import {
+  getAuthUser,
+  getFullName,
+  getPosition
+} from '../utils/auth.ts'
 
 const navItems = [
   {
@@ -27,47 +37,11 @@ const navItems = [
   },
 ];
 
-function getAuthUser(): UserProfile | null {
-  const storedUser = localStorage.getItem('authUser');
-
-  if (!storedUser) return null;
-
-  try {
-    return JSON.parse(storedUser) as UserProfile;
-  } catch {
-    return null;
-  }
-}
-
-function getFullName(user: UserProfile | null) {
-  if (!user) return 'Intern';
-
-  const fullName = [
-    user.first_name,
-    user.last_name,
-  ]
-    .filter(Boolean)
-    .join(' ');
-
-  return fullName || 'Intern';
-}
-
-function getPosition(user: UserProfile | null) {
-  if (!user) return 'No Position';
-
-  const position = [
-    user.position,
-  ]
-
-  return position;
-}
-
 function InternSidebar() {
   const navigate = useNavigate();
   const location = useLocation();
 
   const user = getAuthUser();
-
   const fullName = getFullName(user);
   const position = getPosition(user);
 

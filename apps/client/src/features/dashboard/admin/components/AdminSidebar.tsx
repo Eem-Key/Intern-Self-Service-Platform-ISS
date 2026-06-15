@@ -8,8 +8,12 @@ import {
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { logoutUserAPI } from '../../../../api/auth.api';
-import type { UserProfile } from '../../../../../../shared/types/profile.types';
 import profilepic from '../../../../assets/images/default_pic.png';
+import {
+  getAuthUser,
+  getFullName,
+  getPosition
+} from '../../../../utils/auth.ts'
 
 const navItems = [
     {
@@ -33,32 +37,6 @@ const navItems = [
         icon: CircleCheckBig,
     },
 ];
-
-function getAuthUser(): UserProfile | null {
-    const storedUser = localStorage.getItem('authUser');
-
-    if (!storedUser) return null;
-
-    try {
-        return JSON.parse(storedUser) as UserProfile;
-    } catch {
-        return null;
-    }
-}
-
-function getFullName(user: UserProfile | null) {
-    if (!user) return 'Admin';
-
-    const fullName = [user.first_name, user.last_name]
-        .filter(Boolean)
-        .join(' ');
-
-    return fullName || 'Admin';
-}
-
-function getPosition(user: UserProfile | null) {
-    return user?.position || 'No Position';
-}
 
 function AdminSidebar() {
     const navigate = useNavigate();

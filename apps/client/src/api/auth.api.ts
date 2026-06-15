@@ -6,6 +6,56 @@ import type {
 } from '../../../shared/types/login.types';
 import type { UserProfile } from '../../../shared/types/profile.types';
 import { fetchUserProfileAPI } from './profile.api'
+import { isAccountActive } from '../utils/auth';
+
+export async function loginUserAPI(payload: LoginFormValues): Promise<LoginResponse> {
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email: payload.email,
+        password: payload.password,
+    });
+    
+    if (authError) {
+        throw new Error(authError.message);
+    }
+
+    const user = authData.user;
+    if (!user) {
+        throw new Error('Authentication failed. User session empty.');
+    }
+
+    const userProfile: UserProfile = await fetchUserProfileAPI(user.id)
+
+    if (!await isAccountActive(userProfile.id, userProfile.role)) {
+        console.log('inactive')
+        await supabase.auth.signOut();
+        throw new Error('Your internship account is no longer active.');
+    }
+    
+    console.log('active')
+
+    return {
+        message: 'Login successful',
+        data: {
+            accessToken: authData.session?.access_token || '',
+            refreshToken: authData.session?.refresh_token || '',
+            user: userProfile,
+        },
+    };
+}
+
+export async function logoutUserAPI(): Promise<{ error: string | null }> {
+    try {
+        const { error } = await supabase.auth.signOut();
+
+        if (error) {
+            return { error: error.message };
+        }
+
+        return { error: null };
+    } catch (err) {
+        return { error: 'An unexpected error occurred during logout.' };
+    }
+}
 
 export async function updatePasswordAPI(
     payload: ChangePasswordValues, 
@@ -41,46 +91,5 @@ export async function updatePasswordAPI(
         return { error: null };
     } catch (err) {
         return { error: 'An unexpected error occurred while updating your password.' };
-    }
-}
-
-export async function loginUserAPI(payload: LoginFormValues): Promise<LoginResponse> {
-    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email: payload.email,
-        password: payload.password,
-    });
-    
-    if (authError) {
-        throw new Error(authError.message);
-    }
-
-    const user = authData.user;
-    if (!user) {
-        throw new Error('Authentication failed. User session empty.');
-    }
-
-    const userProfile: UserProfile = await fetchUserProfileAPI(user.id)
-
-    return {
-        message: 'Login successful',
-        data: {
-            accessToken: authData.session?.access_token || '',
-            refreshToken: authData.session?.refresh_token || '',
-            user: userProfile,
-        },
-    };
-}
-
-export async function logoutUserAPI(): Promise<{ error: string | null }> {
-    try {
-        const { error } = await supabase.auth.signOut();
-
-        if (error) {
-            return { error: error.message };
-        }
-
-        return { error: null };
-    } catch (err) {
-        return { error: 'An unexpected error occurred during logout.' };
     }
 }
