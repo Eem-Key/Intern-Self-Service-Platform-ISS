@@ -43,7 +43,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!session && !accessToken) {
+  if (!session) {
     return <Navigate to="/login" replace />;
   }
 

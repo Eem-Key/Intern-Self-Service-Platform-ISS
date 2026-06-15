@@ -19,3 +19,12 @@ export type TimeOutResponse = {
     message: string;
     data: AttendanceRecord;
 };
+
+export type AttendanceWithName = AttendanceRecord & {
+    Name: {
+        first_name: string;
+        middle_name: string | null;
+        last_name: string;
+        suffix: string | null;
+    } | null;
+};

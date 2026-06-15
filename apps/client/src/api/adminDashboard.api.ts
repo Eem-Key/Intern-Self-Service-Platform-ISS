@@ -1,5 +1,5 @@
 import { supabase } from '../config/supabase';
-import type { AttendanceRecord } from '../../../shared/types/attendance.types';
+import type { AttendanceWithName } from '../../../shared/types/attendance.types';
 import { getAuthUserId, isAdmin } from '../utils/auth';
 
 export async function fetchActiveInternsAPI(): Promise<number> {
@@ -54,7 +54,7 @@ export async function fetchActiveAttendanceAPI(): Promise<number> {
 export async function fetchAttendancePerDateRange(
     start_date: string, 
     end_date: string
-): Promise<AttendanceRecord[]>{
+): Promise<AttendanceWithName[]>{
     const userId = await getAuthUserId();
     if (!userId) {
         throw new Error('You must be logged in to fetch your profile.');
@@ -67,7 +67,17 @@ export async function fetchAttendancePerDateRange(
 
     const { data: attendanceLogs, error: fetchError } = await supabase
         .from('attendance_logs')
-        .select('*')
+        .select(`
+            *,
+            interns(
+                profiles(
+                        first_name,
+                        middle_name,
+                        last_name,
+                        suffix
+                    )
+                ) 
+        `)
         .gte('work_date', start_date)
         .lte('work_date', end_date);
     
@@ -75,5 +85,14 @@ export async function fetchAttendancePerDateRange(
         throw new Error(`Error fetching attendance: ${fetchError.message}`);
     }
 
-    return (attendanceLogs as AttendanceRecord[]) || [];
+    return (attendanceLogs || []).map((item: any) => ({
+        id: item.id,
+        intern_id: item.intern_id,
+        clock_in: item.clock_in,
+        clock_out: item.clock_out,
+        work_date: item.work_date,
+        hours_logged: item.hours_logged,
+        work_setup: item.work_setup,
+        Name: item.interns?.profiles || null 
+    })) as AttendanceWithName[];
 }
