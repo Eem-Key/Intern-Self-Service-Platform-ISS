@@ -26,12 +26,9 @@ export async function loginUserAPI(payload: LoginFormValues): Promise<LoginRespo
     const userProfile: UserProfile = await fetchUserProfileAPI(user.id)
 
     if (!await isAccountActive(userProfile.id, userProfile.role)) {
-        console.log('inactive')
         await supabase.auth.signOut();
         throw new Error('Your internship account is no longer active.');
     }
-    
-    console.log('active')
 
     return {
         message: 'Login successful',
