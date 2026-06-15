@@ -72,7 +72,7 @@ function AttendanceCard() {
   const hasAttendanceForToday = Boolean(todayAttendance);
   const currentWorkSetup = todayAttendance?.work_setup || selectedWorkSetup;
 
-  const elapsedTime = useAttendanceTimer(
+  const { elapsedTime, isLunchBreak } = useAttendanceTimer(
     todayAttendance?.clock_in ?? null,
     todayAttendance?.clock_out ?? null
   );
@@ -130,6 +130,8 @@ function AttendanceCard() {
         }),
         queryClient.invalidateQueries({ queryKey: ['program-progress'] }),
         queryClient.invalidateQueries({ queryKey: ['attendance-report'] }),
+        queryClient.invalidateQueries({ queryKey: ['eod-attendance', todayDateKey] }),
+        queryClient.invalidateQueries({ queryKey: ['eod-report', todayDateKey] }),
       ]);
 
       setStatusMessage({
@@ -248,14 +250,38 @@ function AttendanceCard() {
         />
       )}
 
-      <h2 className="border-b-4 border-[#FFBF10] pb-1 text-lg font-bold sm:text-xl xl:text-2xl">
-        Online Attendance
-      </h2>
+      <div className="border-b-4 border-[#FFBF10] pb-1">
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="text-lg font-bold sm:text-xl xl:text-2xl">
+          Online Attendance
+        </h2>
+
+        {isLunchBreak && hasTimedIn && !hasTimedOut && (
+          <span className="rounded-full bg-[#FFF3C4] px-3 py-1 text-xs font-semibold text-[#9A6B00]">
+            Lunch break
+          </span>
+        )}
+      </div>
+    </div>
 
       <div className="mt-6 text-center">
-        <p className="text-5xl font-bold leading-none tracking-tight sm:text-5xl xl:text-[56px]">
-          {isLoading ? '00:00:00' : elapsedTime}
-        </p>
+        <div className="group relative mx-auto inline-block">
+          <p
+            className={`text-5xl font-bold leading-none tracking-tight sm:text-5xl xl:text-[56px] ${
+              isLunchBreak && hasTimedIn && !hasTimedOut
+                ? 'cursor-help text-gray-700'
+                : 'text-black'
+            }`}
+          >
+            {isLoading ? '00:00' : elapsedTime}
+          </p>
+
+          {isLunchBreak && hasTimedIn && !hasTimedOut && (
+            <div className="pointer-events-none absolute left-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-full bg-[#FFF3C4] px-3 py-1.5 text-xs font-semibold text-[#9A6B00] opacity-0 shadow-md transition-opacity group-hover:opacity-100">
+              On pause during lunch break
+            </div>
+          )}
+        </div>
 
         <p className="mt-2 text-sm text-gray-700 sm:text-base">
           {formatToday()}

@@ -1,18 +1,21 @@
 import { ChevronDown } from 'lucide-react';
-import { useRef, useState } from 'react';
-
-import StatusMessage from '../../../components/feedback/StatusMessage';
+import { useEffect, useRef, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { LeaveReason } from '../../../../../shared/types/enums.types';
 import type {
     LeaveForm,
     LeaveFormErrors,
 } from '../../../../../shared/types/leave.types';
-import type { LeaveReason } from '../../../../../shared/types/enums.types';
-import { 
-    insertLeaveRequest,
-    checkLeaveRequestDates
- } from '../../../api/leave.api';
-import { useMutation } from '@tanstack/react-query';
+import {
+  checkLeaveRequestDates,
+  fetchAllLeaveRequestDatesOfIntern,
+  insertLeaveRequest,
+} from '../../../api/leave.api';
+import StatusMessage from '../../../components/feedback/StatusMessage';
+import RequiredMark from '../../../components/ui/RequiredMark';
 import { validateLeaveForm } from '../../../utils/validateLeave.ts';
+import { DayPicker } from 'react-day-picker';
+import 'react-day-picker/dist/style.css';
 
 const leaveTypeOptions: { label: string; value: LeaveReason }[] = [
     {
@@ -26,9 +29,16 @@ const leaveTypeOptions: { label: string; value: LeaveReason }[] = [
 ];
 
 function LeaveFormCard() {
-    const startDateRef = useRef<HTMLInputElement | null>(null);
-    const endDateRef = useRef<HTMLInputElement | null>(null);
+    const queryClient = useQueryClient();
+    const [activeDatePicker, setActiveDatePicker] = useState<
+    'start_date' | 'end_date' | null
+    >(null);
+    const datePickerRef = useRef<HTMLDivElement | null>(null);
 
+    const { data: unavailableLeaveDates = [] } = useQuery({
+    queryKey: ['intern-leave-dates'],
+    queryFn: fetchAllLeaveRequestDatesOfIntern,
+    });
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     const [formValues, setFormValues] = useState<LeaveForm>({
@@ -62,7 +72,62 @@ function LeaveFormCard() {
         }, 5000);
     };
 
+    const isDateOverlappingExistingLeave = (date: string) => {
+        if (!date) return false;
+
+        return unavailableLeaveDates.some((leave) => {
+            return date >= leave.start_date && date <= leave.end_date;
+        });
+        };
+
+        const isDateRangeOverlappingExistingLeave = (
+        startDate: string,
+        endDate: string
+        ) => {
+        if (!startDate || !endDate) return false;
+
+        return unavailableLeaveDates.some((leave) => {
+            return startDate <= leave.end_date && endDate >= leave.start_date;
+        });
+    };
+
+    useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+        if (
+        activeDatePicker &&
+        datePickerRef.current &&
+        !datePickerRef.current.contains(event.target as Node)
+        ) {
+        setActiveDatePicker(null);
+        }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+    };
+    }, [activeDatePicker]);
+
     const handleChange = (field: keyof LeaveForm, value: string) => {
+        if (
+            (field === 'start_date' || field === 'end_date') &&
+            isDateOverlappingExistingLeave(value)
+        ) {
+            setErrors((prev) => ({
+            ...prev,
+            [field]: 'This date is already covered by an existing leave request.',
+            }));
+
+            showStatusMessage(
+            'error',
+            'Date Unavailable',
+            'You already have a leave request during this date.'
+            );
+
+            return;
+        }
+
         setFormValues((prev) => ({
             ...prev,
             [field]: value,
@@ -74,14 +139,6 @@ function LeaveFormCard() {
         }));
     };
 
-    const openDatePicker = (ref: React.RefObject<HTMLInputElement | null>) => {
-        if (ref.current?.showPicker) {
-        ref.current.showPicker();
-        return;
-        }
-
-        ref.current?.focus();
-    };
 
     const handleCancel = () => {
         setFormValues({
@@ -98,13 +155,16 @@ function LeaveFormCard() {
     const submitMutation = useMutation({
         mutationFn: insertLeaveRequest,
         onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['intern-leave-dates'] });
+
             showStatusMessage(
                 'success',
                 'Leave Filed!',
                 'Your request is now waiting for supervisor approval.'
             );
+
             handleCancel();
-        },
+            },
         onError: (error: Error) => {
             showStatusMessage('error', 'Submission Failed', error.message);
         }
@@ -115,13 +175,51 @@ function LeaveFormCard() {
 
         const validationErrors = validateLeaveForm(formValues);
 
-        if (Object.keys(validationErrors).length > 0) {
-            setErrors(validationErrors);
-            showStatusMessage(
-                'error',
-                'Submission Failed',
-                'You couldn’t file your leave. Please check your entries and try again.'
-            );
+            if (!formValues.reason_category) {
+            validationErrors.reason_category = 'Type of leave is required.';
+            }
+
+            if (!formValues.start_date) {
+            validationErrors.start_date = 'Start date is required.';
+            }
+
+            if (!formValues.end_date) {
+            validationErrors.end_date = 'End date is required.';
+            }
+
+            if (!formValues.description.trim()) {
+            validationErrors.description = 'Description is required.';
+            }
+
+            if (Object.keys(validationErrors).length > 0) {
+                setErrors(validationErrors);
+
+                showStatusMessage(
+                    'error',
+                    'Submission Failed',
+                    'You couldn’t file your leave. Please check your entries and try again.'
+                );
+
+                return;
+                }
+
+                if (
+                isDateRangeOverlappingExistingLeave(
+                    formValues.start_date,
+                    formValues.end_date
+                )
+                ) {
+                setErrors({
+                    start_date: 'This date range overlaps with an existing leave request.',
+                    end_date: 'This date range overlaps with an existing leave request.',
+                });
+
+                showStatusMessage(
+                    'error',
+                    'Overlap Detected',
+                    'Please choose different dates.'
+                );
+
             return;
         }
         try {
@@ -129,6 +227,7 @@ function LeaveFormCard() {
             
             if (hasOverlap) {
                 setErrors({ 
+                    start_date: 'You already have a leave request during this period.',
                     end_date: 'You already have a leave request during this period.' 
                 });
                 showStatusMessage('error', 'Overlap Detected', 'Please choose different dates.');
@@ -141,6 +240,22 @@ function LeaveFormCard() {
         }
     };
 
+    const disabledLeaveDateRanges = unavailableLeaveDates.map((leave) => ({
+    from: new Date(`${leave.start_date}T00:00:00`),
+    to: new Date(`${leave.end_date}T00:00:00`),
+    }));
+
+    const formatDateKey = (date: Date) => {
+    return date.toLocaleDateString('en-CA');
+    };
+
+    const isDisabledLeaveDate = (date: Date) => {
+    const dateKey = formatDateKey(date);
+
+    return unavailableLeaveDates.some((leave) => {
+        return dateKey >= leave.start_date && dateKey <= leave.end_date;
+    });
+    };
 
     return (
         <>
@@ -161,7 +276,7 @@ function LeaveFormCard() {
 
             <form onSubmit={handleSubmitClick} className="mt-5 space-y-4">
             <div>
-                <label className="text-xs font-semibold text-gray-700 sm:text-sm">Type of Leave</label>
+                <label className="text-xs font-semibold text-gray-700 sm:text-sm">Type of Leave <RequiredMark /> </label>
 
                 <div className="relative mt-1.5">
                 <button
@@ -200,48 +315,154 @@ function LeaveFormCard() {
                 )}
             </div>
 
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-3">
-                <div className="flex-1">
-                <label className="text-xs font-semibold text-gray-700 sm:text-sm">Start Date</label>
-                <input
-                    ref={startDateRef}
-                    type="date"
-                    value={formValues.start_date}
-                    onClick={() => openDatePicker(startDateRef)}
-                    onChange={(event) =>
-                    handleChange('start_date', event.target.value)
-                    }
-                    className="mt-1.5 h-11 w-full rounded-lg bg-[#eeeeee] px-4 text-sm outline-none transition-all focus:bg-gray-200"
-                />
-                {errors.start_date && (
-                    <p className="mt-1 text-xs text-red-600 font-medium">{errors.start_date}</p>
-                )}
+            <div  ref={datePickerRef} className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-3">
+                <div className="relative flex-1">
+                    <label className="text-xs font-semibold text-gray-700 sm:text-sm">
+                        Start Date <RequiredMark />
+                    </label>
+
+                    <button
+                        type="button"
+                        onClick={() =>
+                        setActiveDatePicker((prev) =>
+                            prev === 'start_date' ? null : 'start_date'
+                        )
+                        }
+                        className="mt-1.5 flex h-11 w-full items-center justify-between rounded-lg bg-[#eeeeee] px-4 text-left text-sm outline-none transition-all focus:bg-gray-200"
+                    >
+                        <span className={formValues.start_date ? 'text-black' : 'text-gray-400'}>
+                        {formValues.start_date || 'Select start date'}
+                        </span>
+                    </button>
+
+                    {activeDatePicker === 'start_date' && (
+                        <div className="absolute left-0 top-full z-40 mt-2 rounded-lg bg-white p-3 shadow-xl">
+                        <DayPicker
+                            mode="single"
+                            selected={
+                                formValues.start_date
+                                ? new Date(`${formValues.start_date}T00:00:00`)
+                                : undefined
+                            }
+                            disabled={isDisabledLeaveDate}
+                            modifiersClassNames={{
+                                disabled:
+                                'opacity-30 text-gray-400 line-through cursor-not-allowed bg-gray-100',
+                                selected:
+                                'bg-[#FFBF10] text-black font-bold rounded-full',
+                                today:
+                                'font-bold text-[#002D6F]',
+                            }}
+                            onSelect={(date) => {
+                                if (!date) return;
+
+                                if (isDisabledLeaveDate(date)) {
+                                setErrors((prev) => ({
+                                    ...prev,
+                                    start_date: 'This date is already covered by an existing leave request.',
+                                }));
+
+                                showStatusMessage(
+                                    'error',
+                                    'Date Unavailable',
+                                    'You already have a leave request during this date.'
+                                );
+
+                                return;
+                                }
+
+                                const selectedDate = formatDateKey(date);
+                                handleChange('start_date', selectedDate);
+                                setActiveDatePicker(null);
+                            }}
+                            />
+                        </div>
+                    )}
+
+                    {errors.start_date && (
+                        <p className="mt-1 text-xs font-medium text-red-600">
+                        {errors.start_date}
+                        </p>
+                    )}
                 </div>
 
                 <span className="hidden pt-10 text-lg font-bold text-gray-400 sm:block shrink-0">
                 &ndash;
                 </span>
 
-                <div className="flex-1">
-                <label className="text-xs font-semibold text-gray-700 sm:text-sm">End Date</label>
-                <input
-                    ref={endDateRef}
-                    type="date"
-                    value={formValues.end_date}
-                    onClick={() => openDatePicker(endDateRef)}
-                    onChange={(event) =>
-                    handleChange('end_date', event.target.value)
-                    }
-                    className="mt-1.5 h-11 w-full rounded-lg bg-[#eeeeee] px-4 text-sm outline-none transition-all focus:bg-gray-200"
-                />
-                {errors.end_date && (
-                    <p className="mt-1 text-xs text-red-600 font-medium">{errors.end_date}</p>
-                )}
+                <div className="relative flex-1">
+                    <label className="text-xs font-semibold text-gray-700 sm:text-sm">
+                        End Date <RequiredMark />
+                    </label>
+
+                    <button
+                        type="button"
+                        onClick={() =>
+                        setActiveDatePicker((prev) =>
+                            prev === 'end_date' ? null : 'end_date'
+                        )
+                        }
+                        className="mt-1.5 flex h-11 w-full items-center justify-between rounded-lg bg-[#eeeeee] px-4 text-left text-sm outline-none transition-all focus:bg-gray-200"
+                    >
+                        <span className={formValues.end_date ? 'text-black' : 'text-gray-400'}>
+                        {formValues.end_date || 'Select end date'}
+                        </span>
+                    </button>
+
+                    {activeDatePicker === 'end_date' && (
+                        <div className="absolute left-0 top-full z-40 mt-2 rounded-lg bg-white p-3 shadow-xl">
+                        <DayPicker
+                        mode="single"
+                        selected={
+                            formValues.end_date
+                            ? new Date(`${formValues.end_date}T00:00:00`)
+                            : undefined
+                        }
+                        disabled={isDisabledLeaveDate}
+                        modifiersClassNames={{
+                            disabled:
+                            'opacity-30 text-gray-400 line-through cursor-not-allowed bg-gray-100',
+                            selected:
+                            'bg-[#FFBF10] text-black font-bold rounded-full',
+                            today:
+                            'font-bold text-[#002D6F]',
+                        }}
+                        onSelect={(date) => {
+                            if (!date) return;
+
+                            if (isDisabledLeaveDate(date)) {
+                            setErrors((prev) => ({
+                                ...prev,
+                                end_date: 'This date is already covered by an existing leave request.',
+                            }));
+
+                            showStatusMessage(
+                                'error',
+                                'Date Unavailable',
+                                'You already have a leave request during this date.'
+                            );
+
+                            return;
+                            }
+
+                            const selectedDate = formatDateKey(date);
+                            handleChange('end_date', selectedDate);
+                            setActiveDatePicker(null);
+                        }}
+                        />
+                        </div>
+                    )}
+
+                    {errors.end_date && (
+                        <p className="mt-1 text-xs font-medium text-red-600">
+                        {errors.end_date}
+                        </p>
+                    )}
                 </div>
             </div>
 
             <div>
-                <label className="text-xs font-semibold text-gray-700 sm:text-sm">Description</label>
+                <label className="text-xs font-semibold text-gray-700 sm:text-sm">Description <RequiredMark /> </label>
                 <textarea
                 value={formValues.description}
                 onChange={(event) =>
