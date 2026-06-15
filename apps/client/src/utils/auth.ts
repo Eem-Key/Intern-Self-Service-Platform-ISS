@@ -32,7 +32,7 @@ export async function isAdmin(): Promise<boolean> {
 }
 
 export async function isAccountActive(userId: String, role: UserRole): Promise<boolean> {
-  if (role === 'Admin') return true 
+  if (role === 'admin') return true 
 
   const { data: intern, error } = await supabase
     .from('interns')
@@ -44,7 +44,7 @@ export async function isAccountActive(userId: String, role: UserRole): Promise<b
     console.error('Error fetching user profile:', error);
     return false;
   }
-  
+
   return intern.status === 'active';
 }
 
