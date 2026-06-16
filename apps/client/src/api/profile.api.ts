@@ -238,3 +238,33 @@ export async function hasPendingProfileUpdateRequestAPI(
 
     return data.length > 0;
 }
+
+export async function updateProfileUpdateRequestAPI(
+    requestId: string,
+    updateRequest: ProfileUpdateRequestForm
+): Promise<ProfileUpdateRequest> {
+    const userId = await getAuthUserId();
+
+    if (!userId) {
+        throw new Error('You must be logged in to update a profile update request.');
+    }
+
+    const { data: updatedRequest, error } = await supabase
+        .from('profile_update_requests')
+        .update({
+        update_type: updateRequest.update_type,
+        requested_data: updateRequest.requested_data,
+        reason: updateRequest.reason || null,
+        })
+        .eq('id', requestId)
+        .eq('intern_id', userId)
+        .eq('status', 'pending')
+        .select()
+        .single();
+
+    if (error) {
+        throw new Error(`Error updating profile update request: ${error.message}`);
+    }
+
+    return updatedRequest;
+}
