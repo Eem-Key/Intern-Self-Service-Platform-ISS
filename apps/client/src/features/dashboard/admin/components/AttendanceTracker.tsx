@@ -275,9 +275,13 @@ function formatTime(value?: string | null) {
 function getAttendanceName(attendance: AttendanceWithName) {
     if (!attendance.Name) return '--';
 
+    const middleInitial = attendance.Name.middle_name
+        ? `${attendance.Name.middle_name.charAt(0).toUpperCase()}.`
+        : null;
+
     const fullName = [
         attendance.Name.first_name,
-        attendance.Name.middle_name,
+        middleInitial,
         attendance.Name.last_name,
         attendance.Name.suffix,
     ]
