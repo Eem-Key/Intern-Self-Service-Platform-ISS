@@ -1,19 +1,19 @@
 import {
-  ClipboardList,
-  LayoutDashboard,
-  LogOut,
-  User,
-  CircleCheckBig,
+    CircleCheckBig,
+    ClipboardList,
+    LayoutDashboard,
+    LogOut,
+    User,
 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { logoutUserAPI } from '../../../../api/auth.api';
-import profilepic from '../../../../assets/images/default_pic.png';
+import profilepic from '../assets/images/default_pic.png';
+import { logoutUserAPI } from '../api/auth.api.ts';
 import {
-  getAuthUser,
-  getFullName,
-  getPosition
-} from '../../../../utils/auth.ts'
+    getAuthUser,
+    getFullName,
+    getPosition
+} from '../utils/auth.ts';
 
 const navItems = [
     {
@@ -62,7 +62,7 @@ function AdminSidebar() {
         }
     };
 
-    const userAvatar = user?.avatar_url ? user.avatar_url : profilepic;
+    const userAvatar = user?.avatar_url || profilepic;
 
     return (
         <aside className="w-full bg-[#002D6F] px-4 py-5 text-white lg:fixed lg:left-0 lg:top-0 lg:flex lg:h-screen lg:w-[270px] lg:flex-col lg:px-6 lg:py-8">

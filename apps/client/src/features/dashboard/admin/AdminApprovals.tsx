@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import AdminSidebar from './components/AdminSidebar';
+import AdminSidebar from '../../AdminSidebar';
 
 function AdminApprovals() {
 
