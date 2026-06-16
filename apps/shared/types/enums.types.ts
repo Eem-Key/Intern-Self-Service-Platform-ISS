@@ -16,8 +16,20 @@ export type CompanyDepartment = 'SDS' | 'ISS';
 // Intern
 export type InternshipStatus = 'active' | 'completed' | 'extended' | 'terminated';
 
+export type InternPosition = 	'quality_assurance' | 'frontend_developer' | 'backend_developer' | 'business_analyst';
+
 // Admin
-export type AdminAccess = 'project_manager' | 'human_resource';
+export type AdminPosition = 'project_manager' | 'human_resource';
+
+//Record
+export type RecordType = 
+  | 'attendance' 
+  | 'eod_report' 
+  | 'leave_request' 
+  | 'profile_update';
+
+// Attendance Logs
+export type WorkSetup = 'onsite' | 'wfh';
 
 // EOD Report
 export const REPORT_STATUS_VALUES = ['draft', 'pending', 'approved', 'denied'] as const;
@@ -31,12 +43,13 @@ export type ProfileUpdateType = typeof PROFILE_UPDATE_TYPE_VALUES[number];
 export const LEAVE_REASON_VALUES = ['sick_medical', 'academic'] as const;
 export type LeaveReason = typeof LEAVE_REASON_VALUES[number];
 
-// Attendance Logs
-export type WorkSetupType = 'onsite' | 'wfh';
-
-// Logs
-export type LogType = 
-  | 'attendance' 
-  | 'eod_report' 
-  | 'leave_request' 
-  | 'profile_update';
+// Log
+export type ActivityDescription = 
+| 'Time In' 
+| 'Time Out' 
+| 'Submission of EOD Report' 
+| 'Submission of Draft' 
+| 'Academic Leave' 
+| 'Medical Leave' 
+| 'Profile Information' 
+| 'Profile Picture';

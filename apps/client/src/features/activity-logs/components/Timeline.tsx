@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import type { LogType } from '../../../../../shared/types/enums.types';
 import { mockActivityLogs } from '../data/MockActivityLogs';
-import type { ActivityLog } from '../../../../../shared/types/logs.types';
+import type { ActivityLog } from '../../../../../shared/types/activityLog.types';
 import LogDetailsModal from './LogDetails';
 import LogTypeDropdown, { type LogTypeFilter } from './LogType';
 import StatusBadge from './StatusBadge';

@@ -1,6 +1,17 @@
 import { supabase } from '../config/supabase.ts';
 import { getAuthUserId } from '../utils/auth.ts';
-import type { LeaveForm, LeaveRequestInsert } from '../../../shared/types/leave.types.ts';
+import type { LeaveReason } from '../../../shared/types/enums.types.ts';
+import type { 
+    LeaveRequest, 
+    LeaveRequestForm 
+} from '../../../shared/types/leave.types.ts';
+import type {
+    Record,
+    RecordInsert,
+} from '../../../shared/types/record.types';
+import { 
+    insertRecord 
+} from './record.api'
 
 export const fetchAllLeaveRequestDatesOfIntern = async (
 
@@ -12,9 +23,17 @@ export const fetchAllLeaveRequestDatesOfIntern = async (
 
     const { data: leaveDates, error: fetchError } = await supabase
         .from('leave_requests')
-        .select('start_date, end_date') 
-        .eq('intern_id', intern_id)
-        .neq('status', 'denied'); 
+        .select(`
+            start_date, 
+            end_date,   
+            records (
+            id,
+            intern_id,
+            status
+            )
+        `) 
+        .eq('records.intern_id', intern_id)
+        .neq('records.status', 'denied'); 
 
     if (fetchError) {
         throw new Error(fetchError.message);
@@ -23,21 +42,27 @@ export const fetchAllLeaveRequestDatesOfIntern = async (
     return leaveDates || [];
 }
 
-export const insertLeaveRequest = async (formData: LeaveForm) => {
+export const insertLeaveRequest = async (formData: LeaveRequestForm) => {
     const intern_id = await getAuthUserId();
     if (!intern_id) {
         throw new Error(`You must be logged in to file a leave.`);
     }
 
-    const leaveRequest: LeaveRequestInsert = {
-            intern_id: intern_id,
+    const record: RecordInsert = {
+        intern_id: intern_id,
+        log_category: 'leave_request',
+        status: 'pending'
+    }
+
+    const record_id = await insertRecord(record);
+
+    const leaveRequest: LeaveRequest = {
+            record_id: record_id,
             
-            reason_category: formData.reason_category,
+            reason_category: formData.reason_category as LeaveReason,
             description: formData.description,
             start_date: formData.start_date,
             end_date: formData.end_date,
-
-            status: 'pending',
         };
 
     const { data: newLeaveData, error: insertError } = await supabase
@@ -60,15 +85,25 @@ export const checkLeaveRequestDates = async (
     const intern_id = await getAuthUserId();
     if (!intern_id) throw new Error("Not authenticated");
 
-    const { data, error } = await supabase
+    const { data, error} = await supabase
         .from('leave_requests')
-        .select('id')
-        .eq('intern_id', intern_id)
+        .select(`
+            record_id, 
+            records (
+            id,
+            intern_id,
+            status
+            )
+        `)
+        .eq('records.intern_id', intern_id)
         .lte('start_date', endDate)
         .gte('end_date', startDate)
-        .neq('status', 'denied');
+        .neq('records. status', 'denied');
 
-    if (error) throw new Error(error.message);
+    if (error) {
+        console.log(error)
+        throw new Error(error.message);
+    }
 
     return (data?.length ?? 0) > 0;
 };

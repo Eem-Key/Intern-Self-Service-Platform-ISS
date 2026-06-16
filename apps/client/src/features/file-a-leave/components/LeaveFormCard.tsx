@@ -3,8 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { LeaveReason } from '../../../../../shared/types/enums.types';
 import type {
-    LeaveForm,
-    LeaveFormErrors,
+    LeaveRequestForm,
+    LeaveRequestFormErrors,
 } from '../../../../../shared/types/leave.types';
 import {
   checkLeaveRequestDates,
@@ -41,14 +41,14 @@ function LeaveFormCard() {
     });
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-    const [formValues, setFormValues] = useState<LeaveForm>({
+    const [formValues, setFormValues] = useState<LeaveRequestForm>({
         reason_category: '',
         start_date: '',
         end_date: '',
         description: '',
     });
 
-    const [errors, setErrors] = useState<LeaveFormErrors>({});
+    const [errors, setErrors] = useState<LeaveRequestFormErrors>({});
 
     const [statusMessage, setStatusMessage] = useState<{
         variant: 'success' | 'error';
@@ -109,7 +109,7 @@ function LeaveFormCard() {
     };
     }, [activeDatePicker]);
 
-    const handleChange = (field: keyof LeaveForm, value: string) => {
+    const handleChange = (field: keyof LeaveRequestForm, value: string) => {
         if (
             (field === 'start_date' || field === 'end_date') &&
             isDateOverlappingExistingLeave(value)

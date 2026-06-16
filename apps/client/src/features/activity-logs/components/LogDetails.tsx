@@ -8,7 +8,7 @@ import RequiredMark from '../../../components/ui/RequiredMark';
 import { updateEODReportAPI } from '../../../api/eodReport.api';
 import { validateEodReport } from '../../../utils/validateEodReport';
 
-import type { ActivityLog } from '../../../../../shared/types/logs.types';
+import type { ActivityLog } from '../../../../../shared/types/activityLog.types';
 import type {
     EODReportForm,
     EODReportFormErrors,

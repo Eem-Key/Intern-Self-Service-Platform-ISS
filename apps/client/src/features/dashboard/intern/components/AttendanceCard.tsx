@@ -9,7 +9,7 @@ import {
   timeOutAPI,
 } from '../../../../api/attendance.api';
 import { useAttendanceTimer } from './attendance/useAttendanceTimer';
-import type { WorkSetupType } from '../../../../../../shared/types/enums.types';
+import type { WorkSetup } from '../../../../../../shared/types/enums.types';
 
 function formatToday() {
   return new Date().toLocaleDateString('en-US', {
@@ -34,7 +34,7 @@ function formatTime(time?: string | null) {
 }
 
 function AttendanceCard() {
-  const [selectedWorkSetup, setSelectedWorkSetup] = useState<WorkSetupType | ''>('');
+  const [selectedWorkSetup, setSelectedWorkSetup] = useState<WorkSetup | ''>('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [statusMessage, setStatusMessage] = useState<{
     variant: 'success' | 'error';
@@ -88,7 +88,7 @@ function AttendanceCard() {
   }, [statusMessage]);
 
   const timeInMutation = useMutation({
-    mutationFn: (setup: WorkSetupType) => timeInAPI(setup),
+    mutationFn: (setup: WorkSetup) => timeInAPI(setup),
 
     onSuccess: async () => {
       await queryClient.invalidateQueries({
@@ -116,11 +116,11 @@ function AttendanceCard() {
 
   const timeOutMutation = useMutation({
     mutationFn: () => {
-      if (!todayAttendance?.id) {
+      if (!todayAttendance?.record_id) {
         throw new Error('No attendance record found.');
       }
 
-      return timeOutAPI(todayAttendance.id);
+      return timeOutAPI(todayAttendance.record_id);
     },
 
     onSuccess: async () => {
@@ -165,7 +165,7 @@ function AttendanceCard() {
     setIsDropdownOpen(false);
   };
 
-  const handleSelectWorkSetup = (workSetup: WorkSetupType) => {
+  const handleSelectWorkSetup = (workSetup: WorkSetup) => {
     if (hasAttendanceForToday) {
       showWorkSetupLockedError();
       return;

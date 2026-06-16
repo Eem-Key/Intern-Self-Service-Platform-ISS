@@ -1,4 +1,4 @@
-import type { ActivityLog } from '../../../../../shared/types/logs.types';
+import type { ActivityLog } from '../../../../../shared/types/activityLog.types';
 
 export const mockActivityLogs: ActivityLog[] = [
     {

@@ -10,6 +10,15 @@ import type {
 } from '../../../shared/types/eodReport.types';
 import { useQuery } from '@tanstack/react-query';
 import { getAttendanceByDateAPI } from '../api/attendance.api';
+import type {
+    Record,
+    RecordInsert,
+} from '../../../shared/types/record.types';
+import {
+    fetchRecordByDate,
+    insertRecord,
+    updateRecordStatus
+} from './record.api'
 
 export function useEODAttendance(date: string) {
     return useQuery({
@@ -20,7 +29,7 @@ export function useEODAttendance(date: string) {
     });
 }
 
-export function useEODReport(date: string) {
+export function useFetchEODReport(date: string) {
     return useQuery({
         queryKey: ['eod-report', date],
         queryFn: () => fetchEODReportByDateAPI(date),
@@ -30,23 +39,27 @@ export function useEODReport(date: string) {
 
 export async function fetchEODReportByDateAPI(
     date: string
-): Promise<EODReport>  {
-    const intern_id = await getAuthUserId();
-    if (!intern_id) {
-        throw new Error(`You must be logged in to fetch a report.`);
-    }
+): Promise<{
+  report: EODReport;
+  status: ReportStatus | null;
+}>  {
+    const record: Record = await fetchRecordByDate(date, 'eod_report')
 
     const { data: reportData, error: fetchError } = await supabase
         .from('eod_reports')
         .select('*')
         .eq('date_written', date)
-        .eq('intern_id', intern_id)
         .single();
 
     if (fetchError) {
         throw new Error(`Error fetching report: ${fetchError.message}`);
     }
-    return reportData;
+
+
+    return {
+        report: reportData,
+        status: record.status
+    };
 }
 
 export async function insertEODReportAPI(
@@ -58,13 +71,20 @@ export async function insertEODReportAPI(
         throw new Error(`You must be logged in to save a ${reportStatus}.`);
     }
 
-    const report: EODReportInsert = {
+    const record: RecordInsert = {
         intern_id: intern_id,
+        log_category: 'eod_report',
+        status: reportStatus
+    }
+
+    const record_id = await insertRecord(record);
+
+    const report: EODReportInsert = {
+        record_id: record_id,
         date_written: payload.date_written,
         project_name: payload.project_name,
         task_accomplished: payload.task_accomplished,
         hours_spent: payload.hours_spent,
-        status: reportStatus
     };
 
     const { data: newReportData, error: insertError } = await supabase
@@ -97,14 +117,12 @@ export async function updateEODReportAPI(
     const report: EODReportUpdate = {
         project_name: payload.project_name,
         task_accomplished: payload.task_accomplished,
-        hours_spent: payload.hours_spent,
-        status: reportStatus
     };
 
     const { data: updatedReportData, error: updateError } = await supabase
         .from('eod_reports')
         .update([report])
-        .eq('id', reportId)
+        .eq('record_id', reportId)
         .select()
         .single();
 
@@ -113,13 +131,10 @@ export async function updateEODReportAPI(
         throw updateError;
     }
 
+    await updateRecordStatus(reportId, reportStatus);
+
     return {
         message: `EOD ${reportStatus} updated successfully`,
         data: updatedReportData,
     };
-}
-
-// export async function adminReviewEODReportAPI(
-//     reportId: string,
-//     newStatus: ReportStatus,
-    
+}    

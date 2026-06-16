@@ -4,7 +4,7 @@ import { supabase } from '../../../config/supabase';
 import { updateProfileUpdateRequestAPI } from '../../../api/profile.api';
 import RequiredMark from '../../../components/ui/RequiredMark';
 
-import type { ActivityLog } from '../../../../../shared/types/logs.types';
+import type { ActivityLog } from '../../../../../shared/types/activityLog.types';
 import type { ProfileUpdateRequestForm } from '../../../../../shared/types/profile.types';
 
 type PendingProfileUpdateEditorProps = {

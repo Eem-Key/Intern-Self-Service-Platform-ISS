@@ -1,11 +1,16 @@
 import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import type {
-    InternInfo,
     Profile,
     ProfileUpdateRequestForm,
 } from '../../../../../shared/types/profile.types';
-import { requestProfileUpdateAPI, hasPendingProfileUpdateRequestAPI,} from '../../../api/profile.api';
+import type {
+    InternInfo,
+} from '../../../../../shared/types/intern.types';
+import { 
+    insertProfileUpdateRequestAPI, 
+    hasPendingProfileUpdateRequestAPI,
+} from '../../../api/profile.api';
 import StatusMessage from '../../../components/feedback/StatusMessage';
 import ConfirmationModal from '../../../components/feedback/confirmationModal';
 import { validateProfileUpdateRequest } from '../../../utils/validateProfile.ts';
@@ -87,7 +92,7 @@ function ProfileDetailsCard(
     }, [profile]);
 
     const updateRequestMutation = useMutation({
-        mutationFn: (payload: ProfileUpdateRequestForm) => requestProfileUpdateAPI(payload),
+        mutationFn: (payload: ProfileUpdateRequestForm) => insertProfileUpdateRequestAPI(payload),
         
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['intern-profile'] });

@@ -6,7 +6,7 @@ import {
   insertEODReportAPI,
   updateEODReportAPI,
   useEODAttendance,
-  useEODReport,
+  useFetchEODReport,
 } from '../../../../api/eodReport.api';
 import type { EODReportForm, EODReportFormErrors } from '../../../../../../shared/types/eodReport.types';
 import { validateEodReport } from '../../../../utils/validateEodReport';
@@ -32,11 +32,12 @@ function EODReportCard() {
     task_accomplished: '',
   });
   const { data: attendanceData } = useEODAttendance(formValues.date_written);
-  const { data: existingReport } = useEODReport(formValues.date_written);
+  const { data: eodReport } = useFetchEODReport(formValues.date_written);
   const [errors, setErrors] = useState<EODReportFormErrors>({});
   const [statusMessage, setStatusMessage] = useState<any>(null);
+  const existingReport = eodReport?.report;
   const hasTimedOut = !!attendanceData?.clock_out;
-  const isSubmitted = existingReport?.status === 'pending';
+  const isSubmitted = eodReport?.status === 'pending';
 
   const openDatePicker = () => {
     if (dateInputRef.current?.showPicker) {
@@ -57,7 +58,7 @@ function EODReportCard() {
     }));
 
     if (existingReport){
-      setReportId(existingReport.id);
+      setReportId(existingReport.record_id);
       setFormValues(prev => ({
         ...prev,
         hours_spent: hasTimedOut 
