@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import React from 'react';
 
-import FormInput from '../../../components/ui/formInput';
 import PasswordStrength from '../../../components/ui/passwordStrength';
 
 import validateChangePassword from '../../../utils/validateChangePassword';
@@ -165,7 +164,7 @@ function ChangePasswordModal({ onSuccess, id , email}: ChangePasswordModalProps)
                 />
 
                 <ChangePassButton type="submit" className="mt-6">
-                Update Password
+                    Update Password
                 </ChangePassButton>
             </form>
             </div>
@@ -208,22 +207,22 @@ function PasswordField({
 
         <div className="relative">
             <input
-                id={id}
-                type={showPassword ? 'text' : 'password'}
-                value={value}
-                onChange={(event) => onChange(event.target.value)}
-                onFocus={onFocus}
-                onBlur={onBlur}
-                onKeyDown={onKeyDown}
-                className={`h-11 w-full rounded-md bg-[#eeeeee] px-3 pr-10 text-sm outline-none ${
-                    error ? 'ring-1 ring-red-500' : ''
-                }`}
-            />
+            id={id}
+            type={showPassword ? 'text' : 'password'}
+            value={value}
+            onChange={(event) => onChange(event.target.value)}
+            onFocus={onFocus}
+            onBlur={onBlur}
+            onKeyDown={onKeyDown}
+            className={`h-11 w-full rounded-md bg-[#eeeeee] px-3 pr-10 text-sm outline-none ${
+                error ? 'ring-1 ring-red-500' : ''
+            }`}
+        />
 
             <button
             type="button"
             onClick={onToggle}
-            disabled={!onToggle}
+            disabled={!value}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-black disabled:cursor-not-allowed disabled:opacity-40"
             aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
