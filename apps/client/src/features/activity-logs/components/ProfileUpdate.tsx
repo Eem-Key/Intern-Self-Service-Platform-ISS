@@ -261,7 +261,7 @@ function ProfileUpdate({
                 type="button"
                 onClick={onClose}
                 disabled={updateMutation.isPending}
-                className="rounded-full bg-[#eeeeee] px-7 py-2 text-sm font-bold text-gray-600 disabled:cursor-not-allowed disabled:opacity-70"
+                className="px-7 py-2 text-sm font-bold text-gray-600 disabled:cursor-not-allowed disabled:opacity-70"
             >
                 Cancel
             </button>
