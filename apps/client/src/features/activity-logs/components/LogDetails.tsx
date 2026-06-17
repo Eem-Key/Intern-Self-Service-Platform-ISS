@@ -223,7 +223,7 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
         )}
 
         <div className="w-full max-w-[620px] overflow-hidden rounded-xl bg-white shadow-xl">
-            <div className="flex items-start justify-between bg-[#002D6F] px-6 py-4 text-white">
+            <div className="flex items-start justify-between bg-gradient-to-r from-[#005de8] to-[#003d8f] px-6 py-4 text-white">
             <div>
                 <div className="flex flex-wrap items-center gap-3">
                 <h2 className="border-l-4 border-[#FFBF10] pl-2 text-xl font-bold sm:text-2xl">
