@@ -69,14 +69,16 @@ export async function fetchAttendancePerDateRange(
         .from('attendance_logs')
         .select(`
             *,
-            interns(
-                profiles(
-                    first_name,
-                    middle_name,
-                    last_name,
-                    suffix
-                )
-            ) 
+            records(
+                interns(
+                    profiles(
+                        first_name,
+                        middle_name,
+                        last_name,
+                        suffix
+                    )
+                ) 
+            )
         `)
         .gte('work_date', start_date)
         .lte('work_date', end_date);
@@ -86,13 +88,12 @@ export async function fetchAttendancePerDateRange(
     }
 
     return (attendanceLogs || []).map((item: any) => ({
-        id: item.id,
-        intern_id: item.intern_id,
+        record_id: item.record_id,
         clock_in: item.clock_in,
         clock_out: item.clock_out,
         work_date: item.work_date,
         hours_logged: item.hours_logged,
         work_setup: item.work_setup,
-        Name: item.interns?.profiles || null 
+        Name: item.records.interns?.profiles || null 
     })) as AttendanceWithName[];
 }
