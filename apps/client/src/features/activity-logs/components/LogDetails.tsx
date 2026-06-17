@@ -92,6 +92,7 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
     const { data: details, isLoading } = useLogDetails(record);
     record.details = details
 
+
     const [statusMessage, setStatusMessage] = useState<{
         variant: 'success' | 'error';
         title: string;
@@ -99,7 +100,7 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
     } | null>(null);
 
     const [eodFormValues, setEodFormValues] = useState<EODReportForm>({
-        date_written: details.date_written || '',
+        date_written: details?.date_written || '',
         hours_spent: Number(details?.hours_spent || 0),
         project_name: details?.project_name || '',
         task_accomplished: details?.task_accomplished || '',
