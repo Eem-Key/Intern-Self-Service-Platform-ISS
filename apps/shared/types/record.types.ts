@@ -30,6 +30,7 @@ import type {
     >;
 
     export type RecordLog = Record & {
+        display_date: string,
         details?: {
 
             date?: string;

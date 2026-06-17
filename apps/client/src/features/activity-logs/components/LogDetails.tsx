@@ -234,7 +234,7 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
                 </div>
 
                 <p className="mt-1 text-xs text-white/80">
-                Submitted on {formatSubmittedAt(record.created_at)}
+                Submitted on {formatSubmittedAt(record.display_date)}
                 </p>
             </div>
 
