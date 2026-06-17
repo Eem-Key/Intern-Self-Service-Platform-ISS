@@ -1,12 +1,12 @@
-import { useMemo, useState } from 'react';
-import type { LogType } from '../../../../../shared/types/enums.types';
-import { mockActivityLogs } from '../data/MockActivityLogs';
-import type { ActivityLog } from '../../../../../shared/types/activityLog.types';
+import { useState } from 'react';
+import type { RecordType } from '../../../../../shared/types/enums.types';
+import type { RecordLog } from '../../../../../shared/types/record.types';
 import LogDetailsModal from './LogDetails';
 import LogTypeDropdown, { type LogTypeFilter } from './LogType';
 import StatusBadge from './StatusBadge';
+import { useFetchRecordsPaginatedIntern } from '../../../api/record.api'
 
-function formatLogType(type: LogType) {
+function formatLogType(type: RecordType) {
     switch (type) {
         case 'attendance':
         return 'Attendance';
@@ -40,31 +40,25 @@ function formatDateTime(value: string) {
 
 function TimelineExplorer() {
     const [selectedType, setSelectedType] = useState<LogTypeFilter>('all');
-    const [selectedLog, setSelectedLog] = useState<ActivityLog | null>(null);
+    const [selectedRecord, setSelectedRecord] = useState<RecordLog | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
 
     const rowsPerPage = 5;
 
-    // replace with API
-    const logs = mockActivityLogs;
-
-    const filteredLogs = useMemo(() => {
-        if (selectedType === 'all') return logs;
-
-        return logs.filter((log) => log.type === selectedType);
-        }, [logs, selectedType]);
-
-    const totalPages = Math.max(1, Math.ceil(filteredLogs.length / rowsPerPage));
-
-    const visibleLogs = filteredLogs.slice(
-        (currentPage - 1) * rowsPerPage,
-        currentPage * rowsPerPage
+    const { data: fetchData, isLoading } = useFetchRecordsPaginatedIntern(
+        currentPage - 1, 
+        rowsPerPage, 
+        selectedType === 'all' ? undefined : selectedType
     );
 
-    const startEntry =
-        filteredLogs.length === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1;
+    const records = fetchData?.data ?? [];
+    const count = fetchData?.count ?? 0;
+    
+    const totalPages = count ? Math.ceil(count / rowsPerPage) : 0;
 
-    const endEntry = Math.min(currentPage * rowsPerPage, filteredLogs.length);
+    const startEntry = count === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1;
+
+    const endEntry = Math.min(currentPage * rowsPerPage, count);
 
     const handleFilterChange = (value: LogTypeFilter) => {
         setSelectedType(value);
@@ -95,32 +89,32 @@ function TimelineExplorer() {
                 </thead>
 
                 <tbody>
-                {visibleLogs.length > 0 ? (
-                    visibleLogs.map((log) => (
-                    <tr key={log.id} className="border-b border-gray-100">
+                {records.length > 0 ? (
+                    records.map((record) => (
+                    <tr key={record.id} className="border-b border-gray-100">
                         <TableCell>
                         <span className="whitespace-pre-line font-bold leading-tight">
-                            {formatDateTime(log.submitted_at)}
+                            {formatDateTime(record.created_at)}
                         </span>
                         </TableCell>
 
-                    <TableCell>{formatLogType(log.type)}</TableCell>
+                    <TableCell>{formatLogType(record.log_category)}</TableCell>
 
-                    <TableCell>{log.activity}</TableCell>
+                    <TableCell>{record.activity_description}</TableCell>
 
                     <TableCell>
-                    {log.type !== 'attendance' ? (
-                        <StatusBadge status={log.status} />
+                    {record.log_category !== 'attendance' ? (
+                        <StatusBadge status={record.status ? record.status : ''} />
                     ) : (
                         <span className="text-sm text-gray-400">—</span>
                     )}
                     </TableCell>
 
                     <TableCell>
-                    {log.type !== 'attendance' ? (
+                    {record.log_category !== 'attendance' ? (
                         <button
                         type="button"
-                        onClick={() => setSelectedLog(log)}
+                        onClick={() => setSelectedRecord(record)}
                         className="text-sm font-medium text-black transition hover:text-[#0058DD]"
                         >
                         View Details
@@ -148,7 +142,7 @@ function TimelineExplorer() {
 
         <div className="flex flex-col gap-3 px-5 text-xs text-gray-500 sm:flex-row sm:items-center sm:justify-between">
             <p>
-            Showing {startEntry} to {endEntry} of {filteredLogs.length} entries
+            Showing {startEntry} to {endEntry} of {count} entries
             </p>
 
             <div className="flex items-center gap-2">
@@ -193,10 +187,10 @@ function TimelineExplorer() {
             </div>
         </div>
 
-        {selectedLog && (
+        {selectedRecord && (
             <LogDetailsModal
-            log={selectedLog}
-            onClose={() => setSelectedLog(null)}
+            record={selectedRecord}
+            onClose={() => setSelectedRecord(null)}
             />
         )}
         </>

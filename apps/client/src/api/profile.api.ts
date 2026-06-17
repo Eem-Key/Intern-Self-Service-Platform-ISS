@@ -131,29 +131,23 @@ export async function adminInsertProfileAPI(
 //     return updatedProfile;
 // }
 
-export async function fetchProfileUpdateRequestAPI(
-    requestId?: string
-): Promise<ProfileUpdateRequest> {
+export async function fetchProfileUpdateRequestById(
+    record_id: string
+) {
     const userId = await getAuthUserId();
     if (!userId) {
         throw new Error('You must be logged in to fetch a profile update request.');
     }
 
-    const isAdminCheck = await isAdmin();
-
     const { data: updateRequest, error: fetchError } = await supabase
         .from('profile_update_requests')
         .select('*')
-        .eq('id', requestId)
+        .eq('record_id', record_id)
         .single();
 
     if (fetchError) {
         console.log(fetchError)
         throw new Error(`Error fetching profile update requests: ${fetchError.message}`);
-    }
-
-    if (!isAdminCheck && updateRequest.intern_id !== userId) {
-        throw new Error('Forbidden: You do not have permission to view this request.');
     }
 
     return updateRequest;
@@ -170,6 +164,9 @@ export async function insertProfileUpdateRequestAPI(
     const record: RecordInsert = {
         intern_id: intern_id,
         log_category: 'profile_update',
+        activity_description: updateRequest.update_type === 'avatar_update'
+        ? 'Profile Information'
+        : 'Profile Picture',
         status: 'pending'
     }
 

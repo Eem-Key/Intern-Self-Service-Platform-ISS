@@ -14,6 +14,28 @@ import {
     insertRecord 
 } from './record.api'
 
+export async function fetchAttendanceById(
+    record_id: string
+) {
+    const intern_id = await getAuthUserId();
+    if (!intern_id) {
+        throw new Error(`You must be logged in to fetch a record.`);
+    }
+
+    const { data: fetchData, error: fetchError } = await supabase
+        .from('attendance_logs')
+        .select('*')
+        .eq('record_id', record_id)
+        .single();
+
+    if (fetchError) {
+        console.error('Error fetching record:', fetchError.message);
+        throw fetchError;
+    }
+    
+    return fetchData
+}
+
 export async function getAttendanceByDateAPI(
     date: string
 ): Promise<AttendanceRecord | null> {
@@ -66,6 +88,7 @@ export async function timeInAPI(
     const record: RecordInsert = {
         intern_id: intern_id,
         log_category: 'attendance',
+        activity_description: 'Time In',
         status: null
     }
 

@@ -5,10 +5,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import StatusBadge from './StatusBadge';
 import StatusMessage from '../../../components/feedback/StatusMessage';
 import RequiredMark from '../../../components/ui/RequiredMark';
+import { useLogDetails } from '../../../api/record.api';
 import { updateEODReportAPI } from '../../../api/eodReport.api';
 import { validateEodReport } from '../../../utils/validateEodReport';
-
-import type { ActivityLog } from '../../../../../shared/types/activityLog.types';
+import type { RecordLog } from '../../../../../shared/types/record.types';
 import type {
     EODReportForm,
     EODReportFormErrors,
@@ -16,11 +16,11 @@ import type {
 import ProfileUpdate from './ProfileUpdate';
 
 type LogDetailsModalProps = {
-    log: ActivityLog;
+    record: RecordLog;
     onClose: () => void;
 };
 
-function formatLogType(type: ActivityLog['type']) {
+function formatLogType(type: RecordLog['log_category']) {
     switch (type) {
         case 'attendance':
         return 'Attendance';
@@ -85,12 +85,13 @@ function formatRequestedData(data?: Record<string, unknown>) {
         .join('\n');
 }
 
-function LogDetailsModal({ log, onClose }: LogDetailsModalProps) {
+function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
     const queryClient = useQueryClient();
-    const details = log.details;
+    const isDraftEOD = record.log_category === 'eod_report' && record.status === 'draft';
 
-    const isDraftEOD = log.type === 'eod_report' && log.status === 'draft';
-
+    const { data: details, isLoading } = useLogDetails(record);
+    record.details = details
+    
     const [statusMessage, setStatusMessage] = useState<{
         variant: 'success' | 'error';
         title: string;
@@ -98,7 +99,7 @@ function LogDetailsModal({ log, onClose }: LogDetailsModalProps) {
     } | null>(null);
 
     const [eodFormValues, setEodFormValues] = useState<EODReportForm>({
-        date_written: details?.date || '',
+        date_written: record?.date_created || '',
         hours_spent: Number(details?.hours_spent || 0),
         project_name: details?.project_name || '',
         task_accomplished: details?.task_accomplished || '',
@@ -132,7 +133,7 @@ function LogDetailsModal({ log, onClose }: LogDetailsModalProps) {
 
     const saveEODDraftMutation = useMutation({
         mutationFn: (payload: EODReportForm) =>
-        updateEODReportAPI(log.source_id, payload, 'draft'),
+        updateEODReportAPI(record.id, payload, 'draft'),
 
         onSuccess: () => {
         showStatusMessage(
@@ -158,7 +159,7 @@ function LogDetailsModal({ log, onClose }: LogDetailsModalProps) {
 
     const submitEODDraftMutation = useMutation({
         mutationFn: (payload: EODReportForm) =>
-        updateEODReportAPI(log.source_id, payload, 'pending'),
+        updateEODReportAPI(record.id, payload, 'pending'),
 
         onSuccess: () => {
         showStatusMessage(
@@ -206,6 +207,8 @@ function LogDetailsModal({ log, onClose }: LogDetailsModalProps) {
         submitEODDraftMutation.mutate(eodFormValues);
     };
 
+    if (isLoading) return <div className="fixed inset-0 z-[99999] flex items-center justify-center">Loading...</div>;
+
     return (
         <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/55 px-4 backdrop-blur-sm lg:left-[270px]">
         {statusMessage && (
@@ -223,14 +226,14 @@ function LogDetailsModal({ log, onClose }: LogDetailsModalProps) {
             <div>
                 <div className="flex flex-wrap items-center gap-3">
                 <h2 className="border-l-4 border-[#FFBF10] pl-2 text-xl font-bold sm:text-2xl">
-                    {formatLogType(log.type)}
+                    {formatLogType(record.log_category)}
                 </h2>
 
-                <StatusBadge status={log.status} />
+                <StatusBadge status={record.status ? record.status : ''} />
                 </div>
 
                 <p className="mt-1 text-xs text-white/80">
-                Submitted on {formatSubmittedAt(log.submitted_at)}
+                Submitted on {formatSubmittedAt(record.created_at)}
                 </p>
             </div>
 
@@ -244,10 +247,10 @@ function LogDetailsModal({ log, onClose }: LogDetailsModalProps) {
             </div>
 
             <div className="max-h-[75vh] space-y-5 overflow-y-auto px-6 py-5">
-            {log.type === 'attendance' && (
+            {record.log_category === 'attendance' && (
                 <>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                    <DetailItem label="Date" value={formatDate(details?.date)} />
+                    <DetailItem label="Date" value={formatDate(record?.date_created)} />
                     <DetailItem
                     label="Time In"
                     value={formatTime(details?.time_in)}
@@ -270,7 +273,7 @@ function LogDetailsModal({ log, onClose }: LogDetailsModalProps) {
                 </>
             )}
 
-            {log.type === 'eod_report' && isDraftEOD && (
+            {record.log_category === 'eod_report' && isDraftEOD && (
                 <>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
@@ -378,10 +381,10 @@ function LogDetailsModal({ log, onClose }: LogDetailsModalProps) {
                 </>
             )}
 
-            {log.type === 'eod_report' && !isDraftEOD && (
+            {record.log_category === 'eod_report' && !isDraftEOD && (
                 <>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                    <DetailItem label="Date" value={formatDate(details?.date)} />
+                    <DetailItem label="Date" value={formatDate(record?.date_created)} />
                     <DetailItem
                     label="Hour Spent"
                     value={
@@ -405,13 +408,13 @@ function LogDetailsModal({ log, onClose }: LogDetailsModalProps) {
                     }
                 />
 
-                {log.status !== 'pending' && (
-                    <AdminFeedback value={details?.admin_feedback} />
+                {record.status !== 'pending' && (
+                    <AdminFeedback value={record?.admin_feedback} />
                 )}
                 </>
             )}
 
-            {log.type === 'leave_request' && (
+            {record.log_category === 'leave_request' && (
                 <>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <DetailItem
@@ -432,31 +435,31 @@ function LogDetailsModal({ log, onClose }: LogDetailsModalProps) {
                     value={details?.description || 'No description provided.'}
                 />
 
-                {log.status !== 'pending' && (
-                    <AdminFeedback value={details?.admin_feedback} />
+                {record.status !== 'pending' && (
+                    <AdminFeedback value={record?.admin_feedback} />
                 )}
                 </>
             )}
 
-            {log.type === 'profile_update' && log.status === 'pending' && (
+            {record.log_category === 'profile_update' && record.status === 'pending' && (
             <ProfileUpdate
-                log={log}
+                record={record}
                 onClose={onClose}
                 onNotify={showStatusMessage}
             />
             )}
 
-            {log.type === 'profile_update' && log.status !== 'pending' && (
+            {record.log_category === 'profile_update' && record.status !== 'pending' && (
             <>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <DetailItem
                     label="Update Type"
-                    value={details?.update_type || log.activity}
+                    value={details?.update_type || record.activity_description}
                 />
 
                 <DetailItem
                     label="Date Requested"
-                    value={formatDate(log.submitted_at)}
+                    value={formatDate(record.created_at)}
                 />
                 </div>
 
@@ -465,7 +468,7 @@ function LogDetailsModal({ log, onClose }: LogDetailsModalProps) {
                 value={formatRequestedData(details?.requested_data)}
                 />
 
-                <AdminFeedback value={details?.admin_feedback} />
+                <AdminFeedback value={record?.admin_feedback} />
             </>
             )}
             </div>

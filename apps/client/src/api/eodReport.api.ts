@@ -72,6 +72,28 @@ export async function fetchEODReportByDateAPI(
     };
 }
 
+export async function fetchEodReportById(
+    record_id: string
+) {
+    const intern_id = await getAuthUserId();
+    if (!intern_id) {
+        throw new Error(`You must be logged in to fetch a record.`);
+    }
+
+    const { data: fetchData, error: fetchError } = await supabase
+        .from('eod_reports')
+        .select('*')
+        .eq('record_id', record_id)
+        .single();
+
+    if (fetchError) {
+        console.error('Error fetching record:', fetchError.message);
+        throw fetchError;
+    }
+
+    return fetchData
+}
+
 export async function insertEODReportAPI(
     payload: EODReportForm,
     reportStatus: ReportStatus
@@ -84,6 +106,9 @@ export async function insertEODReportAPI(
     const record: RecordInsert = {
         intern_id: intern_id,
         log_category: 'eod_report',
+        activity_description: reportStatus === 'draft' 
+        ? 'Submission of Draft'
+        : 'Submission of EOD Report',
         status: reportStatus
     }
 

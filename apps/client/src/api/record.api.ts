@@ -1,13 +1,77 @@
 import { supabase } from '../config/supabase.ts';
 import { getAuthUserId } from '../utils/auth';
+import { useQuery } from '@tanstack/react-query';
+import { fetchAttendanceById } from './attendance.api';
+import { fetchEodReportById } from './eodReport.api';
+import { fetchLeaveRequestById } from './leave.api';
+import { fetchProfileUpdateRequestById } from './profile.api';
 import type { 
     ReportStatus, 
-    RecordType 
+    RecordType,
 } from '../../../shared/types/enums.types.ts';
 import type { 
     Record, 
-    RecordInsert 
+    RecordInsert,
+    RecordLog
 } from '../../../shared/types/record.types.ts';
+
+export function useLogDetails(record: RecordLog) {
+    return useQuery({
+        queryKey: ['log-details', record.id],
+        queryFn: async () => {
+            switch (record.log_category) {
+                case 'attendance': return await fetchAttendanceById(record.id);
+                case 'eod_report': return await fetchEodReportById(record.id);
+                case 'leave_request': return await fetchLeaveRequestById(record.id);
+                case 'profile_update': return await fetchProfileUpdateRequestById(record.id);
+                default: return null;
+            }
+        },
+    });
+}
+
+export function useFetchRecordsPaginatedIntern(
+    page:number, 
+    pageSize: number,
+    log_category?: RecordType
+) {
+    return useQuery({
+        queryKey: ['records', page, log_category], 
+        queryFn: () => fetchRecordsPaginatedIntern(page, pageSize, log_category),
+    });
+}
+
+export const fetchRecordsPaginatedIntern = async (
+    page: number, 
+    pageSize: number = 5,
+    log_category?: string
+): Promise<{
+    data: Record[];
+    count: number;
+}> => {
+    const intern_id = await getAuthUserId();
+    if (!intern_id) {
+        throw new Error('You must be logged in to fetch records');
+    }
+    const from = page * pageSize;
+    const to = from + pageSize - 1;
+
+    let query = supabase
+        .from('records')
+        .select('*', { count: 'exact' })
+        .eq('intern_id', intern_id);
+
+    if (log_category) {
+        query = query.eq('log_category', log_category);
+    }
+
+    const { data, error, count } = await query
+        .order('created_at', { ascending: false })
+        .range(from, to);
+    if (error) throw error;
+    
+    return { data: data || [], count: count ?? 0 };
+};
 
 export const insertRecord = async (record: RecordInsert): Promise<string> => {
     const { data: recordInsert, error: insertRecordError } = await supabase

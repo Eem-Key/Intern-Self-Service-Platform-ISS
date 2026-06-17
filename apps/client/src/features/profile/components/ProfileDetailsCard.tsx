@@ -238,6 +238,7 @@ function ProfileDetailsCard(
                     first_name: formValues.first_name,
                     middle_name: formValues.middle_name,
                     last_name: formValues.last_name,
+                    email: formValues.email,
                     suffix: formValues.suffix,
                     birth_date: formValues.birth_date,
                     gender: formValues.gender,

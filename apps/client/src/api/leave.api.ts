@@ -42,6 +42,28 @@ export const fetchAllLeaveRequestDatesOfIntern = async (
     return leaveDates || [];
 }
 
+export async function fetchLeaveRequestById(
+    record_id: string
+) {
+    const intern_id = await getAuthUserId();
+    if (!intern_id) {
+        throw new Error(`You must be logged in to fetch a record.`);
+    }
+
+    const { data: fetchData, error: fetchError } = await supabase
+        .from('leave_requests')
+        .select('*')
+        .eq('record_id', record_id)
+        .single();
+
+    if (fetchError) {
+        console.error('Error fetching record:', fetchError.message);
+        throw fetchError;
+    }
+
+    return fetchData
+}
+
 export const insertLeaveRequest = async (formData: LeaveRequestForm) => {
     const intern_id = await getAuthUserId();
     if (!intern_id) {
@@ -51,6 +73,9 @@ export const insertLeaveRequest = async (formData: LeaveRequestForm) => {
     const record: RecordInsert = {
         intern_id: intern_id,
         log_category: 'leave_request',
+        activity_description: formData.reason_category === 'sick_medical'
+        ? 'Medical Leave'
+        : 'Academic Leave',
         status: 'pending'
     }
 
