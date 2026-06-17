@@ -99,7 +99,7 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
     } | null>(null);
 
     const [eodFormValues, setEodFormValues] = useState<EODReportForm>({
-        date_written: record?.date_created || '',
+        date_written: details.date_written || '',
         hours_spent: Number(details?.hours_spent || 0),
         project_name: details?.project_name || '',
         task_accomplished: details?.task_accomplished || '',
