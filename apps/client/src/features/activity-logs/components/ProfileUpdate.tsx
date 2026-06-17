@@ -257,14 +257,14 @@ function ProfileUpdate({
             </div>
 
             <div className="flex flex-col-reverse justify-end gap-3 sm:flex-row">
-            <button
+            {/*<button
                 type="button"
                 onClick={onClose}
                 disabled={updateMutation.isPending}
                 className="px-7 py-2 text-sm font-bold text-gray-600 disabled:cursor-not-allowed disabled:opacity-70"
             >
                 Cancel
-            </button>
+            </button>*/}
 
             <button
                 type="button"
@@ -430,14 +430,14 @@ function ProfileUpdate({
         </div>
 
         <div className="flex flex-col-reverse justify-end gap-3 pt-2 sm:flex-row">
-            <button
+            {/*<button
             type="button"
             onClick={onClose}
             disabled={updateMutation.isPending}
             className="rounded-full bg-[#eeeeee] px-7 py-2 text-sm font-bold text-gray-600 disabled:cursor-not-allowed disabled:opacity-70"
             >
             Cancel
-            </button>
+            </button>*/}
 
             <button
             type="button"
