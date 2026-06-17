@@ -259,7 +259,7 @@ export async function hasPendingProfileUpdateRequestAPI(
 }
 
 export async function updateProfileUpdateRequestAPI(
-    requestId: string,
+    record_id: string,
     updateRequest: ProfileUpdateRequestForm
 ): Promise<ProfileUpdateRequest> {
     const userId = await getAuthUserId();
@@ -267,7 +267,6 @@ export async function updateProfileUpdateRequestAPI(
     if (!userId) {
         throw new Error('You must be logged in to update a profile update request.');
     }
-
     const { data: updatedRequest, error } = await supabase
         .from('profile_update_requests')
         .update({
@@ -275,14 +274,11 @@ export async function updateProfileUpdateRequestAPI(
         requested_data: updateRequest.requested_data,
         reason: updateRequest.reason || null,
         })
-        .eq('id', requestId)
-        .eq('intern_id', userId)
-        .eq('status', 'pending')
+        .eq('record_id', record_id)
         .select()
         .single();
-
+    
     if (error) {
-        console.log(error)
         throw new Error(`Error updating profile update request: ${error.message}`);
     }
 

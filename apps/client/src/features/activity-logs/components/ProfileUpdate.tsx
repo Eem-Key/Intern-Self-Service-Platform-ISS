@@ -90,7 +90,7 @@ function ProfileUpdate({
         updateProfileUpdateRequestAPI(record.id, payload),
 
         onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['activity-logs'] });
+        queryClient.invalidateQueries({ queryKey: ['log-details'] });
         queryClient.invalidateQueries({ queryKey: ['intern-profile'] });
 
         onNotify(
@@ -112,6 +112,15 @@ function ProfileUpdate({
     });
 
     const handleSaveInformationUpdate = () => {
+        if (record.status !== 'pending') {
+            onNotify(
+                'error',
+                'Update Failed',
+                'Update only allowed for pending records.'
+            );
+            return; 
+        }
+
         const payload: ProfileUpdateRequestForm = {
         update_type: 'information_update',
         requested_data: {
@@ -166,6 +175,15 @@ function ProfileUpdate({
     };
 
     const handleSaveAvatarUpdate = async () => {
+        if (record.status !== 'pending') {
+            onNotify(
+                'error',
+                'Update Failed',
+                'Update only allowed for pending records.'
+            );
+            return; 
+        }
+        
         if (!selectedFile) {
         onNotify('error', 'No Photo Selected', 'Please select a photo first.');
         return;

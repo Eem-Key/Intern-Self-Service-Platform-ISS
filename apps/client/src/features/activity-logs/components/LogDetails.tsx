@@ -91,7 +91,7 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
 
     const { data: details, isLoading } = useLogDetails(record);
     record.details = details
-    
+
     const [statusMessage, setStatusMessage] = useState<{
         variant: 'success' | 'error';
         title: string;
@@ -142,7 +142,7 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
             'Your EOD draft was updated successfully.'
         );
 
-        queryClient.invalidateQueries({ queryKey: ['activity-logs'] });
+        queryClient.invalidateQueries({ queryKey: ['log-details'] });
         queryClient.invalidateQueries({
             queryKey: ['eod-report', eodFormValues.date_written],
         });

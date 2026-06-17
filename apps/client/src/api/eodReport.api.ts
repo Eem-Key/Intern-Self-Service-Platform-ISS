@@ -57,7 +57,7 @@ export async function fetchEODReportByDateAPI(
             `)
         .eq('records.intern_id', intern_id)
         .eq('records.log_category', 'eod_report')
-        .eq('records.date_written', date)
+        .eq('date_written', date)
         .single();
 
     if (fetchError) {
