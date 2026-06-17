@@ -76,6 +76,8 @@ export type ProfileUpdateRequest = {
 
 export type ProfileUpdateRequestForm = Omit<ProfileUpdateRequest, 'record_id' >
 
+export type ProfileUpdateRequestUpdate = Omit<ProfileUpdateRequest, 'record_id' | 'update_type'>
+
 // export type AdminReviewProfileUpdateRequest = Pick<
 //   ProfileUpdateRequest, 
 //   'status' | 'admin_id' | 'reviewed_at' | 'admin_feedback'

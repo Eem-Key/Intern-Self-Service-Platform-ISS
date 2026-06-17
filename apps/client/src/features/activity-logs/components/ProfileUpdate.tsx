@@ -91,6 +91,7 @@ function ProfileUpdate({
 
         onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['log-details'] });
+        queryClient.invalidateQueries({ queryKey: ['records'] });
         queryClient.invalidateQueries({ queryKey: ['intern-profile'] });
 
         onNotify(

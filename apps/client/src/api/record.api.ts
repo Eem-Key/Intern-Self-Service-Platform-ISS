@@ -46,7 +46,7 @@ export const fetchRecordsPaginatedIntern = async (
     pageSize: number = 5,
     log_category?: string
 ): Promise<{
-    data: Record[];
+    data: (Record & { display_date: string })[];
     count: number;
 }> => {
     const intern_id = await getAuthUserId();
@@ -57,7 +57,7 @@ export const fetchRecordsPaginatedIntern = async (
     const to = from + pageSize - 1;
 
     let query = supabase
-        .from('records')
+        .from('view_all_timeline_records')
         .select('*', { count: 'exact' })
         .eq('intern_id', intern_id);
 
@@ -66,7 +66,7 @@ export const fetchRecordsPaginatedIntern = async (
     }
 
     const { data, error, count } = await query
-        .order('created_at', { ascending: false })
+        .order('display_date', { ascending: false })
         .range(from, to);
     if (error) throw error;
     

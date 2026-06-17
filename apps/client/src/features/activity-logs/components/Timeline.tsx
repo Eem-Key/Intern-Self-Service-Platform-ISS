@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import type { RecordType } from '../../../../../shared/types/enums.types';
-import type { RecordLog } from '../../../../../shared/types/record.types';
+import type { 
+    Record, 
+    RecordLog 
+} from '../../../../../shared/types/record.types';
 import LogDetailsModal from './LogDetails';
 import LogTypeDropdown, { type LogTypeFilter } from './LogType';
 import StatusBadge from './StatusBadge';
@@ -94,7 +97,7 @@ function TimelineExplorer() {
                     <tr key={record.id} className="border-b border-gray-100">
                         <TableCell>
                         <span className="whitespace-pre-line font-bold leading-tight">
-                            {formatDateTime(record.created_at)}
+                            {formatDateTime(record.display_date)}
                         </span>
                         </TableCell>
 

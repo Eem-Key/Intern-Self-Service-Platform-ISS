@@ -270,7 +270,6 @@ export async function updateProfileUpdateRequestAPI(
     const { data: updatedRequest, error } = await supabase
         .from('profile_update_requests')
         .update({
-        update_type: updateRequest.update_type,
         requested_data: updateRequest.requested_data,
         reason: updateRequest.reason || null,
         })

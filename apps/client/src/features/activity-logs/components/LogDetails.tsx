@@ -169,6 +169,7 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
         );
 
         queryClient.invalidateQueries({ queryKey: ['activity-logs'] });
+        queryClient.invalidateQueries({ queryKey: ['records'] });
         queryClient.invalidateQueries({
             queryKey: ['eod-report', eodFormValues.date_written],
         });
