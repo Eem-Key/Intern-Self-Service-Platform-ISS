@@ -1,6 +1,5 @@
 import { Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
-
 import type { ChangePasswordValues } from '../../../../../shared/schemas/changePassword.schema';
 import type { Profile } from '../../../../../shared/types/profile.types';
 import ChangePassButton from '../../../components/ui/changePassButton';

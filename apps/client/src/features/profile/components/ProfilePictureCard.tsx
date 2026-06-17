@@ -4,7 +4,7 @@ import { supabase } from '../../../config/supabase';
 import StatusMessage from '../../../components/feedback/StatusMessage';
 import ConfirmationModal from '../../../components/feedback/confirmationModal';
 import profilepic from '../../../assets/images/default_pic.png';
-import { requestProfileUpdateAPI, hasPendingProfileUpdateRequestAPI, } from '../../../api/profile.api';
+import { insertProfileUpdateRequestAPI, hasPendingProfileUpdateRequestAPI, } from '../../../api/profile.api';
 import type {
   Profile,
   ProfileUpdateRequest,
@@ -50,7 +50,7 @@ function ProfilePictureCard({ profile }: ProfilePictureCardProps) {
     });
 
     const avatarUpdateMutation = useMutation({
-        mutationFn: requestProfileUpdateAPI,
+        mutationFn: insertProfileUpdateRequestAPI,
 
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['intern-profile'] });

@@ -1,54 +1,19 @@
-import type { ReportStatus } from './enums.types';
-
 export type EODReport = {
-    id: string,
-    intern_id: string;
+    record_id: string,
     date_written: string;
-    created_at: string;
     project_name: string;
     task_accomplished: string;
     hours_spent: number;
-    status: ReportStatus;
-    admin_id: string | null;
-    reviewed_at: string | null;
-    admin_notes: string | null;
+    updated_at: string;
 };
 
-export type EODReportFormErrors = Partial<Record<keyof EODReportForm, string>>;
+export type EODReportFormErrors = Partial<Record<keyof EODReportInsert, string>>;
 
-export type EODReportInsert = Omit<
-    EODReport, 
-    'id' |
-    'created_at' |
-    'admin_id' |
-    'reviewed_at' |
-    'admin_notes'
->
+export type EODReportForm = Omit<EODReport, 'record_id' | 'updated_at'>
 
-export type EODReportUpdate = Omit<
-    EODReport, 
-    'id' |
-    'intern_id' |
-    'date_written' |
-    'created_at' |
-    'admin_id' |
-    'reviewed_at' |
-    'admin_notes'
->
+export type EODReportInsert = Omit<EODReport, 'updated_at'>
 
-export type EODReportForm = Omit<EODReportInsert, 'intern_id' | 'status'>
-
-export type EODReportWithAdminNotes = {
-    intern_id: string;
-    date_written: string;
-    project_name: string;
-    task_accomplished: string;
-    hours_spent: string;
-    status: ReportStatus;
-    admin_id: string | null;
-    reviewed_at: string | null;
-    admin_notes: string | null;
-};
+export type EODReportUpdate = Omit<EODReport, 'record_id' |'date_written' | 'hours_spent' | 'updated_at'>
 
 export type EODReportResponse = {
     message: string;

@@ -9,7 +9,7 @@ import {
   timeOutAPI,
 } from '../../../../api/attendance.api';
 import { useAttendanceTimer } from './attendance/useAttendanceTimer';
-import type { WorkSetupType } from '../../../../../../shared/types/enums.types';
+import type { WorkSetup } from '../../../../../../shared/types/enums.types';
 
 function formatToday() {
   return new Date().toLocaleDateString('en-US', {
@@ -34,7 +34,7 @@ function formatTime(time?: string | null) {
 }
 
 function AttendanceCard() {
-  const [selectedWorkSetup, setSelectedWorkSetup] = useState<WorkSetupType | ''>('');
+  const [selectedWorkSetup, setSelectedWorkSetup] = useState<WorkSetup | ''>('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [statusMessage, setStatusMessage] = useState<{
     variant: 'success' | 'error';
@@ -88,7 +88,7 @@ function AttendanceCard() {
   }, [statusMessage]);
 
   const timeInMutation = useMutation({
-    mutationFn: (setup: WorkSetupType) => timeInAPI(setup),
+    mutationFn: (setup: WorkSetup) => timeInAPI(setup),
 
     onSuccess: async () => {
       await queryClient.invalidateQueries({
@@ -116,11 +116,11 @@ function AttendanceCard() {
 
   const timeOutMutation = useMutation({
     mutationFn: () => {
-      if (!todayAttendance?.id) {
+      if (!todayAttendance?.record_id) {
         throw new Error('No attendance record found.');
       }
 
-      return timeOutAPI(todayAttendance.id);
+      return timeOutAPI(todayAttendance.record_id);
     },
 
     onSuccess: async () => {
@@ -165,7 +165,7 @@ function AttendanceCard() {
     setIsDropdownOpen(false);
   };
 
-  const handleSelectWorkSetup = (workSetup: WorkSetupType) => {
+  const handleSelectWorkSetup = (workSetup: WorkSetup) => {
     if (hasAttendanceForToday) {
       showWorkSetupLockedError();
       return;
@@ -238,6 +238,8 @@ function AttendanceCard() {
       ? 'bg-[#eeeeee] text-gray-500'
       : 'bg-[#E60000] text-white disabled:bg-[#eeeeee] disabled:text-gray-500';
 
+  const [showLunchTooltip, setShowLunchTooltip] = useState(false);
+
   return (
     <section className="rounded-xl bg-white px-4 py-4 shadow-md sm:px-6 sm:py-5 xl:px-8 xl:py-6">
       {statusMessage && (
@@ -265,8 +267,14 @@ function AttendanceCard() {
     </div>
 
       <div className="mt-6 text-center">
-        <div className="group relative mx-auto inline-block">
+      <div className="group relative mx-auto inline-block">
           <p
+            onClick={() => {
+              if (isLunchBreak && hasTimedIn && !hasTimedOut) {
+                setShowLunchTooltip((prev) => !prev);
+              }
+            }}
+            onMouseLeave={() => setShowLunchTooltip(false)}
             className={`text-5xl font-bold leading-none tracking-tight sm:text-5xl xl:text-[56px] ${
               isLunchBreak && hasTimedIn && !hasTimedOut
                 ? 'cursor-help text-gray-700'
@@ -277,11 +285,17 @@ function AttendanceCard() {
           </p>
 
           {isLunchBreak && hasTimedIn && !hasTimedOut && (
-            <div className="pointer-events-none absolute left-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-full bg-[#FFF3C4] px-3 py-1.5 text-xs font-semibold text-[#9A6B00] opacity-0 shadow-md transition-opacity group-hover:opacity-100">
+            <div
+              className={`pointer-events-none absolute left-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-full bg-[#FFF3C4] px-3 py-1.5 text-xs font-semibold text-[#9A6B00] shadow-md transition-opacity ${
+                showLunchTooltip
+                  ? 'opacity-100'
+                  : 'opacity-0 group-hover:opacity-100'
+              }`}
+            >
               On pause during lunch break
             </div>
           )}
-        </div>
+      </div>
 
         <p className="mt-2 text-sm text-gray-700 sm:text-base">
           {formatToday()}

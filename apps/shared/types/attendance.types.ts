@@ -1,13 +1,12 @@
-import type { WorkSetupType } from './enums.types';
+import type { WorkSetup } from './enums.types';
 
 export type AttendanceRecord = {
-    id: string;
-    intern_id: string;
+    record_id: string;
     clock_in: string | null;
     clock_out: string | null;
     work_date: string;
     hours_logged: number | null;
-    work_setup: WorkSetupType;
+    work_setup: WorkSetup;
 };
 
 export type TimeInResponse = {

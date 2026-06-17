@@ -1,37 +1,27 @@
 import { supabase } from '../config/supabase';
 import { getAuthUserId } from '../utils/auth';
-import type { WorkSetupType } from '../../../shared/types/enums.types';
+import type { WorkSetup } from '../../../shared/types/enums.types';
 import type {
     AttendanceRecord,
     TimeInResponse,
     TimeOutResponse
 } from '../../../shared/types/attendance.types';
-
-export async function getActiveAttendanceAPI(): Promise<AttendanceRecord | null> {
-    const intern_id = await getAuthUserId();
-    if (!intern_id) return null;
-
-    const { data, error } = await supabase
-        .from('attendance_logs')
-        .select('*')
-        .eq('intern_id', intern_id)
-        .is('clock_out', null)
-        .maybeSingle();
-
-    if (error) throw error;
-    return data;
-}
+import type {
+    Record,
+    RecordInsert,
+} from '../../../shared/types/record.types';
+import { 
+    fetchRecordByDate,
+    insertRecord 
+} from './record.api'
 
 export async function getAttendanceByDateAPI(date: string): Promise<AttendanceRecord | null> {
-    const intern_id = await getAuthUserId();
-    if (!intern_id) return null;
+    const record: Record = await fetchRecordByDate(date, 'attendance')
 
     const { data, error } = await supabase
         .from('attendance_logs')
         .select('*')
-        .eq('intern_id', intern_id)
-        .gte('clock_in', `${date} 00:00:00`)
-        .lte('clock_in', `${date} 23:59:59`)
+        .eq('record_id', record.id)
         .single();
     
     if (error) throw error;
@@ -39,7 +29,7 @@ export async function getAttendanceByDateAPI(date: string): Promise<AttendanceRe
 }
 
 export async function timeInAPI(
-    setup: WorkSetupType
+    setup: WorkSetup
 ): Promise<TimeInResponse> {
     const intern_id = await getAuthUserId();
     
@@ -49,7 +39,7 @@ export async function timeInAPI(
 
     const { data: existingLog, error: checkError } = await supabase
         .from('attendance_logs')
-        .select('id')
+        .select('record_id')
         .eq('intern_id', intern_id)
         .is('clock_out', null)
         .maybeSingle();
@@ -60,13 +50,22 @@ export async function timeInAPI(
         throw new Error('You have an active session. Please clock out of your current log before starting a new one.');
     }
 
+    const record: RecordInsert = {
+        intern_id: intern_id,
+        log_category: 'attendance',
+        status: null
+    }
+
+    const record_id = await insertRecord(record);
+
     const { data: timein, error: insertError } = await supabase
         .from('attendance_logs')
         .insert([
-        {
-            intern_id: intern_id,
-            work_setup: setup,
-        },
+            {
+                record_id: record_id,
+                intern_id: intern_id,
+                work_setup: setup,
+            },
         ])
         .select()
         .single();
@@ -76,18 +75,15 @@ export async function timeInAPI(
             throw insertError;
         }
 
-    const timeinAttendanceRecord = timein as AttendanceRecord;
-
     return {
         message: 'Time in successful',
         data: {
-            id: timeinAttendanceRecord.id,
-            intern_id: intern_id,
-            clock_in: timeinAttendanceRecord.clock_in,
+            record_id: timein.id,
+            clock_in: timein.clock_in,
             clock_out: null,
-            work_date: timeinAttendanceRecord.work_date,
+            work_date: timein.work_date,
             hours_logged: null,
-            work_setup: timeinAttendanceRecord.work_setup,
+            work_setup: timein.work_setup,
         },
     };
 }
@@ -104,8 +100,7 @@ export async function timeOutAPI(
     const { data: log, error: checkError } = await supabase
         .from('attendance_logs')
         .select('clock_in, clock_out')
-        .eq('id', attendanceId)
-        .eq('intern_id', intern_id)
+        .eq('record_id', attendanceId)
         .single();
     
     if (checkError || !log) {
@@ -151,8 +146,7 @@ export async function timeOutAPI(
             clock_out: now.toISOString(),
             hours_logged: hours_logged,
         })
-        .eq('id', attendanceId)
-        .eq('intern_id', intern_id)
+        .eq('record_id', attendanceId)
         .is('clock_out', null)
         .select()
         .single()
@@ -161,18 +155,8 @@ export async function timeOutAPI(
         throw new Error(`Failed to clock out: ${updateError.message}`);
     }
 
-    const timeoutAttendanceRecord = timeout as AttendanceRecord;
-
     return {
         message: 'Time out successful',
-        data: {
-            id: timeoutAttendanceRecord.id,
-            intern_id: intern_id,
-            clock_in: timeoutAttendanceRecord.clock_in,
-            clock_out: timeoutAttendanceRecord.clock_out,
-            work_date: timeoutAttendanceRecord.work_date,
-            hours_logged: timeoutAttendanceRecord.hours_logged,
-            work_setup: timeoutAttendanceRecord.work_setup,
-        },
+        data: timeout,
     };
 }

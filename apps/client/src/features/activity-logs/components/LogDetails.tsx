@@ -1,0 +1,511 @@
+import { useState } from 'react';
+import { Clock, X } from 'lucide-react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+
+import StatusBadge from './StatusBadge';
+import StatusMessage from '../../../components/feedback/StatusMessage';
+import RequiredMark from '../../../components/ui/RequiredMark';
+import { updateEODReportAPI } from '../../../api/eodReport.api';
+import { validateEodReport } from '../../../utils/validateEodReport';
+
+import type { ActivityLog } from '../../../../../shared/types/activityLog.types';
+import type {
+    EODReportForm,
+    EODReportFormErrors,
+} from '../../../../../shared/types/eodReport.types';
+import ProfileUpdate from './ProfileUpdate';
+
+type LogDetailsModalProps = {
+    log: ActivityLog;
+    onClose: () => void;
+};
+
+function formatLogType(type: ActivityLog['type']) {
+    switch (type) {
+        case 'attendance':
+        return 'Attendance';
+        case 'eod_report':
+        return 'End of Day Report';
+        case 'leave_request':
+        return 'Leave Request';
+        case 'profile_update':
+        return 'Profile Update';
+        default:
+        return type;
+    }
+}
+
+function formatDate(value?: string | null) {
+    if (!value) return '--';
+
+    return new Date(value).toLocaleDateString('en-US', {
+        month: 'short',
+        day: '2-digit',
+        year: 'numeric',
+    });
+}
+
+function formatTime(value?: string | null) {
+    if (!value) return '--';
+
+    return new Date(value).toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+    });
+}
+
+function formatSubmittedAt(value: string) {
+    const date = new Date(value);
+
+    const datePart = date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: '2-digit',
+        year: 'numeric',
+    });
+
+    const timePart = date.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+    });
+
+    return `${datePart} at ${timePart}`;
+}
+
+function formatRequestedData(data?: Record<string, unknown>) {
+    if (!data) return 'No requested changes provided.';
+
+    return Object.entries(data)
+        .map(([key, value]) => {
+        if (key === 'intern_info') {
+            return `Internship Info: ${JSON.stringify(value, null, 2)}`;
+        }
+
+        return `${key.replaceAll('_', ' ')}: ${String(value)}`;
+        })
+        .join('\n');
+}
+
+function LogDetailsModal({ log, onClose }: LogDetailsModalProps) {
+    const queryClient = useQueryClient();
+    const details = log.details;
+
+    const isDraftEOD = log.type === 'eod_report' && log.status === 'draft';
+
+    const [statusMessage, setStatusMessage] = useState<{
+        variant: 'success' | 'error';
+        title: string;
+        message: string;
+    } | null>(null);
+
+    const [eodFormValues, setEodFormValues] = useState<EODReportForm>({
+        date_written: details?.date || '',
+        hours_spent: Number(details?.hours_spent || 0),
+        project_name: details?.project_name || '',
+        task_accomplished: details?.task_accomplished || '',
+    });
+
+    const [eodErrors, setEodErrors] = useState<EODReportFormErrors>({});
+
+    const showStatusMessage = (
+        variant: 'success' | 'error',
+        title: string,
+        message: string
+    ) => {
+        setStatusMessage({ variant, title, message });
+
+        setTimeout(() => {
+        setStatusMessage(null);
+        }, 5000);
+    };
+
+    const handleEODChange = (field: keyof EODReportForm, value: string) => {
+        setEodFormValues((prev) => ({
+        ...prev,
+        [field]: value,
+        }));
+
+        setEodErrors((prev) => ({
+        ...prev,
+        [field]: undefined,
+        }));
+    };
+
+    const saveEODDraftMutation = useMutation({
+        mutationFn: (payload: EODReportForm) =>
+        updateEODReportAPI(log.source_id, payload, 'draft'),
+
+        onSuccess: () => {
+        showStatusMessage(
+            'success',
+            'Draft Saved',
+            'Your EOD draft was updated successfully.'
+        );
+
+        queryClient.invalidateQueries({ queryKey: ['activity-logs'] });
+        queryClient.invalidateQueries({
+            queryKey: ['eod-report', eodFormValues.date_written],
+        });
+        },
+
+        onError: () => {
+        showStatusMessage(
+            'error',
+            'Save Failed',
+            'Failed to update your EOD draft.'
+        );
+        },
+    });
+
+    const submitEODDraftMutation = useMutation({
+        mutationFn: (payload: EODReportForm) =>
+        updateEODReportAPI(log.source_id, payload, 'pending'),
+
+        onSuccess: () => {
+        showStatusMessage(
+            'success',
+            'Report Submitted',
+            'Your EOD report has been sent for review.'
+        );
+
+        queryClient.invalidateQueries({ queryKey: ['activity-logs'] });
+        queryClient.invalidateQueries({
+            queryKey: ['eod-report', eodFormValues.date_written],
+        });
+
+        onClose();
+        },
+
+        onError: () => {
+        showStatusMessage(
+            'error',
+            'Submission Failed',
+            'We could not save your report. Please check your entries and try again.'
+        );
+        },
+    });
+
+    const handleSaveEODDraft = () => {
+        const validationErrors = validateEodReport(eodFormValues, 'save');
+
+        if (Object.keys(validationErrors).length > 0) {
+        setEodErrors(validationErrors);
+        return;
+        }
+
+        saveEODDraftMutation.mutate(eodFormValues);
+    };
+
+    const handleSubmitEODDraft = () => {
+        const validationErrors = validateEodReport(eodFormValues, 'submit');
+
+        if (Object.keys(validationErrors).length > 0) {
+        setEodErrors(validationErrors);
+        return;
+        }
+
+        submitEODDraftMutation.mutate(eodFormValues);
+    };
+
+    return (
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/55 px-4 backdrop-blur-sm lg:left-[270px]">
+        {statusMessage && (
+            <StatusMessage
+            variant={statusMessage.variant}
+            title={statusMessage.title}
+            message={statusMessage.message}
+            isFixed
+            onClose={() => setStatusMessage(null)}
+            />
+        )}
+
+        <div className="w-full max-w-[620px] overflow-hidden rounded-xl bg-white shadow-xl">
+            <div className="flex items-start justify-between bg-[#002D6F] px-6 py-4 text-white">
+            <div>
+                <div className="flex flex-wrap items-center gap-3">
+                <h2 className="border-l-4 border-[#FFBF10] pl-2 text-xl font-bold sm:text-2xl">
+                    {formatLogType(log.type)}
+                </h2>
+
+                <StatusBadge status={log.status} />
+                </div>
+
+                <p className="mt-1 text-xs text-white/80">
+                Submitted on {formatSubmittedAt(log.submitted_at)}
+                </p>
+            </div>
+
+            <button
+                type="button"
+                onClick={onClose}
+                className="rounded-full p-1 transition hover:bg-white/10"
+            >
+                <X size={22} />
+            </button>
+            </div>
+
+            <div className="max-h-[75vh] space-y-5 overflow-y-auto px-6 py-5">
+            {log.type === 'attendance' && (
+                <>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                    <DetailItem label="Date" value={formatDate(details?.date)} />
+                    <DetailItem
+                    label="Time In"
+                    value={formatTime(details?.time_in)}
+                    />
+                    <DetailItem
+                    label="Time Out"
+                    value={formatTime(details?.time_out)}
+                    />
+                </div>
+
+                <DetailItem
+                    label="Hours Logged"
+                    value={
+                    details?.hours_spent !== null &&
+                    details?.hours_spent !== undefined
+                        ? `${details.hours_spent} hrs`
+                        : '--'
+                    }
+                />
+                </>
+            )}
+
+            {log.type === 'eod_report' && isDraftEOD && (
+                <>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div>
+                    <label className="text-sm font-medium">Date</label>
+                    <input
+                        type="date"
+                        value={eodFormValues.date_written}
+                        disabled
+                        className="mt-1 h-10 w-full rounded bg-[#eeeeee] px-4 text-sm outline-none disabled:cursor-not-allowed disabled:text-gray-600"
+                    />
+                    {eodErrors.date_written && (
+                        <p className="mt-1 text-xs text-red-600">
+                        {eodErrors.date_written}
+                        </p>
+                    )}
+                    </div>
+
+                    <div>
+                    <label className="text-sm font-medium">Hour Spent</label>
+                    <div className="relative mt-1">
+                        <input
+                        type="text"
+                        value={`${eodFormValues.hours_spent} Hrs`}
+                        disabled
+                        className="h-10 w-full rounded bg-[#eeeeee] px-4 text-sm outline-none disabled:cursor-not-allowed disabled:text-gray-600"
+                        />
+                        <Clock
+                        size={17}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                        />
+                    </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label className="inline-flex items-center gap-1 text-sm font-medium">
+                    Project Name
+                    <RequiredMark />
+                    </label>
+
+                    <input
+                    type="text"
+                    value={eodFormValues.project_name}
+                    onChange={(event) =>
+                        handleEODChange('project_name', event.target.value)
+                    }
+                    className="mt-1 h-10 w-full rounded bg-[#eeeeee] px-4 text-sm outline-none"
+                    />
+
+                    {eodErrors.project_name && (
+                    <p className="mt-1 text-xs text-red-600">
+                        {eodErrors.project_name}
+                    </p>
+                    )}
+                </div>
+
+                <div>
+                    <label className="inline-flex items-center gap-1 text-sm font-medium">
+                    Task Accomplished
+                    <RequiredMark />
+                    </label>
+
+                    <textarea
+                    value={eodFormValues.task_accomplished}
+                    onChange={(event) =>
+                        handleEODChange('task_accomplished', event.target.value)
+                    }
+                    className="mt-1 h-[180px] w-full resize-none rounded bg-[#eeeeee] p-3 text-sm outline-none"
+                    />
+
+                    {eodErrors.task_accomplished && (
+                    <p className="mt-1 text-xs text-red-600">
+                        {eodErrors.task_accomplished}
+                    </p>
+                    )}
+                </div>
+
+                <div className="flex flex-col-reverse justify-end gap-3 pt-2 sm:flex-row">
+                    <button
+                    type="button"
+                    onClick={onClose}
+                    disabled={
+                        saveEODDraftMutation.isPending ||
+                        submitEODDraftMutation.isPending
+                    }
+                    className=" px-7 py-2 text-sm font-bold text-gray-600 disabled:cursor-not-allowed disabled:opacity-70"
+                    >
+                    Cancel
+                    </button>
+
+                    <button
+                    type="button"
+                    onClick={handleSubmitEODDraft}
+                    disabled={
+                        saveEODDraftMutation.isPending ||
+                        submitEODDraftMutation.isPending
+                    }
+                    className="rounded-full bg-[#FFBF10] px-7 py-2 text-sm font-bold text-black disabled:cursor-not-allowed disabled:bg-[#eeeeee] disabled:text-gray-500 disabled:opacity-70"
+                    >
+                    {submitEODDraftMutation.isPending
+                        ? 'Submitting...'
+                        : 'Submit'}
+                    </button>
+                </div>
+                </>
+            )}
+
+            {log.type === 'eod_report' && !isDraftEOD && (
+                <>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                    <DetailItem label="Date" value={formatDate(details?.date)} />
+                    <DetailItem
+                    label="Hour Spent"
+                    value={
+                        details?.hours_spent !== null &&
+                        details?.hours_spent !== undefined
+                        ? `${details.hours_spent} Hrs`
+                        : '--'
+                    }
+                    />
+                    <DetailItem
+                    label="Project"
+                    value={details?.project_name || '--'}
+                    />
+                </div>
+
+                <DetailBox
+                    label="Task Accomplished"
+                    value={
+                    details?.task_accomplished ||
+                    'No task accomplished provided.'
+                    }
+                />
+
+                {log.status !== 'pending' && (
+                    <AdminFeedback value={details?.admin_feedback} />
+                )}
+                </>
+            )}
+
+            {log.type === 'leave_request' && (
+                <>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <DetailItem
+                    label="Date of Leave"
+                    value={`${formatDate(details?.leave_start_date)} - ${formatDate(
+                        details?.leave_end_date
+                    )}`}
+                    />
+
+                    <DetailItem
+                    label="Reason"
+                    value={details?.leave_reason || '--'}
+                    />
+                </div>
+
+                <DetailBox
+                    label="Description"
+                    value={details?.description || 'No description provided.'}
+                />
+
+                {log.status !== 'pending' && (
+                    <AdminFeedback value={details?.admin_feedback} />
+                )}
+                </>
+            )}
+
+            {log.type === 'profile_update' && log.status === 'pending' && (
+            <ProfileUpdate
+                log={log}
+                onClose={onClose}
+                onNotify={showStatusMessage}
+            />
+            )}
+
+            {log.type === 'profile_update' && log.status !== 'pending' && (
+            <>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <DetailItem
+                    label="Update Type"
+                    value={details?.update_type || log.activity}
+                />
+
+                <DetailItem
+                    label="Date Requested"
+                    value={formatDate(log.submitted_at)}
+                />
+                </div>
+
+                <DetailBox
+                label="Requested Changes"
+                value={formatRequestedData(details?.requested_data)}
+                />
+
+                <AdminFeedback value={details?.admin_feedback} />
+            </>
+            )}
+            </div>
+        </div>
+        </div>
+    );
+}
+
+function DetailItem({ label, value }: { label: string; value: string }) {
+    return (
+        <div>
+        <p className="text-xs font-medium text-gray-600">{label}</p>
+        <p className="mt-1 text-sm font-bold text-black">{value}</p>
+        </div>
+    );
+}
+
+function DetailBox({ label, value }: { label: string; value: string }) {
+    return (
+        <div>
+        <p className="mb-2 text-sm font-bold text-black">{label}</p>
+        <div className="min-h-[110px] whitespace-pre-wrap rounded bg-[#eeeeee] p-4 text-sm leading-relaxed text-gray-800">
+            {value}
+        </div>
+        </div>
+    );
+}
+
+function AdminFeedback({ value }: { value?: string | null }) {
+    return (
+        <div>
+        <h3 className="border-l-4 border-[#FFBF10] pl-2 text-xl font-bold text-[#002D6F]">
+            Admin Feedback
+        </h3>
+
+        <div className="mt-3 min-h-[80px] rounded border border-dashed border-gray-300 bg-[#eeeeee] p-4 text-sm leading-relaxed text-gray-700">
+            {value || 'No further feedback...'}
+        </div>
+        </div>
+    );
+}
+
+export default LogDetailsModal;
