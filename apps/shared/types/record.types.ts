@@ -1,7 +1,8 @@
 import type { 
     RecordType, 
     ReportStatus,
-    ActivityDescription
+    ActivityDescription,
+    LeaveReason
 } from './enums.types';
 
     export type Record = {
@@ -39,9 +40,9 @@ import type {
             project_name?: string | null;
             task_accomplished?: string | null;
 
-            leave_start_date?: string;
-            leave_end_date?: string;
-            leave_reason?: string;
+            start_date?: string;
+            end_date?: string;
+            reason_category?: LeaveReason;
             description?: string | null;
 
             update_type?: string;

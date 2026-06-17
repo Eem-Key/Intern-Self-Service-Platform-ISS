@@ -419,14 +419,14 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <DetailItem
                     label="Date of Leave"
-                    value={`${formatDate(details?.leave_start_date)} - ${formatDate(
-                        details?.leave_end_date
+                    value={`${formatDate(details?.start_date)} - ${formatDate(
+                        details?.end_date
                     )}`}
                     />
 
                     <DetailItem
                     label="Reason"
-                    value={details?.leave_reason || '--'}
+                    value={details?.reason_category || '--'}
                     />
                 </div>
 

@@ -165,8 +165,8 @@ export async function insertProfileUpdateRequestAPI(
         intern_id: intern_id,
         log_category: 'profile_update',
         activity_description: updateRequest.update_type === 'avatar_update'
-        ? 'Profile Information'
-        : 'Profile Picture',
+        ? 'Profile Picture'
+        : 'Profile Information',
         status: 'pending'
     }
 
