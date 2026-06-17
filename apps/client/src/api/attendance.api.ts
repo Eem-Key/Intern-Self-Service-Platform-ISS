@@ -11,21 +11,34 @@ import type {
     RecordInsert,
 } from '../../../shared/types/record.types';
 import { 
-    fetchRecordByDate,
     insertRecord 
 } from './record.api'
 
-export async function getAttendanceByDateAPI(date: string): Promise<AttendanceRecord | null> {
-    const record: Record = await fetchRecordByDate(date, 'attendance')
+export async function getAttendanceByDateAPI(
+    date: string
+): Promise<AttendanceRecord | null> {
+    const intern_id = await getAuthUserId();
+    if (!intern_id) {
+        throw new Error(`You must be logged in to fetch a record.`);
+    }
 
     const { data, error } = await supabase
         .from('attendance_logs')
-        .select('*')
-        .eq('record_id', record.id)
+        .select(`
+            *,
+            records!inner(id)
+            `)
+        .eq('records.intern_id', intern_id)
+        .eq('records.log_category', 'attendance')
+        .eq('records.date_created', date)
         .single();
     
     if (error) throw error;
-    return data;
+    if (!data) return null;
+    
+    const { records, ...attendance } = data;
+
+    return attendance as AttendanceRecord;
 }
 
 export async function timeInAPI(

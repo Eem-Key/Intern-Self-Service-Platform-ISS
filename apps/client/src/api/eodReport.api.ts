@@ -15,7 +15,6 @@ import type {
     RecordInsert,
 } from '../../../shared/types/record.types';
 import {
-    fetchRecordByDate,
     insertRecord,
     updateRecordStatus
 } from './record.api'
@@ -43,22 +42,33 @@ export async function fetchEODReportByDateAPI(
   report: EODReport;
   status: ReportStatus | null;
 }>  {
-    const record: Record = await fetchRecordByDate(date, 'eod_report')
+    const intern_id = await getAuthUserId();
+    if (!intern_id) {
+        throw new Error(`You must be logged in to fetch a report.`);
+    }
 
     const { data: reportData, error: fetchError } = await supabase
         .from('eod_reports')
-        .select('*')
-        .eq('date_written', date)
+        .select(`
+            *,
+            records!inner(
+            status
+            )
+            `)
+        .eq('records.intern_id', intern_id)
+        .eq('records.log_category', 'eod_report')
+        .eq('records.date_written', date)
         .single();
 
     if (fetchError) {
         throw new Error(`Error fetching report: ${fetchError.message}`);
     }
 
+    const { records, ...report } = reportData;
 
     return {
-        report: reportData,
-        status: record.status
+        report: report as EODReport,
+        status: records.status as ReportStatus
     };
 }
 
