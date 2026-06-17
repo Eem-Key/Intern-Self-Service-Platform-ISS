@@ -30,9 +30,10 @@ function AdminDashboard() {
                 <PendingApprovalsCard value={pendingApprovals} />
             </div>
 
-            <div className="mt-5 grid flex-1 grid-cols-1 items-stretch gap-5 xl:grid-cols-[1fr_0.48fr]">
-                <AttendanceTracker />
-                <NotificationCard />
+            {/*add flex-1*/}
+            <div className="mt-5 grid grid-cols-1 items-stretch gap-5 xl:grid-cols-[1fr_0.48fr]">
+            <AttendanceTracker />
+            <NotificationCard />
             </div>
             </div>
         </section>

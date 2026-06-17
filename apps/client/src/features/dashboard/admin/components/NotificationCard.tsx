@@ -85,7 +85,8 @@ function NotificationCard() {
 
     return (
         <>
-        <section className="flex min-w-0 flex-col rounded-xl bg-white px-5 py-4 shadow-md sm:px-6">
+        <section className="flex h-[calc(100vh-280px)] min-h-[360px] max-h-[520px] min-w-0 flex-col rounded-xl bg-white px-5 py-4 shadow-md sm:px-6">
+        {/*<section className="flex min-w-0 flex-col rounded-xl bg-white px-5 py-4 shadow-md sm:px-6">*/}
             <div className="mb-4 flex shrink-0 items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
                 <h2 className="border-l-4 border-[#FFBF10] pl-3 text-xl font-bold sm:text-2xl">
@@ -99,8 +100,10 @@ function NotificationCard() {
                 )}
             </div>
             </div>
-
-            <div className="max-h-[320px] space-y-3 overflow-y-auto pr-1 sm:max-h-[380px] md:max-h-[420px] lg:max-h-[calc(100vh-360px)] xl:max-h-[calc(100vh-280px)]">
+            
+            
+            <div className="min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
+            {/*<div className="max-h-[320px] space-y-3 overflow-y-auto pr-1 sm:max-h-[380px] md:max-h-[420px] lg:max-h-[calc(100vh-360px)] xl:max-h-[calc(100vh-280px)]">*/}
             {isLoading && (
                 <p className="py-6 text-center text-sm text-gray-500">
                 Loading notifications...

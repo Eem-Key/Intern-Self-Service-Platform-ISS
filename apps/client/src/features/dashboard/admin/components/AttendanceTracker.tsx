@@ -85,6 +85,81 @@ function getTodayDateString() {
         suffix: null,
         },
     },
+    {
+    id: 'attendance-6',
+    intern_id: 'intern-6',
+    clock_in: '2026-06-15T10:20:00',
+    clock_out: null,
+    work_date: '2026-06-15',
+    hours_logged: null,
+    work_setup: 'wfh',
+    Name: {
+        first_name: 'Carlo',
+        middle_name: null,
+        last_name: 'Test',
+        suffix: null,
+        },
+    },
+    {
+    id: 'attendance-7',
+    intern_id: 'intern-7',
+    clock_in: '2026-06-14T10:20:00',
+    clock_out: null,
+    work_date: '2026-06-14',
+    hours_logged: null,
+    work_setup: 'wfh',
+    Name: {
+        first_name: 'Carlo',
+        middle_name: null,
+        last_name: 'Test2',
+        suffix: null,
+        },
+    },
+    {
+    id: 'attendance-8',
+    intern_id: 'intern-8',
+    clock_in: '2026-06-14T10:20:00',
+    clock_out: null,
+    work_date: '2026-06-14',
+    hours_logged: null,
+    work_setup: 'wfh',
+    Name: {
+        first_name: 'Carlo',
+        middle_name: null,
+        last_name: 'Test3',
+        suffix: null,
+        },
+    },
+    {
+    id: 'attendance-9',
+    intern_id: 'intern-9',
+    clock_in: '2026-06-13T10:20:00',
+    clock_out: null,
+    work_date: '2026-06-13',
+    hours_logged: null,
+    work_setup: 'wfh',
+    Name: {
+        first_name: 'Carlo',
+        middle_name: null,
+        last_name: 'Test4',
+        suffix: null,
+        },
+    },
+    {
+    id: 'attendance-10',
+    intern_id: 'intern-10',
+    clock_in: '2026-06-13T10:20:00',
+    clock_out: null,
+    work_date: '2026-06-13',
+    hours_logged: null,
+    work_setup: 'wfh',
+    Name: {
+        first_name: 'Carlo',
+        middle_name: null,
+        last_name: 'Test5',
+        suffix: null,
+        },
+    },
 ];*/
 
 function AttendanceTracker() {
@@ -125,7 +200,8 @@ function AttendanceTracker() {
     };
 
     return (
-        <section className="flex min-w-0 flex-col rounded-xl bg-white shadow-md">
+        <section className="flex h-[360px] min-h-0 min-w-0 flex-col rounded-xl bg-white shadow-md sm:h-[420px] lg:h-[calc(100vh-360px)] xl:h-[calc(100vh-280px)] xl:max-h-[520px]">
+        {/*</section><section className="flex min-w-0 flex-col rounded-xl bg-white shadow-md">*/}
         <div className="flex shrink-0 flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
             <h2 className="border-l-4 border-[#FFBF10] pl-3 text-xl font-bold sm:text-3xl">
             Attendance Tracker
@@ -167,7 +243,9 @@ function AttendanceTracker() {
             </div>
         </div>
 
-        <div className="max-h-[320px] overflow-auto sm:max-h-[380px] md:max-h-[420px] lg:max-h-[calc(100vh-360px)] xl:max-h-[calc(100vh-280px)]">
+        
+        <div className="min-h-0 flex-1 overflow-auto"> 
+        {/*</div><div className="max-h-[320px] overflow-auto sm:max-h-[380px] md:max-h-[420px] lg:max-h-[calc(100vh-360px)] xl:max-h-[calc(100vh-280px)]">*/}
             <table className="w-full min-w-[720px] border-collapse">
             <thead className="sticky top-0 z-10 bg-[#EAF0FA]">
                 <tr>
@@ -209,7 +287,7 @@ function AttendanceTracker() {
                 attendanceRecords.length > 0 &&
                 attendanceRecords.map((attendance) => (
                     <tr
-                    key={attendance.id}
+                    key={attendance.record_id}
                     className="border-b border-gray-100"
                     >
                     <TableCell>{getAttendanceName(attendance)}</TableCell>
@@ -292,4 +370,4 @@ function getAttendanceName(attendance: AttendanceWithName) {
     return fullName || '--';
 }
 
-export default AttendanceTracker;
+export default AttendanceTracker; 
