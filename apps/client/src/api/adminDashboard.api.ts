@@ -71,12 +71,12 @@ export async function fetchAttendancePerDateRange(
             *,
             interns(
                 profiles(
-                        first_name,
-                        middle_name,
-                        last_name,
-                        suffix
-                    )
-                ) 
+                    first_name,
+                    middle_name,
+                    last_name,
+                    suffix
+                )
+            ) 
         `)
         .gte('work_date', start_date)
         .lte('work_date', end_date);
