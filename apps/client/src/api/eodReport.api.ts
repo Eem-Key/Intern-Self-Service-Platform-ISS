@@ -24,7 +24,6 @@ export function useEODAttendance(date: string) {
         queryKey: ['attendance-report', date],
         queryFn: () => getAttendanceByDateAPI(date),
         enabled: !!date,
-        retry: false,
     });
 }
 
@@ -33,6 +32,7 @@ export function useFetchEODReport(date: string) {
         queryKey: ['eod-report', date],
         queryFn: () => fetchEODReportByDateAPI(date),
         enabled: !!date,
+        retry: false,
     });
 }
 
