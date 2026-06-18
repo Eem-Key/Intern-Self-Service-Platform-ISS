@@ -4,11 +4,11 @@ import { supabase } from '../../../config/supabase';
 import { updateProfileUpdateRequestAPI } from '../../../api/profile.api';
 import RequiredMark from '../../../components/ui/RequiredMark';
 
-import type { ActivityLog } from '../../../../../shared/types/activityLog.types';
+import type { RecordLog } from '../../../../../shared/types/record.types';
 import type { ProfileUpdateRequestForm } from '../../../../../shared/types/profile.types';
 
 type PendingProfileUpdateEditorProps = {
-    log: ActivityLog;
+    record: RecordLog;
     onClose: () => void;
     onNotify: (
         variant: 'success' | 'error',
@@ -40,16 +40,16 @@ function getInternInfo(data: Record<string, unknown> | undefined) {
 }
 
 function ProfileUpdate({
-    log,
+    record,
     onClose,
     onNotify,
 }: PendingProfileUpdateEditorProps) {
     const queryClient = useQueryClient();
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-    const requestedData = log.details?.requested_data;
+    const requestedData = record.details?.requested_data;
     const internInfo = getInternInfo(requestedData);
-    const updateType = log.details?.update_type || 'information_update';
+    const updateType = record.details?.update_type || 'information_update';
 
     const isAvatarUpdate = updateType === 'avatar_update';
 
@@ -87,10 +87,11 @@ function ProfileUpdate({
 
     const updateMutation = useMutation({
         mutationFn: (payload: ProfileUpdateRequestForm) =>
-        updateProfileUpdateRequestAPI(log.source_id, payload),
+        updateProfileUpdateRequestAPI(record.id, payload),
 
         onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['activity-logs'] });
+        queryClient.invalidateQueries({ queryKey: ['log-details'] });
+        queryClient.invalidateQueries({ queryKey: ['records'] });
         queryClient.invalidateQueries({ queryKey: ['intern-profile'] });
 
         onNotify(
@@ -112,6 +113,15 @@ function ProfileUpdate({
     });
 
     const handleSaveInformationUpdate = () => {
+        if (record.status !== 'pending') {
+            onNotify(
+                'error',
+                'Update Failed',
+                'Update only allowed for pending records.'
+            );
+            return; 
+        }
+
         const payload: ProfileUpdateRequestForm = {
         update_type: 'information_update',
         requested_data: {
@@ -166,13 +176,22 @@ function ProfileUpdate({
     };
 
     const handleSaveAvatarUpdate = async () => {
+        if (record.status !== 'pending') {
+            onNotify(
+                'error',
+                'Update Failed',
+                'Update only allowed for pending records.'
+            );
+            return; 
+        }
+        
         if (!selectedFile) {
         onNotify('error', 'No Photo Selected', 'Please select a photo first.');
         return;
         }
 
         const fileExt = selectedFile.name.split('.').pop();
-        const filePath = `pending-profile-updates/${log.source_id}/avatar-${Date.now()}.${fileExt}`;
+        const filePath = `pending-profile-updates/${record.id}/avatar-${Date.now()}.${fileExt}`;
 
         const { error: uploadError } = await supabase.storage
         .from('avatars')
@@ -238,14 +257,14 @@ function ProfileUpdate({
             </div>
 
             <div className="flex flex-col-reverse justify-end gap-3 sm:flex-row">
-            <button
+            {/*<button
                 type="button"
                 onClick={onClose}
                 disabled={updateMutation.isPending}
-                className="rounded-full bg-[#eeeeee] px-7 py-2 text-sm font-bold text-gray-600 disabled:cursor-not-allowed disabled:opacity-70"
+                className="px-7 py-2 text-sm font-bold text-gray-600 disabled:cursor-not-allowed disabled:opacity-70"
             >
                 Cancel
-            </button>
+            </button>*/}
 
             <button
                 type="button"
@@ -411,14 +430,14 @@ function ProfileUpdate({
         </div>
 
         <div className="flex flex-col-reverse justify-end gap-3 pt-2 sm:flex-row">
-            <button
+            {/*<button
             type="button"
             onClick={onClose}
             disabled={updateMutation.isPending}
             className="rounded-full bg-[#eeeeee] px-7 py-2 text-sm font-bold text-gray-600 disabled:cursor-not-allowed disabled:opacity-70"
             >
             Cancel
-            </button>
+            </button>*/}
 
             <button
             type="button"

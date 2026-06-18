@@ -13,7 +13,7 @@ export type EODReportForm = Omit<EODReport, 'record_id' | 'updated_at'>
 
 export type EODReportInsert = Omit<EODReport, 'updated_at'>
 
-export type EODReportUpdate = Omit<EODReport, 'record_id' |'date_written' | 'hours_spent' | 'updated_at'>
+export type EODReportUpdate = Omit<EODReport, 'record_id' |'date_written' | 'updated_at'>
 
 export type EODReportResponse = {
     message: string;

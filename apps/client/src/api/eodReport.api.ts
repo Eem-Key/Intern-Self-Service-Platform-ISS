@@ -15,9 +15,8 @@ import type {
     RecordInsert,
 } from '../../../shared/types/record.types';
 import {
-    fetchRecordByDate,
     insertRecord,
-    updateRecordStatus
+    updateRecord
 } from './record.api'
 
 export function useEODAttendance(date: string) {
@@ -25,7 +24,6 @@ export function useEODAttendance(date: string) {
         queryKey: ['attendance-report', date],
         queryFn: () => getAttendanceByDateAPI(date),
         enabled: !!date,
-        retry: false,
     });
 }
 
@@ -34,6 +32,7 @@ export function useFetchEODReport(date: string) {
         queryKey: ['eod-report', date],
         queryFn: () => fetchEODReportByDateAPI(date),
         enabled: !!date,
+        retry: false,
     });
 }
 
@@ -43,11 +42,21 @@ export async function fetchEODReportByDateAPI(
   report: EODReport;
   status: ReportStatus | null;
 }>  {
-    const record: Record = await fetchRecordByDate(date, 'eod_report')
+    const intern_id = await getAuthUserId();
+    if (!intern_id) {
+        throw new Error(`You must be logged in to fetch a report.`);
+    }
 
     const { data: reportData, error: fetchError } = await supabase
         .from('eod_reports')
-        .select('*')
+        .select(`
+            *,
+            records!inner(
+            status
+            )
+            `)
+        .eq('records.intern_id', intern_id)
+        .eq('records.log_category', 'eod_report')
         .eq('date_written', date)
         .single();
 
@@ -55,11 +64,34 @@ export async function fetchEODReportByDateAPI(
         throw new Error(`Error fetching report: ${fetchError.message}`);
     }
 
+    const { records, ...report } = reportData;
 
     return {
-        report: reportData,
-        status: record.status
+        report: report as EODReport,
+        status: records.status as ReportStatus
     };
+}
+
+export async function fetchEodReportById(
+    record_id: string
+) {
+    const intern_id = await getAuthUserId();
+    if (!intern_id) {
+        throw new Error(`You must be logged in to fetch a record.`);
+    }
+
+    const { data: fetchData, error: fetchError } = await supabase
+        .from('eod_reports')
+        .select('*')
+        .eq('record_id', record_id)
+        .single();
+
+    if (fetchError) {
+        console.error('Error fetching record:', fetchError.message);
+        throw fetchError;
+    }
+
+    return fetchData
 }
 
 export async function insertEODReportAPI(
@@ -74,6 +106,9 @@ export async function insertEODReportAPI(
     const record: RecordInsert = {
         intern_id: intern_id,
         log_category: 'eod_report',
+        activity_description: reportStatus === 'draft' 
+        ? 'Submission of Draft'
+        : 'Submission of EOD Report',
         status: reportStatus
     }
 
@@ -115,6 +150,7 @@ export async function updateEODReportAPI(
     }
 
     const report: EODReportUpdate = {
+        hours_spent: payload.hours_spent,
         project_name: payload.project_name,
         task_accomplished: payload.task_accomplished,
     };
@@ -131,7 +167,11 @@ export async function updateEODReportAPI(
         throw updateError;
     }
 
-    await updateRecordStatus(reportId, reportStatus);
+    const description = reportStatus === 'draft' 
+        ? 'Submission of Draft'
+        : 'Submission of EOD Report'
+
+    await updateRecord(reportId, description, reportStatus);
 
     return {
         message: `EOD ${reportStatus} updated successfully`,

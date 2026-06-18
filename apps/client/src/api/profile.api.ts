@@ -131,29 +131,23 @@ export async function adminInsertProfileAPI(
 //     return updatedProfile;
 // }
 
-export async function fetchProfileUpdateRequestAPI(
-    requestId?: string
-): Promise<ProfileUpdateRequest> {
+export async function fetchProfileUpdateRequestById(
+    record_id: string
+) {
     const userId = await getAuthUserId();
     if (!userId) {
         throw new Error('You must be logged in to fetch a profile update request.');
     }
 
-    const isAdminCheck = await isAdmin();
-
     const { data: updateRequest, error: fetchError } = await supabase
         .from('profile_update_requests')
         .select('*')
-        .eq('id', requestId)
+        .eq('record_id', record_id)
         .single();
 
     if (fetchError) {
         console.log(fetchError)
         throw new Error(`Error fetching profile update requests: ${fetchError.message}`);
-    }
-
-    if (!isAdminCheck && updateRequest.intern_id !== userId) {
-        throw new Error('Forbidden: You do not have permission to view this request.');
     }
 
     return updateRequest;
@@ -170,6 +164,9 @@ export async function insertProfileUpdateRequestAPI(
     const record: RecordInsert = {
         intern_id: intern_id,
         log_category: 'profile_update',
+        activity_description: updateRequest.update_type === 'avatar_update'
+        ? 'Profile Picture'
+        : 'Profile Information',
         status: 'pending'
     }
 
@@ -262,7 +259,7 @@ export async function hasPendingProfileUpdateRequestAPI(
 }
 
 export async function updateProfileUpdateRequestAPI(
-    requestId: string,
+    record_id: string,
     updateRequest: ProfileUpdateRequestForm
 ): Promise<ProfileUpdateRequest> {
     const userId = await getAuthUserId();
@@ -270,22 +267,17 @@ export async function updateProfileUpdateRequestAPI(
     if (!userId) {
         throw new Error('You must be logged in to update a profile update request.');
     }
-
     const { data: updatedRequest, error } = await supabase
         .from('profile_update_requests')
         .update({
-        update_type: updateRequest.update_type,
         requested_data: updateRequest.requested_data,
         reason: updateRequest.reason || null,
         })
-        .eq('id', requestId)
-        .eq('intern_id', userId)
-        .eq('status', 'pending')
+        .eq('record_id', record_id)
         .select()
         .single();
-
+    
     if (error) {
-        console.log(error)
         throw new Error(`Error updating profile update request: ${error.message}`);
     }
 

@@ -11,21 +11,57 @@ import type {
     RecordInsert,
 } from '../../../shared/types/record.types';
 import { 
-    fetchRecordByDate,
-    insertRecord 
+    insertRecord,
+    updateRecord
 } from './record.api'
 
-export async function getAttendanceByDateAPI(date: string): Promise<AttendanceRecord | null> {
-    const record: Record = await fetchRecordByDate(date, 'attendance')
+export async function fetchAttendanceById(
+    record_id: string
+) {
+    const intern_id = await getAuthUserId();
+    if (!intern_id) {
+        throw new Error(`You must be logged in to fetch a record.`);
+    }
+
+    const { data: fetchData, error: fetchError } = await supabase
+        .from('attendance_logs')
+        .select('*')
+        .eq('record_id', record_id)
+        .single();
+
+    if (fetchError) {
+        console.error('Error fetching record:', fetchError.message);
+        throw fetchError;
+    }
+    
+    return fetchData
+}
+
+export async function getAttendanceByDateAPI(
+    date: string
+): Promise<AttendanceRecord | null> {
+    const intern_id = await getAuthUserId();
+    if (!intern_id) {
+        throw new Error(`You must be logged in to fetch a record.`);
+    }
 
     const { data, error } = await supabase
         .from('attendance_logs')
-        .select('*')
-        .eq('record_id', record.id)
+        .select(`
+            *,
+            records!inner(id)
+            `)
+        .eq('records.intern_id', intern_id)
+        .eq('records.log_category', 'attendance')
+        .eq('records.date_created', date)
         .single();
     
     if (error) throw error;
-    return data;
+    if (!data) return null;
+    
+    const { records, ...attendance } = data;
+    
+    return attendance as AttendanceRecord;
 }
 
 export async function timeInAPI(
@@ -53,6 +89,7 @@ export async function timeInAPI(
     const record: RecordInsert = {
         intern_id: intern_id,
         log_category: 'attendance',
+        activity_description: 'Time In',
         status: null
     }
 
@@ -139,6 +176,8 @@ export async function timeOutAPI(
 
     const netDiffInMs = totalDiffInMs - lunchDurationInMs;
     const hours_logged = Math.floor(netDiffInMs / (1000 * 60 * 60));
+
+    await updateRecord(attendanceId, 'Time Out');
 
     const { data: timeout, error: updateError } = await supabase
         .from('attendance_logs')

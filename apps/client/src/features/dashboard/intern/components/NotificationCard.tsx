@@ -3,10 +3,10 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 
 import {
-  getNotificationsAPI,
-  markNotificationAsReadAPI,
+  fetchNotificationsAPI,
+  updateNotificationsAsRead
 } from '../../../../api/notification.api';
-import type { NotificationItem } from '../../../../../../shared/types/notification.types';
+import type { Notification } from '../../../../../../shared/types/notification.types';
 
 function getElapsedTime(sentAt: string) {
   const sentTime = new Date(sentAt).getTime();
@@ -30,19 +30,19 @@ function getElapsedTime(sentAt: string) {
 function NotificationCard() {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedNotification, setSelectedNotification] =
-    useState<NotificationItem | null>(null);
+    useState<Notification | null>(null);
   const [, setCurrentTime] = useState(Date.now());
 
   const { data, refetch, isLoading } = useQuery({
     queryKey: ['notifications'],
-    queryFn: getNotificationsAPI,
+    queryFn: fetchNotificationsAPI,
   });
 
   const notifications = data?.data ?? [];
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
   const markAsReadMutation = useMutation({
-    mutationFn: markNotificationAsReadAPI,
+    mutationFn: updateNotificationsAsRead,
     onSuccess: async () => { await refetch(); },
   });
 
@@ -51,7 +51,7 @@ function NotificationCard() {
     return () => window.clearInterval(timer);
   }, []);
 
-  const handleReadMore = (notification: NotificationItem) => {
+  const handleReadMore = (notification: Notification) => {
     setSelectedNotification(notification);
     if (!notification.is_read) markAsReadMutation.mutate(notification.id);
   };
@@ -87,7 +87,7 @@ function NotificationCard() {
             {!isLoading &&
               notifications.map((notification) => (
                 <div
-                  key={notification.id}
+                  key={notification.record_id}
                   className="relative flex w-full items-start gap-3 rounded-xl border border-gray-100 bg-white p-3 text-left shadow-sm transition-colors hover:bg-gray-50/50"
                 >
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#FFDB4A]/50 mt-0.5">

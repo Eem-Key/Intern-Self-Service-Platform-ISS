@@ -1,8 +1,8 @@
 import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
-import type { LogType } from '../../../../../shared/types/enums.types';
+import type { RecordType } from '../../../../../shared/types/enums.types';
 
-export type LogTypeFilter = 'all' | LogType;
+export type LogTypeFilter = 'all' | RecordType;
 
 type LogTypeDropdownProps = {
     value: LogTypeFilter;
