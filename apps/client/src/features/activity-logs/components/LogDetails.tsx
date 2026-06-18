@@ -71,18 +71,65 @@ function formatSubmittedAt(value: string) {
     return `${datePart} at ${timePart}`;
 }
 
+function formatLabel(key: string) {
+    return key
+        .replaceAll('_', ' ')
+        .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+const profileFieldOrder = [
+    'first_name',
+    'middle_name',
+    'last_name',
+    'suffix',
+    'email',
+    'birth_date',
+    'gender',
+    'contact_number',
+    'address',
+    'position',
+    'department',
+    'office',
+];
+
+const internInfoFieldOrder = [
+    'program',
+    'university',
+    'year_level',
+    'start_date',
+    'required_hours',
+];
+
 function formatRequestedData(data?: Record<string, unknown>) {
-    if (!data) return 'No requested changes provided.';
+    if (!data || Object.keys(data).length === 0) {
+        return 'No requested changes provided.';
+    }
 
-    return Object.entries(data)
-        .map(([key, value]) => {
-        if (key === 'intern_info') {
-            return `Internship Info: ${JSON.stringify(value, null, 2)}`;
+    const lines: string[] = [];
+
+    profileFieldOrder.forEach((key) => {
+        if (key in data) {
+            lines.push(`${formatLabel(key)}: ${String(data[key])}`);
         }
+    });
 
-        return `${key.replaceAll('_', ' ')}: ${String(value)}`;
-        })
-        .join('\n');
+    if (
+        data.intern_info &&
+        typeof data.intern_info === 'object' &&
+        !Array.isArray(data.intern_info)
+    ) {
+        const internInfo = data.intern_info as Record<string, unknown>;
+
+        internInfoFieldOrder.forEach((key) => {
+            if (key in internInfo) {
+                lines.push(
+                    `Internship Info - ${formatLabel(key)}: ${String(internInfo[key])}`
+                );
+            }
+        });
+    }
+
+    return lines.join('\n');
 }
 
 function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
