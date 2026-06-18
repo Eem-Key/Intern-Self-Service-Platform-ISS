@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Clock, X } from 'lucide-react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '../../../config/supabase';
 import StatusBadge from './StatusBadge';
 import StatusMessage from '../../../components/feedback/StatusMessage';
 import RequiredMark from '../../../components/ui/RequiredMark';
@@ -140,6 +140,35 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
 
     const { data: details, isLoading } = useLogDetails(record);
     record.details = details
+
+    const requestedData = details?.requested_data as
+    | Record<string, unknown>
+    | undefined;
+
+    const avatarPath =
+        details?.update_type === 'avatar_update'
+            ? String(requestedData?.avatar_url || '')
+            : '';
+
+    const { data: avatarPreviewUrl = '', isLoading: isAvatarPreviewLoading } =
+        useQuery({
+            queryKey: ['log-avatar-preview', avatarPath],
+            queryFn: async () => {
+                if (!avatarPath) return '';
+
+                const { data, error } = await supabase.storage
+                    .from('avatars')
+                    .createSignedUrl(avatarPath, 3600);
+
+                if (error) {
+                    console.log('Avatar preview error:', error.message);
+                    return '';
+                }
+
+                return data.signedUrl;
+            },
+            enabled: !!avatarPath,
+        });
 
     const [statusMessage, setStatusMessage] = useState<{
         variant: 'success' | 'error';
@@ -562,26 +591,33 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
             )}
 
             {record.log_category === 'profile_update' && record.status !== 'pending' && (
-            <>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <DetailItem
-                    label="Update Type"
-                    value={details?.update_type || record.activity_description}
-                />
+                <>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <DetailItem
+                            label="Update Type"
+                            value={details?.update_type || record.activity_description}
+                        />
 
-                <DetailItem
-                    label="Date Requested"
-                    value={formatDate(record.created_at)}
-                />
-                </div>
+                        <DetailItem
+                            label="Date Requested"
+                            value={formatDate(record.created_at)}
+                        />
+                    </div>
 
-                <DetailBox
-                label="Requested Changes"
-                value={formatRequestedData(details?.requested_data)}
-                />
+                    {details?.update_type === 'avatar_update' ? (
+                        <AvatarRequestedChange
+                            imageUrl={avatarPreviewUrl}
+                            isLoading={isAvatarPreviewLoading}
+                        />
+                    ) : (
+                        <DetailBox
+                            label="Requested Changes"
+                            value={formatRequestedData(details?.requested_data)}
+                        />
+                    )}
 
-                <AdminFeedback value={record?.admin_feedback} />
-            </>
+                    <AdminFeedback value={record?.admin_feedback} />
+                </>
             )}
             </div>
         </div>
@@ -605,6 +641,38 @@ function DetailBox({ label, value }: { label: string; value: string }) {
         <div className="min-h-[50px] whitespace-pre-wrap rounded bg-[#eeeeee] p-4 text-sm leading-relaxed text-gray-800">
             {value}
         </div>
+        </div>
+    );
+}
+
+function AvatarRequestedChange({
+    imageUrl,
+    isLoading,
+}: {
+    imageUrl: string;
+    isLoading: boolean;
+}) {
+    return (
+        <div>
+            <p className="mb-2 text-sm font-bold text-black">
+                Requested Profile Picture
+            </p>
+
+            <div className="flex min-h-[180px] items-center justify-center rounded p-5">
+                {isLoading ? (
+                    <div className="h-9 w-9 animate-spin rounded-full border-4 border-[#EAF0FA] border-t-[#0058DD]" />
+                ) : imageUrl ? (
+                    <img
+                        src={imageUrl}
+                        alt="Requested profile picture"
+                        className="h-36 w-36 rounded-full border-4 border-[#FFBF10] object-cover shadow-md"
+                    />
+                ) : (
+                    <p className="text-sm text-gray-500">
+                        No profile picture preview available.
+                    </p>
+                )}
+            </div>
         </div>
     );
 }
