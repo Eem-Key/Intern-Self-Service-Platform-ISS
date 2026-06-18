@@ -57,7 +57,10 @@ function ProfileUpdate({
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const pendingAvatarPath = getString(requestedData, 'avatar_url');
 
-    const { data: pendingAvatarUrl = '' } = useQuery({
+    const {
+        data: pendingAvatarUrl = '',
+        isLoading: isPendingAvatarLoading,
+    } = useQuery({
         queryKey: ['pending-avatar-preview', pendingAvatarPath],
         queryFn: async () => {
             if (!pendingAvatarPath) return '';
@@ -245,18 +248,26 @@ function ProfileUpdate({
             </p>
 
             <div className="mx-auto mt-4 flex h-40 w-40 items-center justify-center overflow-hidden rounded-full border-4 border-[#FFBF10] bg-[#d9d9d9] shadow-md">
-            {previewUrl || pendingAvatarUrl ? (
-                <img
-                    src={previewUrl || pendingAvatarUrl}
-                    alt="Pending profile picture preview"
-                    className="h-full w-full object-cover"
-                />
-            ) : (
-                <p className="px-4 text-center text-xs text-gray-500">
-                    Select a new photo to replace the pending request.
-                </p>
-            )}
-        </div>
+                {previewUrl ? (
+                    <img
+                        src={previewUrl}
+                        alt="New profile picture preview"
+                        className="h-full w-full object-cover"
+                    />
+                ) : isPendingAvatarLoading && pendingAvatarPath ? (
+                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#EAF0FA] border-t-[#0058DD]" />
+                ) : pendingAvatarUrl ? (
+                    <img
+                        src={pendingAvatarUrl}
+                        alt="Pending profile picture preview"
+                        className="h-full w-full object-cover"
+                    />
+                ) : (
+                    <p className="px-4 text-center text-xs text-gray-500">
+                        Select a new photo to replace the pending request.
+                    </p>
+                )}
+            </div>
 
             <input
                 ref={fileInputRef}
