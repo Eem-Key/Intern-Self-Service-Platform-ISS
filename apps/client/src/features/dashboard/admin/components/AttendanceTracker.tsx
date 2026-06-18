@@ -8,160 +8,6 @@ function getTodayDateString() {
     return new Date().toISOString().split('T')[0];
 }
 
-// mock data
-/*const mockAttendanceRecords: AttendanceWithName[] = [
-    {
-    id: 'attendance-1',
-    intern_id: 'intern-1',
-    clock_in: '2026-06-16T08:15:00',
-    clock_out: '2026-06-16T17:30:00',
-    work_date: '2026-06-16',
-    hours_logged: 8,
-    work_setup: 'onsite',
-    Name: {
-        first_name: 'Joehanna',
-        middle_name: null,
-        last_name: 'Cansino',
-        suffix: null,
-        },
-    },
-    {
-    id: 'attendance-2',
-    intern_id: 'intern-2',
-    clock_in: '2026-06-16T09:00:00',
-    clock_out: null,
-    work_date: '2026-06-16',
-    hours_logged: null,
-    work_setup: 'wfh',
-    Name: {
-        first_name: 'Miggy',
-        middle_name: null,
-        last_name: 'Santos',
-        suffix: null,
-        },
-    },
-    {
-    id: 'attendance-3',
-    intern_id: 'intern-3',
-    clock_in: '2026-06-16T08:45:00',
-    clock_out: '2026-06-16T16:45:00',
-    work_date: '2026-06-16',
-    hours_logged: 8,
-    work_setup: 'onsite',
-    Name: {
-        first_name: 'Ana',
-        middle_name: 'Reyes',
-        last_name: 'Dela Cruz',
-        suffix: null,
-        },
-    },
-    {
-    id: 'attendance-4',
-    intern_id: 'intern-4',
-    clock_in: '2026-06-16T10:20:00',
-    clock_out: null,
-    work_date: '2026-06-16',
-    hours_logged: null,
-    work_setup: 'wfh',
-    Name: {
-        first_name: 'Carlo',
-        middle_name: null,
-        last_name: 'Garcia',
-        suffix: null,
-        },
-    },
-    {
-    id: 'attendance-5',
-    intern_id: 'intern-5',
-    clock_in: '2026-06-15T10:20:00',
-    clock_out: null,
-    work_date: '2026-06-15',
-    hours_logged: null,
-    work_setup: 'wfh',
-    Name: {
-        first_name: 'Carlo',
-        middle_name: null,
-        last_name: 'Go',
-        suffix: null,
-        },
-    },
-    {
-    id: 'attendance-6',
-    intern_id: 'intern-6',
-    clock_in: '2026-06-15T10:20:00',
-    clock_out: null,
-    work_date: '2026-06-15',
-    hours_logged: null,
-    work_setup: 'wfh',
-    Name: {
-        first_name: 'Carlo',
-        middle_name: null,
-        last_name: 'Test',
-        suffix: null,
-        },
-    },
-    {
-    id: 'attendance-7',
-    intern_id: 'intern-7',
-    clock_in: '2026-06-14T10:20:00',
-    clock_out: null,
-    work_date: '2026-06-14',
-    hours_logged: null,
-    work_setup: 'wfh',
-    Name: {
-        first_name: 'Carlo',
-        middle_name: null,
-        last_name: 'Test2',
-        suffix: null,
-        },
-    },
-    {
-    id: 'attendance-8',
-    intern_id: 'intern-8',
-    clock_in: '2026-06-14T10:20:00',
-    clock_out: null,
-    work_date: '2026-06-14',
-    hours_logged: null,
-    work_setup: 'wfh',
-    Name: {
-        first_name: 'Carlo',
-        middle_name: null,
-        last_name: 'Test3',
-        suffix: null,
-        },
-    },
-    {
-    id: 'attendance-9',
-    intern_id: 'intern-9',
-    clock_in: '2026-06-13T10:20:00',
-    clock_out: null,
-    work_date: '2026-06-13',
-    hours_logged: null,
-    work_setup: 'wfh',
-    Name: {
-        first_name: 'Carlo',
-        middle_name: null,
-        last_name: 'Test4',
-        suffix: null,
-        },
-    },
-    {
-    id: 'attendance-10',
-    intern_id: 'intern-10',
-    clock_in: '2026-06-13T10:20:00',
-    clock_out: null,
-    work_date: '2026-06-13',
-    hours_logged: null,
-    work_setup: 'wfh',
-    Name: {
-        first_name: 'Carlo',
-        middle_name: null,
-        last_name: 'Test5',
-        suffix: null,
-        },
-    },
-];*/
-
 function AttendanceTracker() {
     const today = getTodayDateString();
 
@@ -178,15 +24,6 @@ function AttendanceTracker() {
         queryFn: () => fetchAttendancePerDateRange(startDate, endDate),
     });
 
-    // mock testing
-    /*const attendanceRecords = mockAttendanceRecords.filter((record) => {
-    return record.work_date >= startDate && record.work_date <= endDate;
-    });
-
-    const isLoading = false;
-    const isError = false;
-    const error = null;*/
-
     const handleStartDateChange = (newStartDate: string) => {
         setStartDate(newStartDate);
 
@@ -200,52 +37,121 @@ function AttendanceTracker() {
     };
 
     return (
-        <section className="flex h-[360px] min-h-0 min-w-0 flex-col rounded-xl bg-white shadow-md sm:h-[420px] lg:h-[calc(100vh-360px)] xl:h-[calc(100vh-280px)] xl:max-h-[520px]">
+        <section className="flex max-h-[620px] min-h-[430px] min-w-0 flex-col rounded-xl bg-white shadow-md lg:h-[calc(100vh-360px)] xl:h-[calc(100vh-280px)] xl:max-h-[520px]">
+        {/*<section className="flex h-[360px] min-h-0 min-w-0 flex-col rounded-xl bg-white shadow-md sm:h-[420px] lg:h-[calc(100vh-360px)] xl:h-[calc(100vh-280px)] xl:max-h-[520px]">*/}
         {/*</section><section className="flex min-w-0 flex-col rounded-xl bg-white shadow-md">*/}
-        <div className="flex shrink-0 flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-            <h2 className="border-l-4 border-[#FFBF10] pl-3 text-xl font-bold sm:text-3xl">
+        <div className="flex shrink-0 flex-col gap-3 px-4 py-4 sm:px-5 md:px-6 lg:flex-row lg:items-center lg:justify-between">
+        <h2 className="border-l-4 border-[#FFBF10] pl-3 text-xl font-bold sm:text-2xl">
             Attendance Tracker
-            </h2>
+        </h2>
 
-            <div className="flex w-full items-center rounded-xl bg-[#FFF3C4] px-3 py-2 text-[#9A6B00] ring-1 ring-[#FFE28A] sm:w-auto">
-            
-
-            <div className="flex min-w-0 flex-1 items-center gap-2">
-                <div className="flex min-w-0 items-center gap-1">
-                <span className="text-sm font-semibold text-[#9A6B00]/70">
-                    From
+        <div className="w-full rounded-xl bg-[#FFF3C4] px-3 py-2 text-[#9A6B00] ring-1 ring-[#FFE28A] lg:w-auto">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
+            <div className="flex min-w-0 items-center justify-between gap-2">
+                <span className="text-xs font-semibold text-[#9A6B00]/70 sm:text-sm">
+                From
                 </span>
 
                 <input
-                    type="date"
-                    value={startDate}
-                    onChange={(event) => handleStartDateChange(event.target.value)}
-                    className="w-[125px] bg-transparent text-xs font-semibold text-[#9A6B00] outline-none"
+                type="date"
+                value={startDate}
+                onChange={(event) => handleStartDateChange(event.target.value)}
+                className="min-w-0 flex-1 bg-transparent text-right text-xs font-semibold text-[#9A6B00] outline-none sm:w-[125px] sm:flex-none"
                 />
-                </div>
+            </div>
 
-                <span className="mx-2 h-6 w-px bg-[#D8A600]/35" />
+            <span className="hidden h-6 w-px bg-[#D8A600]/35 sm:block" />
 
-                <div className="flex min-w-0 items-center gap-1">
-                <span className="text-sm font-semibold text-[#9A6B00]/70">
-                    To
+            <div className="flex min-w-0 items-center justify-between gap-2">
+                <span className="text-xs font-semibold text-[#9A6B00]/70 sm:text-sm">
+                To
                 </span>
 
                 <input
-                    type="date"
-                    value={endDate}
-                    min={startDate}
-                    onChange={(event) => handleEndDateChange(event.target.value)}
-                    className="w-[125px] bg-transparent text-xs font-semibold text-[#9A6B00] outline-none"
+                type="date"
+                value={endDate}
+                min={startDate}
+                onChange={(event) => handleEndDateChange(event.target.value)}
+                className="min-w-0 flex-1 bg-transparent text-right text-xs font-semibold text-[#9A6B00] outline-none sm:w-[125px] sm:flex-none"
                 />
-                </div>
             </div>
             </div>
         </div>
+        </div>
 
         
-        <div className="min-h-0 flex-1 overflow-auto"> 
-        {/*</div><div className="max-h-[320px] overflow-auto sm:max-h-[380px] md:max-h-[420px] lg:max-h-[calc(100vh-360px)] xl:max-h-[calc(100vh-280px)]">*/}
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4 sm:px-5 lg:px-0 lg:pb-0">
+        {/* Mobile / Tablet Card Layout */}
+        <div className="space-y-3 lg:hidden">
+            {isLoading && (
+            <div className="py-10 text-center text-sm text-gray-500">
+                Loading attendance records...
+            </div>
+            )}
+
+            {isError && (
+            <div className="py-10 text-center text-sm text-red-600">
+                {error instanceof Error
+                ? error.message
+                : 'Unable to load attendance records.'}
+            </div>
+            )}
+
+            {!isLoading &&
+            !isError &&
+            attendanceRecords.length > 0 &&
+            attendanceRecords.map((attendance) => (
+                <div
+                key={attendance.record_id}
+                className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm"
+                >
+                <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                    <p className="break-words text-sm font-bold text-black">
+                        {getAttendanceName(attendance)}
+                    </p>
+
+                    <p className="mt-1 text-xs text-gray-500">
+                        {attendance.work_setup || '--'}
+                    </p>
+                    </div>
+
+                    <p className="shrink-0 text-right text-xs font-semibold text-gray-600">
+                    {formatDate(attendance.work_date)}
+                    </p>
+                </div>
+
+                <div className="mt-4 grid grid-cols-2 gap-3 rounded-lg bg-[#F7F7F7] p-3">
+                    <div>
+                    <p className="text-[11px] font-semibold text-gray-500">
+                        Time In
+                    </p>
+                    <p className="mt-1 text-xs font-bold text-black">
+                        {formatTime(attendance.clock_in)}
+                    </p>
+                    </div>
+
+                    <div>
+                    <p className="text-[11px] font-semibold text-gray-500">
+                        Time Out
+                    </p>
+                    <p className="mt-1 text-xs font-bold text-black">
+                        {formatTime(attendance.clock_out)}
+                    </p>
+                    </div>
+                </div>
+                </div>
+            ))}
+
+            {!isLoading && !isError && attendanceRecords.length === 0 && (
+            <div className="py-10 text-center text-sm text-gray-500">
+                No attendance records found.
+            </div>
+            )}
+        </div>
+
+        {/*Desktop*/}
+        <div className="hidden h-full overflow-auto lg:block">
             <table className="w-full min-w-[720px] border-collapse">
             <thead className="sticky top-0 z-10 bg-[#EAF0FA]">
                 <tr>
@@ -310,6 +216,7 @@ function AttendanceTracker() {
                 )}
             </tbody>
             </table>
+        </div>
         </div>
         </section>
     );
