@@ -12,6 +12,7 @@ import type {
     LoginErrors,
     LoginResponse 
 } from '../../../../../shared/types/login.types';
+import { Eye, EyeOff } from 'lucide-react';
 
 function LoginForm() {
     const navigate = useNavigate();
@@ -20,6 +21,8 @@ function LoginForm() {
         email: '',
         password: '',
     });
+    
+    const [showPassword, setShowPassword] = useState(false);
 
     const [errors, setErrors] = useState<LoginErrors>({});
     const [serverError, setServerError] = useState('');
@@ -164,12 +167,16 @@ function LoginForm() {
             onChange={(value) => handleChange('email', value)}
             />
 
-            <FormInput
+            <PasswordField
             id="password"
             label="Password"
-            type="password"
             value={formValues.password}
             error={errors.password}
+            showPassword={showPassword}
+            onToggle={() => {
+                if (!formValues.password) return;
+                setShowPassword((prev) => !prev);
+            }}
             onChange={(value) => handleChange('password', value)}
             />
 
@@ -178,6 +185,60 @@ function LoginForm() {
             </PrimaryButton>
         </form>
         </>
+    );
+}
+
+type PasswordFieldProps = {
+    id: string;
+    label: string;
+    value: string;
+    error?: string;
+    showPassword: boolean;
+    onToggle: () => void;
+    onChange: (value: string) => void;
+};
+
+function PasswordField({
+    id,
+    label,
+    value,
+    error,
+    showPassword,
+    onToggle,
+    onChange,
+}: PasswordFieldProps) {
+    const canToggle = value.length > 0;
+
+    return (
+        <div>
+        <label htmlFor={id} className="mb-1 block text-sm font-medium text-black">
+            {label}
+        </label>
+
+        <div className="relative">
+            <input
+            id={id}
+            type={showPassword ? 'text' : 'password'}
+            value={value}
+            onChange={(event) => onChange(event.target.value)}
+            className={`h-11 w-full rounded-md bg-[#eeeeee] px-3 pr-10 text-sm outline-none ${
+                error ? 'ring-1 ring-red-500' : ''
+            }`}
+            />
+
+            <button
+            type="button"
+            onClick={onToggle}
+            disabled={!canToggle}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-black disabled:cursor-not-allowed disabled:opacity-40"
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+            >
+            {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+            </button>
+        </div>
+
+        {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+        </div>
     );
 }
 
