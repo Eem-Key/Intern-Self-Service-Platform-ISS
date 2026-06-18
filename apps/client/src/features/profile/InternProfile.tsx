@@ -28,8 +28,14 @@ function InternProfile() {
         <main className="min-h-screen bg-[#eeeeee] text-black lg:flex">
             <InternSidebar />
 
-            <section className="w-full px-4 py-4 sm:px-5 lg:ml-[270px] lg:px-6 lg:py-5">
-            <p className="text-gray-500">Loading profile...</p>
+            <section className="flex min-h-screen w-full items-center justify-center px-4 py-4 sm:px-5 lg:ml-[270px] lg:px-6 lg:py-5">
+                <div className="flex flex-col items-center gap-3 rounded-xl bg-white px-8 py-6 shadow-xl">
+                    <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#EAF0FA] border-t-[#0058DD]" />
+
+                    <p className="text-sm font-semibold text-[#002D6F]">
+                    Loading profile...
+                    </p>
+                </div>
             </section>
         </main>
         );

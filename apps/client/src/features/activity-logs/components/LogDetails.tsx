@@ -221,7 +221,20 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
         submitEODDraftMutation.mutate(eodFormValues);
     };
 
-    if (isLoading) return <div className="fixed inset-0 z-[99999] flex items-center justify-center">Loading...</div>;
+    {/*if (isLoading) return <div className="fixed inset-0 z-[99999] flex items-center justify-center">Loading...</div>;*/}
+
+    if (isLoading) {
+        return (
+            <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/20 backdrop-blur-sm lg:left-[270px]">
+                <div className="flex flex-col items-center gap-3 rounded-xl bg-white px-8 py-6 shadow-xl">
+                    <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#EAF0FA] border-t-[#0058DD]" />
+                    <p className="text-sm font-semibold text-[#002D6F]">
+                        Loading...
+                    </p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/55 px-4 backdrop-blur-sm lg:left-[270px]">
@@ -390,7 +403,9 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
                         className="rounded-full bg-[#FFBF10] px-7 py-2 text-sm font-bold text-black disabled:cursor-not-allowed disabled:bg-[#eeeeee] disabled:text-gray-500 disabled:opacity-70"
                     >
                         {submitEODDraftMutation.isPending
-                            ? 'Submitting...'
+                            ? isEditingDeniedEOD
+                            ? 'Resubmitting...'
+                            : 'Submitting...'
                             : isEditingDeniedEOD
                                 ? 'Resubmit'
                                 : 'Submit'}

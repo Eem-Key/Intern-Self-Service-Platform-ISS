@@ -112,7 +112,18 @@ function TimelineExplorer() {
                 </thead>
 
                 <tbody>
-                {records.length > 0 ? (
+                {isLoading ? (
+                    <tr>
+                    <td colSpan={5} className="px-6 py-16">
+                        <div className="flex flex-col items-center justify-center gap-3">
+                        <div className="h-9 w-9 animate-spin rounded-full border-4 border-[#EAF0FA] border-t-[#0058DD]" />
+                        <p className="text-sm font-semibold text-[#002D6F]">
+                            Loading activity logs...
+                        </p>
+                        </div>
+                    </td>
+                    </tr>
+                ) : records.length > 0 ? (
                     records.map((record) => (
                     <tr key={record.id} className="border-b border-gray-100">
                         <TableCell>
@@ -121,38 +132,38 @@ function TimelineExplorer() {
                         </span>
                         </TableCell>
 
-                    <TableCell>{formatLogType(record.log_category)}</TableCell>
+                        <TableCell>{formatLogType(record.log_category)}</TableCell>
 
-                    <TableCell>{record.activity_description}</TableCell>
+                        <TableCell>{record.activity_description}</TableCell>
 
-                    <TableCell>
-                    {record.log_category !== 'attendance' ? (
-                        <StatusBadge status={record.status ? record.status : ''} />
-                    ) : (
-                        <span className="text-sm text-gray-400">—</span>
-                    )}
-                    </TableCell>
+                        <TableCell>
+                        {record.log_category !== 'attendance' ? (
+                            <StatusBadge status={record.status ? record.status : ''} />
+                        ) : (
+                            <span className="text-sm text-gray-400">—</span>
+                        )}
+                        </TableCell>
 
-                    <TableCell>
-                    {record.log_category !== 'attendance' ? (
-                        <button
-                        type="button"
-                        onClick={() => setSelectedRecord(record)}
-                        className="text-sm font-medium text-black transition hover:text-[#0058DD]"
-                        >
-                        View Details
-                        </button>
-                    ) : (
-                        <span className="text-sm text-gray-400">—</span>
-                    )}
-                    </TableCell>
+                        <TableCell>
+                        {record.log_category !== 'attendance' ? (
+                            <button
+                            type="button"
+                            onClick={() => setSelectedRecord(record)}
+                            className="text-sm font-medium text-black transition hover:text-[#0058DD]"
+                            >
+                            View Details
+                            </button>
+                        ) : (
+                            <span className="text-sm text-gray-400">—</span>
+                        )}
+                        </TableCell>
                     </tr>
                     ))
                 ) : (
                     <tr>
                     <td
                         colSpan={5}
-                        className="px-6 py-10 text-center text-sm text-gray-500"
+                        className="px-6 py-16 text-center text-sm text-gray-500"
                     >
                         No activity logs found.
                     </td>
