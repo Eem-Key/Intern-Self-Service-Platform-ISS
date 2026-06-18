@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { fetchProfileAPI } from '../../api/profile.api';
 import InternSidebar from '../InternSidebar';
@@ -7,9 +7,11 @@ import Banner from './banner/ProfileBanner';
 import ProfileChangePasswordCard from './components/ChangePassword';
 import ProfileDetailsCard from './components/ProfileDetailsCard';
 import ProfilePictureCard from './components/ProfilePictureCard';
+import { supabase } from '../../config/supabase';
 
 function InternProfile() {
 
+    const queryClient = useQueryClient();
     useEffect(() => {
                 document.title = 'Profile | Intern Self Service';
                 }, []);
@@ -21,7 +23,67 @@ function InternProfile() {
     } = useQuery({
         queryKey: ['intern-profile'],
         queryFn: fetchProfileAPI,
+        staleTime: 0,
+        refetchOnMount: 'always',
+        refetchOnWindowFocus: true,
     });
+
+    useEffect(() => {
+    if (!profile?.id) return;
+
+    const channel = supabase
+        .channel(`intern-profile-updates-${profile.id}`)
+        .on(
+            'postgres_changes',
+            {
+                event: 'UPDATE',
+                schema: 'public',
+                table: 'records',
+                filter: `intern_id=eq.${profile.id}`,
+            },
+            () => {
+                queryClient.invalidateQueries({
+                    queryKey: ['pending-profile-update-request', 'avatar_update', profile.id],
+                });
+
+                queryClient.invalidateQueries({
+                    queryKey: ['pending-profile-update-request', 'information_update', profile.id],
+                });
+
+                queryClient.invalidateQueries({ queryKey: ['records'] });
+                queryClient.invalidateQueries({ queryKey: ['intern-profile'] });
+            }
+        )
+        .on(
+            'postgres_changes',
+            {
+                event: 'UPDATE',
+                schema: 'public',
+                table: 'profiles',
+                filter: `id=eq.${profile.id}`,
+            },
+            () => {
+                queryClient.invalidateQueries({ queryKey: ['intern-profile'] });
+            }
+        )
+        .on(
+            'postgres_changes',
+            {
+                event: 'UPDATE',
+                schema: 'public',
+                table: 'interns',
+                filter: `id=eq.${profile.id}`,
+            },
+            () => {
+                queryClient.invalidateQueries({ queryKey: ['intern-profile'] });
+            }
+        )
+        .subscribe();
+
+    return () => {
+        supabase.removeChannel(channel);
+    };
+}, [profile?.id, queryClient]);
 
     if (isLoading) {
         return (

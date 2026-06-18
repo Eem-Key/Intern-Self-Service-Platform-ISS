@@ -224,38 +224,41 @@ export async function insertProfileUpdateRequestAPI(
 //     return updatedUpdateRequest;
 // }
 
-export async function hasPendingProfileUpdateRequestAPI(
-    updateType: 'information_update' | 'avatar_update'
-    ): Promise<boolean> {
-    const userId = await getAuthUserId();
+export async function hasPendingProfileUpdateRequestAPI(updateType: string) {
+    const {
+        data: { user },
+        error: userError,
+    } = await supabase.auth.getUser();
 
-    if (!userId) {
-        throw new Error('You must be logged in to check profile update requests.');
+    if (userError || !user) {
+        throw new Error('User not authenticated.');
     }
 
     const { data, error } = await supabase
         .from('profile_update_requests')
         .select(`
-            record_id, 
-            records (
-            id,
-            intern_id,
-            status
+            record_id,
+            update_type,
+            records!inner (
+                id,
+                intern_id,
+                status,
+                log_category
             )
         `)
-        .eq('records.intern_id', userId)
         .eq('update_type', updateType)
+        .eq('records.intern_id', user.id)
+        .eq('records.log_category', 'profile_update')
         .eq('records.status', 'pending')
-        .limit(1);
+        .maybeSingle();
 
     if (error) {
-        console.log(error)
-        throw new Error(
-        `Error checking pending profile update request: ${error.message}`
-        );
+        throw new Error(error.message);
     }
 
-    return data.length > 0;
+    console.log('pending profile request result:', data);
+
+    return !!data;
 }
 
 export async function updateProfileUpdateRequestAPI(

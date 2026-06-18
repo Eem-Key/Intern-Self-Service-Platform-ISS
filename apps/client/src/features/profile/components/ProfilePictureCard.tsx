@@ -25,9 +25,14 @@ function ProfilePictureCard({ profile }: ProfilePictureCardProps) {
     );
 
     const { data: hasPendingAvatarRequest = false } = useQuery({
-    queryKey: ['pending-profile-update-request', 'avatar_update', profile.id],
-    queryFn: () => hasPendingProfileUpdateRequestAPI('avatar_update'),
+        queryKey: ['pending-profile-update-request', 'avatar_update', profile.id],
+        queryFn: () => hasPendingProfileUpdateRequestAPI('avatar_update'),
+        staleTime: 0,
+        refetchOnMount: 'always',
+        refetchOnWindowFocus: true,
     });
+
+    console.log('hasPendingAvatarRequest:', hasPendingAvatarRequest);
 
     const [statusMessage, setStatusMessage] = useState<{
         variant: 'success' | 'error';

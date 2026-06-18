@@ -46,9 +46,13 @@ function ProfileDetailsCard(
     };
 
     const { data: hasPendingProfileRequest = false } = useQuery({
-    queryKey: ['pending-profile-update-request', 'information_update', profile.id],
-    queryFn: () => hasPendingProfileUpdateRequestAPI('information_update'),
+        queryKey: ['pending-profile-update-request', 'information_update', profile.id],
+        queryFn: () => hasPendingProfileUpdateRequestAPI('information_update'),
+        staleTime: 0,
+        refetchOnMount: 'always',
+        refetchOnWindowFocus: true,
     });
+
     const [isGenderDropdownOpen, setIsGenderDropdownOpen] = useState(false);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const queryClient = useQueryClient();
