@@ -8,6 +8,7 @@ import { fetchProfileUpdateRequestById } from './profile.api';
 import type { 
     ReportStatus, 
     RecordType,
+    ActivityDescription,
 } from '../../../shared/types/enums.types.ts';
 import type { 
     Record, 
@@ -90,11 +91,12 @@ export const insertRecord = async (record: RecordInsert): Promise<string> => {
     return recordInsert.id
 };
 
-export const updateRecordStatus = async (record_id: string, status: ReportStatus) => {
+export const updateRecord = async (record_id: string, description: ActivityDescription, status?: ReportStatus) => {
     const { data: recordUpdate, error: updateRecordError } = await supabase
     .from('records')
     .update({
-        status:status
+        status:status,
+        activity_description: description,
     })
     .eq('id', record_id)
     .select('status')

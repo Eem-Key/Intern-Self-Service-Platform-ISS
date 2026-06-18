@@ -11,7 +11,8 @@ import type {
     RecordInsert,
 } from '../../../shared/types/record.types';
 import { 
-    insertRecord 
+    insertRecord,
+    updateRecord
 } from './record.api'
 
 export async function fetchAttendanceById(
@@ -59,7 +60,7 @@ export async function getAttendanceByDateAPI(
     if (!data) return null;
     
     const { records, ...attendance } = data;
-
+    console.log('attendance: ', attendance);
     return attendance as AttendanceRecord;
 }
 
@@ -175,6 +176,8 @@ export async function timeOutAPI(
 
     const netDiffInMs = totalDiffInMs - lunchDurationInMs;
     const hours_logged = Math.floor(netDiffInMs / (1000 * 60 * 60));
+
+    await updateRecord(attendanceId, 'Time Out');
 
     const { data: timeout, error: updateError } = await supabase
         .from('attendance_logs')

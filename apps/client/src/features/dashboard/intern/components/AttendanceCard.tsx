@@ -130,7 +130,6 @@ function AttendanceCard() {
         }),
         queryClient.invalidateQueries({ queryKey: ['program-progress'] }),
         queryClient.invalidateQueries({ queryKey: ['attendance-report'] }),
-        queryClient.invalidateQueries({ queryKey: ['eod-attendance', todayDateKey] }),
         queryClient.invalidateQueries({ queryKey: ['eod-report', todayDateKey] }),
       ]);
 
