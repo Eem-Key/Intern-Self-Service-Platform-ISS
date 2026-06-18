@@ -1,89 +1,49 @@
-// MOCK FOR TESTING
-
+import { supabase } from '../config/supabase.ts';
+import { getAuthUserId } from '../utils/auth.ts';
 import type {
-    NotificationItem,
     NotificationsResponse,
 } from '../../../shared/types/notification.types';
 
-const MOCK_NOTIFICATIONS_KEY = 'mockNotifications';
-
-const initialNotifications = [
-    {
-        id: '1',
-        title: 'EOD Report Approved',
-        message: 'Your EOD report for June 4, 2026 has been approved by your supervisor.',
-        sent_at: new Date(Date.now() - 1 * 60 * 1000).toISOString(),
-        is_read: false,
-    },
-    {
-        id: '2',
-        title: 'Leave Request Reviewed',
-        message: 'Your leave request has been reviewed. Please check your leave request page for details.',
-        sent_at: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
-        is_read: false,
-    },
-    {
-        id: '3',
-        title: 'Attendance Update',
-        message: 'Your attendance record was updated by an admin. Please review your logs.',
-        sent_at: new Date(Date.now() - 12 * 60 * 1000).toISOString(),
-        is_read: false,
-    },
-    {
-        id: '4',
-        title: 'Profile Update Approved',
-        message: 'Your profile update request has been approved.',
-        sent_at: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
-        is_read: true,
-    },
-];
-
-function getStoredNotifications() {
-    const saved = localStorage.getItem(MOCK_NOTIFICATIONS_KEY);
-
-    if (!saved) {
-        localStorage.setItem(
-        MOCK_NOTIFICATIONS_KEY,
-        JSON.stringify(initialNotifications)
-        );
-
-        return initialNotifications;
+export async function fetchNotificationsAPI(): Promise<NotificationsResponse> {
+    const intern_id = await getAuthUserId();
+    if (!intern_id) {
+        throw new Error(`You must be logged in to fetch notifications.`);
     }
 
-    return JSON.parse(saved) as NotificationItem[];
-}
+    const { data: fetchData, error: fetchError } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('intern_id', intern_id)
+        .in('status', ['approved', 'denied']);
 
-function saveNotifications(notifications: NotificationItem[]) {
-    localStorage.setItem(MOCK_NOTIFICATIONS_KEY, JSON.stringify(notifications));
-}
-
-export async function getNotificationsAPI(): Promise<NotificationsResponse> {
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    if (fetchError) {
+        console.error('Error fetching notifications:', fetchError.message);
+        throw fetchError;
+    }
 
     return {
         message: 'Notifications fetched successfully',
-        data: getStoredNotifications(),
+        data: fetchData
     };
 }
 
-export async function markNotificationAsReadAPI(
-    notificationId: string
-    ): Promise<NotificationsResponse> {
-    await new Promise((resolve) => setTimeout(resolve, 200));
+export async function updateNotificationsAsRead(id: string){
+    const intern_id = await getAuthUserId();
+    if (!intern_id) {
+        throw new Error(`You must be logged in to read a notification.`);
+    }
 
-    const updatedNotifications = getStoredNotifications().map((notification) =>
-        notification.id === notificationId
-        ? {
-            ...notification,
+    const { error: updateError } = await supabase
+        .from('notifications')
+        .update({
             is_read: true,
-            }
-        : notification
-    );
+        })
+        .eq('id', id)
+        .in('status', ['approved', 'denied']);
 
-    saveNotifications(updatedNotifications);
+    if (updateError) {
+        console.error('Error updating notification:', updateError.message);
+        throw updateError;
+    }
 
-    return {
-        message: 'Notification marked as read',
-        data: updatedNotifications,
-    };
 }

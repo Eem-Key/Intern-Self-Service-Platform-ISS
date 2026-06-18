@@ -60,7 +60,7 @@ export async function getAttendanceByDateAPI(
     if (!data) return null;
     
     const { records, ...attendance } = data;
-    console.log('attendance: ', attendance);
+    
     return attendance as AttendanceRecord;
 }
 
