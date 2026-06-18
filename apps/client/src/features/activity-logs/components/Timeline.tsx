@@ -175,11 +175,11 @@ function TimelineExplorer() {
                         </p>
 
                         <button
-                            type="button"
-                            onClick={() => setSelectedRecord(record)}
-                            className="shrink-0 rounded-md bg-[#F3F6FB] px-2 py-0.5 text-[10px] font-medium text-black transition hover:bg-[#EAF0FA]"
-                            >
-                            Details
+                        type="button"
+                        onClick={() => setSelectedRecord(record)}
+                        className="shrink-0 px-1.5 py-0 !text-[12] !leading-none font-medium text-black transition hover:bg-[#EAF0FA]"
+                        >
+                        View Details
                         </button>
                     </div>
                     </div>
