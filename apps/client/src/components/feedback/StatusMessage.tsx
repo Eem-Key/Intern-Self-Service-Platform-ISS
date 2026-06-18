@@ -26,14 +26,16 @@ function StatusMessage({
 
   const messageContent = (
     <div
-      className={`w-full max-w-[650px] overflow-hidden rounded-xl text-white shadow-lg ${className}`}
+      className={`w-full overflow-hidden rounded-lg text-white shadow-lg sm:rounded-xl ${className}`}
     >
-      <div className={`${headerColor} px-6 py-3`}>
-        <h3 className="text-lg font-bold sm:text-xl">{title}</h3>
+      <div className={`${headerColor} px-4 py-2.5 sm:px-6 sm:py-3`}>
+        <h3 className="text-base font-bold leading-snug sm:text-lg md:text-xl">
+          {title}
+        </h3>
       </div>
 
-      <div className={`${bodyColor} px-6 py-4`}>
-        <p className="text-sm font-medium leading-snug sm:text-base">
+      <div className={`${bodyColor} px-4 py-3 sm:px-6 sm:py-4`}>
+        <p className="text-xs font-medium leading-snug sm:text-sm md:text-base">
           {message}
         </p>
       </div>
@@ -45,7 +47,14 @@ function StatusMessage({
       <button
         type="button"
         onClick={onClose}
-        className="fixed right-0 top-[50px] z-[99999] w-[90%] max-w-[450px] text-left"
+        className="
+          fixed left-1/2 top-4 z-[99999] 
+          w-[calc(100%-2rem)] max-w-[430px] 
+          -translate-x-1/2 text-left
+          sm:top-6 sm:w-[90%] sm:max-w-[500px]
+          md:right-6 md:left-auto md:top-6 md:w-[420px] md:translate-x-0
+          lg:right-8 lg:top-8 lg:w-[450px]
+        "
         aria-label="Dismiss message"
       >
         {messageContent}
@@ -54,7 +63,11 @@ function StatusMessage({
     );
   }
 
-  return messageContent;
+  return (
+    <div className="w-full">
+      {messageContent}
+    </div>
+  );
 }
 
 export default StatusMessage;
