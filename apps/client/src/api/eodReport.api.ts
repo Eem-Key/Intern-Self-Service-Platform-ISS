@@ -16,7 +16,7 @@ import type {
 } from '../../../shared/types/record.types';
 import {
     insertRecord,
-    updateRecordStatus
+    updateRecord
 } from './record.api'
 
 export function useEODAttendance(date: string) {
@@ -150,6 +150,7 @@ export async function updateEODReportAPI(
     }
 
     const report: EODReportUpdate = {
+        hours_spent: payload.hours_spent,
         project_name: payload.project_name,
         task_accomplished: payload.task_accomplished,
     };
@@ -166,7 +167,11 @@ export async function updateEODReportAPI(
         throw updateError;
     }
 
-    await updateRecordStatus(reportId, reportStatus);
+    const description = reportStatus === 'draft' 
+        ? 'Submission of Draft'
+        : 'Submission of EOD Report'
+
+    await updateRecord(reportId, description, reportStatus);
 
     return {
         message: `EOD ${reportStatus} updated successfully`,
