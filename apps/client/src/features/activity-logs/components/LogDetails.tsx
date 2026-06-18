@@ -92,6 +92,7 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
     const { data: details, isLoading } = useLogDetails(record);
     record.details = details
 
+    console.log(details)
 
     const [statusMessage, setStatusMessage] = useState<{
         variant: 'success' | 'error';
@@ -105,6 +106,8 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
         project_name: details?.project_name || '',
         task_accomplished: details?.task_accomplished || '',
     });
+
+    console.log(eodFormValues)
 
     const [eodErrors, setEodErrors] = useState<EODReportFormErrors>({});
 
@@ -278,6 +281,7 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
             {record.log_category === 'eod_report' && isDraftEOD && (
                 <>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    
                     <div>
                     <label className="text-sm font-medium">Date</label>
                     <input
@@ -292,7 +296,6 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
                         </p>
                     )}
                     </div>
-
                     <div>
                     <label className="text-sm font-medium">Hour Spent</label>
                     <div className="relative mt-1">
@@ -386,7 +389,7 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
             {record.log_category === 'eod_report' && !isDraftEOD && (
                 <>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                    <DetailItem label="Date" value={formatDate(record?.date_created)} />
+                    <DetailItem label="Date" value={formatDate(details?.date_written)} />
                     <DetailItem
                     label="Hour Spent"
                     value={
