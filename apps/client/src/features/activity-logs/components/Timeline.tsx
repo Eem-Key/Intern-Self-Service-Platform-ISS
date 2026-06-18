@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { supabase } from '../../../config/supabase';
 import type { RecordType } from '../../../../../shared/types/enums.types';
 import type { 
     Record, 
@@ -58,6 +60,7 @@ function formatDateTime(value: string) {
 }
 
 function TimelineExplorer() {
+    const queryClient = useQueryClient();
     const [selectedType, setSelectedType] = useState<LogTypeFilter>('all');
     const [selectedRecord, setSelectedRecord] = useState<RecordLog | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
@@ -85,6 +88,38 @@ function TimelineExplorer() {
         setSelectedType(value);
         setCurrentPage(1);
     };
+
+    useEffect(() => {
+    const channel = supabase
+        .channel('intern-record-status-changes')
+        .on(
+            'postgres_changes',
+            {
+                event: 'UPDATE',
+                schema: 'public',
+                table: 'records',
+            },
+            (payload) => {
+                queryClient.invalidateQueries({ queryKey: ['records'] });
+                queryClient.invalidateQueries({ queryKey: ['log-details'] });
+                queryClient.invalidateQueries({ queryKey: ['intern-profile'] });
+
+                setSelectedRecord((prev) => {
+                    if (!prev || prev.id !== payload.new.id) return prev;
+
+                    return {
+                        ...prev,
+                        ...payload.new,
+                    } as RecordLog;
+                });
+            }
+        )
+        .subscribe();
+
+    return () => {
+        supabase.removeChannel(channel);
+    };
+}, [queryClient]);
 
     return (
         <>
