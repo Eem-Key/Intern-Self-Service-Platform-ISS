@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Clock, X } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -88,6 +88,8 @@ function formatRequestedData(data?: Record<string, unknown>) {
 function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
     const queryClient = useQueryClient();
     const isDraftEOD = record.log_category === 'eod_report' && record.status === 'draft';
+    const isDeniedEOD = record.log_category === 'eod_report' && record.status === 'denied';
+    const [isEditingDeniedEOD, setIsEditingDeniedEOD] = useState(false);
 
     const { data: details, isLoading } = useLogDetails(record);
     record.details = details
@@ -104,6 +106,17 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
         project_name: details?.project_name || '',
         task_accomplished: details?.task_accomplished || '',
     });
+
+    useEffect(() => {
+        if (!details) return;
+
+        setEodFormValues({
+            date_written: details.date_written || '',
+            hours_spent: Number(details.hours_spent || 0),
+            project_name: details.project_name || '',
+            task_accomplished: details.task_accomplished || '',
+        });
+    }, [details]);
 
     const [eodErrors, setEodErrors] = useState<EODReportFormErrors>({});
 
@@ -274,7 +287,7 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
                 </>
             )}
 
-            {record.log_category === 'eod_report' && isDraftEOD && (
+            {record.log_category === 'eod_report' && (isDraftEOD || isEditingDeniedEOD) &&  (
                 <>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     
@@ -353,36 +366,40 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
                 </div>
 
                 <div className="flex flex-col-reverse justify-end gap-3 pt-2 sm:flex-row">
-                    <button
-                    type="button"
-                    onClick={onClose}
-                    disabled={
-                        saveEODDraftMutation.isPending ||
-                        submitEODDraftMutation.isPending
-                    }
-                    className=" px-7 py-2 text-sm font-bold text-gray-600 disabled:cursor-not-allowed disabled:opacity-70"
-                    >
-                    Cancel
-                    </button>
+                    {isDraftEOD && (
+                        <button
+                            type="button"
+                            onClick={handleSaveEODDraft}
+                            disabled={
+                                saveEODDraftMutation.isPending ||
+                                submitEODDraftMutation.isPending
+                            }
+                            className="rounded-full border border-gray-300 bg-white px-7 py-2 text-sm font-bold text-black disabled:cursor-not-allowed disabled:opacity-70"
+                        >
+                            {saveEODDraftMutation.isPending ? 'Saving...' : 'Save'}
+                        </button>
+                    )}
 
                     <button
-                    type="button"
-                    onClick={handleSubmitEODDraft}
-                    disabled={
-                        saveEODDraftMutation.isPending ||
-                        submitEODDraftMutation.isPending
-                    }
-                    className="rounded-full bg-[#FFBF10] px-7 py-2 text-sm font-bold text-black disabled:cursor-not-allowed disabled:bg-[#eeeeee] disabled:text-gray-500 disabled:opacity-70"
+                        type="button"
+                        onClick={handleSubmitEODDraft}
+                        disabled={
+                            saveEODDraftMutation.isPending ||
+                            submitEODDraftMutation.isPending
+                        }
+                        className="rounded-full bg-[#FFBF10] px-7 py-2 text-sm font-bold text-black disabled:cursor-not-allowed disabled:bg-[#eeeeee] disabled:text-gray-500 disabled:opacity-70"
                     >
-                    {submitEODDraftMutation.isPending
-                        ? 'Submitting...'
-                        : 'Submit'}
+                        {submitEODDraftMutation.isPending
+                            ? 'Submitting...'
+                            : isEditingDeniedEOD
+                                ? 'Resubmit'
+                                : 'Submit'}
                     </button>
                 </div>
                 </>
             )}
 
-            {record.log_category === 'eod_report' && !isDraftEOD && (
+            {record.log_category === 'eod_report' && !isDraftEOD && !isEditingDeniedEOD && (
                 <>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                     <DetailItem label="Date" value={formatDate(details?.date_written)} />
@@ -411,6 +428,18 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
 
                 {record.status !== 'pending' && (
                     <AdminFeedback value={record?.admin_feedback} />
+                )}
+
+                {isDeniedEOD && (
+                    <div className="flex justify-end pt-2">
+                        <button
+                            type="button"
+                            onClick={() => setIsEditingDeniedEOD(true)}
+                            className="rounded-full bg-[#FFBF10] px-7 py-2 text-sm font-bold text-black transition hover:bg-[#e5aa0e]"
+                        >
+                            Edit
+                        </button>
+                    </div>
                 )}
                 </>
             )}
