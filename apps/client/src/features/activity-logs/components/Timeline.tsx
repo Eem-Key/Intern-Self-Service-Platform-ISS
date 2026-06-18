@@ -24,6 +24,22 @@ function formatLogType(type: RecordType) {
     }
 }
 
+function getPageNumbers(currentPage: number, totalPages: number) {
+    if (totalPages <= 5) {
+        return Array.from({ length: totalPages }, (_, index) => index + 1);
+    }
+
+    if (currentPage <= 3) {
+        return [1, 2, 3, '...', totalPages];
+    }
+
+    if (currentPage >= totalPages - 2) {
+        return [1, '...', totalPages - 2, totalPages - 1, totalPages];
+    }
+
+    return [1, '...', currentPage, '...', totalPages];
+}
+
 function formatDateTime(value: string) {
     const date = new Date(value);
 
@@ -59,6 +75,8 @@ function TimelineExplorer() {
     
     const totalPages = count ? Math.ceil(count / rowsPerPage) : 0;
 
+    const pageNumbers = getPageNumbers(currentPage, totalPages);
+
     const startEntry = count === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1;
 
     const endEntry = Math.min(currentPage * rowsPerPage, count);
@@ -70,7 +88,8 @@ function TimelineExplorer() {
 
     return (
         <>
-        <section className="relative rounded-xl bg-white shadow-md">
+        <section className="relative flex h-[490px] flex-col rounded-xl bg-white shadow-md">
+        {/*<section className="relative rounded-xl bg-white shadow-md">*/}
             <div className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
             <h2 className="border-l-4 border-[#FFBF10] pl-3 text-xl font-bold sm:text-2xl">
                 Timeline Explorer
@@ -79,7 +98,8 @@ function TimelineExplorer() {
             <LogTypeDropdown value={selectedType} onChange={handleFilterChange} />
             </div>
 
-            <div className="w-full overflow-x-auto">
+            <div className="min-h-0 flex-1 overflow-x-auto overflow-y-auto">
+            {/*<div className="w-full overflow-x-auto">*/}
             <table className="w-full min-w-[760px] border-collapse">
                 <thead className="bg-[#EAF0FA]">
                 <tr>
@@ -158,30 +178,39 @@ function TimelineExplorer() {
                 Previous
             </button>
 
-            {Array.from({ length: totalPages }).map((_, index) => {
-                const page = index + 1;
+            {pageNumbers.map((page, index) => {
+                if (typeof page === 'string') {
+                    return (
+                        <span
+                            key={`ellipsis-${index}`}
+                            className="flex h-8 w-8 items-center justify-center text-sm text-gray-400"
+                        >
+                            ...
+                        </span>
+                    );
+                }
 
                 return (
-                <button
-                    key={page}
-                    type="button"
-                    onClick={() => setCurrentPage(page)}
-                    className={`flex h-8 w-8 items-center justify-center rounded-full border text-sm ${
-                    currentPage === page
-                        ? 'border-[#FFBF10] bg-[#FFBF10] text-black'
-                        : 'border-gray-300 bg-white text-black'
-                    }`}
-                >
-                    {page}
-                </button>
+                    <button
+                        key={page}
+                        type="button"
+                        onClick={() => setCurrentPage(page)}
+                        className={`flex h-8 w-8 items-center justify-center rounded-full border text-sm ${
+                            currentPage === page
+                                ? 'border-[#FFBF10] bg-[#FFBF10] text-black'
+                                : 'border-gray-300 bg-white text-black'
+                        }`}
+                    >
+                        {page}
+                    </button>
                 );
             })}
 
             <button
                 type="button"
-                disabled={currentPage === totalPages}
+                disabled={totalPages === 0 || currentPage === totalPages}
                 onClick={() =>
-                setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+                    setCurrentPage((prev) => Math.min(totalPages, prev + 1))
                 }
                 className="rounded-full border border-gray-300 bg-white px-4 py-1.5 text-sm text-black disabled:cursor-not-allowed disabled:opacity-50"
             >
