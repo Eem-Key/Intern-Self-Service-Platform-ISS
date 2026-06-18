@@ -145,17 +145,13 @@ function TimelineExplorer() {
                         </TableCell>
 
                         <TableCell>
-                        {record.log_category !== 'attendance' ? (
-                            <button
+                        <button
                             type="button"
                             onClick={() => setSelectedRecord(record)}
                             className="text-sm font-medium text-black transition hover:text-[#0058DD]"
-                            >
+                        >
                             View Details
-                            </button>
-                        ) : (
-                            <span className="text-sm text-gray-400">—</span>
-                        )}
+                        </button>
                         </TableCell>
                     </tr>
                     ))

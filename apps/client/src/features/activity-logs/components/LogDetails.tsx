@@ -256,7 +256,9 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
                     {formatLogType(record.log_category)}
                 </h2>
 
-                <StatusBadge status={record.status ? record.status : ''} />
+                {record.log_category !== 'attendance' && (
+                    <StatusBadge status={record.status ? record.status : ''} />
+                )}
                 </div>
 
                 <p className="mt-1 text-xs text-white/80">
@@ -276,27 +278,34 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
             <div className="max-h-[75vh] space-y-5 overflow-y-auto px-6 py-5">
             {record.log_category === 'attendance' && (
                 <>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                    <DetailItem label="Date" value={formatDate(record?.date_created)} />
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <DetailItem
-                    label="Time In"
-                    value={formatTime(details?.time_in)}
+                        label="Date"
+                        value={formatDate(details?.work_date || record?.date_created)}
                     />
-                    <DetailItem
-                    label="Time Out"
-                    value={formatTime(details?.time_out)}
-                    />
-                </div>
 
-                <DetailItem
-                    label="Hours Logged"
-                    value={
-                    details?.hours_spent !== null &&
-                    details?.hours_spent !== undefined
-                        ? `${details.hours_spent} hrs`
-                        : '--'
-                    }
-                />
+                    <DetailItem
+                        label="Hours Spent"
+                        value={
+                        details?.hours_logged !== null &&
+                        details?.hours_logged !== undefined
+                            ? `${details.hours_logged} Hrs`
+                            : '--'
+                        }
+                    />
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <DetailBox
+                        label="Time In"
+                        value={formatTime(details?.clock_in || details?.time_in)}
+                    />
+
+                    <DetailBox
+                        label="Time Out"
+                        value={formatTime(details?.clock_out || details?.time_out)}
+                    />
+                    </div>
                 </>
             )}
 
@@ -535,7 +544,7 @@ function DetailBox({ label, value }: { label: string; value: string }) {
     return (
         <div>
         <p className="mb-2 text-sm font-bold text-black">{label}</p>
-        <div className="min-h-[110px] whitespace-pre-wrap rounded bg-[#eeeeee] p-4 text-sm leading-relaxed text-gray-800">
+        <div className="min-h-[50px] whitespace-pre-wrap rounded bg-[#eeeeee] p-4 text-sm leading-relaxed text-gray-800">
             {value}
         </div>
         </div>
