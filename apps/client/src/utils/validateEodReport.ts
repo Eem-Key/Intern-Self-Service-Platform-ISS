@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 export const validateEodReport = (
   data: EODReportForm,
-  mode: 'save' | 'submit'
+  mode: 'save' | 'submit' | 'resubmit'
 ): EODReportFormErrors => {
   const dynamicSchema = eodReportSchema.extend({
     hours_spent: mode === 'submit' 

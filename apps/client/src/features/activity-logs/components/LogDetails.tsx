@@ -221,6 +221,17 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
         submitEODDraftMutation.mutate(eodFormValues);
     };
 
+    const handleResubmitDeniedEOD = () => {
+        const validationErrors = validateEodReport(eodFormValues, 'resubmit');
+
+        if (Object.keys(validationErrors).length > 0) {
+            setEodErrors(validationErrors);
+            return;
+        }
+
+        submitEODDraftMutation.mutate(eodFormValues);
+    };
+
     {/*if (isLoading) return <div className="fixed inset-0 z-[99999] flex items-center justify-center">Loading...</div>;*/}
 
     if (isLoading) {
@@ -404,7 +415,7 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
 
                     <button
                         type="button"
-                        onClick={handleSubmitEODDraft}
+                        onClick={isEditingDeniedEOD ? handleResubmitDeniedEOD : handleSubmitEODDraft}
                         disabled={
                             saveEODDraftMutation.isPending ||
                             submitEODDraftMutation.isPending
@@ -413,8 +424,8 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
                     >
                         {submitEODDraftMutation.isPending
                             ? isEditingDeniedEOD
-                            ? 'Resubmitting...'
-                            : 'Submitting...'
+                                ? 'Resubmitting...'
+                                : 'Submitting...'
                             : isEditingDeniedEOD
                                 ? 'Resubmit'
                                 : 'Submit'}
