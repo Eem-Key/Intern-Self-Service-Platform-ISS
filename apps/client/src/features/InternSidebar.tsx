@@ -69,11 +69,12 @@ function InternSidebar() {
 
   return (
     <>
-      {/* Mobile / Tablet Menu Button */}
+    {/* Mobile / Tablet Top Bar */}
+    <div className="fixed left-0 top-0 z-[9997] h-16 w-full bg-[#002D6F] shadow-md lg:hidden" />
       <button
         type="button"
         onClick={() => setIsMobileSidebarOpen(true)}
-        className="fixed left-4 top-4 z-[9998] flex h-11 w-11 items-center justify-center rounded-full bg-[#002D6F] text-white shadow-lg lg:hidden"
+        className="fixed left-4 top-2.5 z-[9998] flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white shadow-lg ring-1 ring-white/20 lg:hidden"
       >
         <Menu size={24} />
       </button>

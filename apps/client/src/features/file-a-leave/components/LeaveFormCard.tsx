@@ -508,21 +508,21 @@ function LeaveFormCard() {
                 )}
             </div>
 
-            <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-3">
+            <div className="flex flex-row gap-3 pt-3 sm:justify-end">
                 <button
-                type="button"
-                onClick={handleCancel}
-                className="h-11 w-full sm:w-auto sm:min-w-[110px] rounded-full bg-[#eeeeee] px-6 text-sm font-semibold text-black hover:bg-gray-200 border border-gray-300 transition-colors"
+                    type="button"
+                    onClick={handleCancel}
+                    className="h-11 flex-1 rounded-full border border-gray-300 bg-[#eeeeee] px-4 text-sm font-semibold text-black transition-colors hover:bg-gray-200 sm:flex-none sm:min-w-[110px] sm:px-6"
                 >
-                Cancel
+                    Cancel
                 </button>
 
                 <button
-                disabled={submitMutation.isPending}
-                type="submit"
-                className="h-11 w-full sm:w-auto sm:min-w-[110px] rounded-full bg-[#FFBF10] px-6 text-sm font-semibold text-black hover:bg-[#e8a900] transition-colors"
+                    disabled={submitMutation.isPending}
+                    type="submit"
+                    className="h-11 flex-1 rounded-full bg-[#FFBF10] px-4 text-sm font-semibold text-black transition-colors hover:bg-[#e8a900] disabled:cursor-not-allowed disabled:opacity-70 sm:flex-none sm:min-w-[110px] sm:px-6"
                 >
-                {submitMutation.isPending ? 'Submitting...' : 'Submit'}
+                    {submitMutation.isPending ? 'Submitting...' : 'Submit'}
                 </button>
             </div>
             </form>
