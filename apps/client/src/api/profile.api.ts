@@ -84,9 +84,13 @@ export async function fetchFullNameAPI(
         throw new Error(`Error fetching profile: ${fetchError.message}`);
     }
 
+    const middleInitial = nameData.middle_name 
+    ? `${nameData.middle_name.charAt(0).toUpperCase()}.` 
+    : null;
+
     const fullname = [
         nameData.first_name,
-        nameData.middle_name,
+        middleInitial,
         nameData.last_name,
         nameData.suffix
     ]
@@ -217,37 +221,6 @@ export async function insertProfileUpdateRequestAPI(
 
     return insertedUpdateRequest;
 }
-
-// export async function adminReviewProfileUpdateAPI(
-//     review: AdminReviewProfileUpdateRequest
-// ): Promise<ProfileUpdateRequest> {
-//     const adminId = await getAuthUserId();
-//     if (!adminId) {
-//         throw new Error('You must be logged in as a user to review profile update requests.');
-//     }
-
-//     if (!await isAdmin()) {
-//         throw new Error('You must be an admin to review profile update requests.');
-//     }
-
-//     const { data: updatedUpdateRequest, error: updateError } = await supabase
-//         .from('profile_update_requests')
-//         .update({
-//             status: review.status,
-//             admin_id: adminId,
-//             reviewed_at: new Date().toISOString(),
-//             admin_feedback: review.admin_feedback || null,
-//         })
-//         .eq('id', review.id)
-//         .select()
-//         .single();
-
-//     if (updateError) {
-//         throw new Error(`Error reviewing profile update request: ${updateError.message}`);
-//     }
-
-//     return updatedUpdateRequest;
-// }
 
 export async function hasPendingProfileUpdateRequestAPI(updateType: string) {
     const {
