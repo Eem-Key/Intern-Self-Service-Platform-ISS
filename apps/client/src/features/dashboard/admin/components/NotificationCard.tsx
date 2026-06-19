@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { Bell, X } from 'lucide-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import {
-    getNotificationsAPI,
-    markNotificationAsReadAPI,
-} from '../../../../api/adminNotification.api';
-import type { NotificationItem } from '../../../../../../shared/types/notification.types';
+    fetchAdminNotificationsAPI,
+    updateAdminNotificationsAsRead,
+} from '../../../../api/notification.api';
+import type { Notification } from '../../../../../../shared/types/notification.types';
 
 function getElapsedTime(sentAt: string) {
     const sentTime = new Date(sentAt).getTime();
@@ -26,8 +26,8 @@ function getElapsedTime(sentAt: string) {
     return `${diffInDays} days ago`;
 }
 
-function isNotificationUnread(notification: NotificationItem) {
-    const item = notification as NotificationItem & {
+function isNotificationUnread(notification: Notification) {
+    const item = notification as Notification & {
         is_read?: boolean | null;
         isRead?: boolean | null;
         read_at?: string | null;
@@ -45,19 +45,19 @@ function isNotificationUnread(notification: NotificationItem) {
 
 function NotificationCard() {
     const [selectedNotification, setSelectedNotification] =
-        useState<NotificationItem | null>(null);
+        useState<Notification | null>(null);
     const [, setCurrentTime] = useState(Date.now());
 
     const { data, refetch, isLoading } = useQuery({
         queryKey: ['admin-notifications'],
-        queryFn: getNotificationsAPI,
+        queryFn: fetchAdminNotificationsAPI,
     });
 
     const notifications = data?.data ?? [];
     const unreadCount = notifications.filter(isNotificationUnread).length;
 
     const markAsReadMutation = useMutation({
-        mutationFn: markNotificationAsReadAPI,
+        mutationFn: updateAdminNotificationsAsRead,
         onSuccess: async () => {
         await refetch();
         },
@@ -71,7 +71,7 @@ function NotificationCard() {
         return () => window.clearInterval(timer);
     }, []);
 
-    const handleReadMore = (notification: NotificationItem) => {
+    const handleReadMore = (notification: Notification) => {
         setSelectedNotification(notification);
 
         if (isNotificationUnread(notification)) {

@@ -71,6 +71,31 @@ export async function fetchUserProfileAPI(user_id: string): Promise<UserProfile>
     return userProfile;
 }
 
+export async function fetchFullNameAPI(
+    user_id: string
+): Promise<string> {
+    const { data: nameData, error: fetchError } = await supabase
+        .from('profiles')
+        .select(`first_name, middle_name, last_name, suffix`)
+        .eq('id', user_id)
+        .single();
+
+    if (fetchError) {
+        throw new Error(`Error fetching profile: ${fetchError.message}`);
+    }
+
+    const fullname = [
+        nameData.first_name,
+        nameData.middle_name,
+        nameData.last_name,
+        nameData.suffix
+    ]
+    .filter(Boolean)
+    .join(' ');
+
+    return fullname;
+}
+
 export async function adminInsertProfileAPI(
     profile: ProfileInsert,
     internInfo: InternInfo

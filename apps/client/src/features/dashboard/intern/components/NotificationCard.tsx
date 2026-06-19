@@ -3,8 +3,8 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 
 import {
-  fetchNotificationsAPI,
-  updateNotificationsAsRead
+  fetchInternNotificationsAPI,
+  updateInternNotificationsAsRead
 } from '../../../../api/notification.api';
 import type { Notification } from '../../../../../../shared/types/notification.types';
 
@@ -35,14 +35,14 @@ function NotificationCard() {
 
   const { data, refetch, isLoading } = useQuery({
     queryKey: ['notifications'],
-    queryFn: fetchNotificationsAPI,
+    queryFn: fetchInternNotificationsAPI,
   });
 
   const notifications = data?.data ?? [];
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
   const markAsReadMutation = useMutation({
-    mutationFn: updateNotificationsAsRead,
+    mutationFn: updateInternNotificationsAsRead,
     onSuccess: async () => { await refetch(); },
   });
 

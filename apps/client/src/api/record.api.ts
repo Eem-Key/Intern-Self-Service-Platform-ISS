@@ -5,6 +5,7 @@ import { fetchAttendanceById } from './attendance.api';
 import { fetchEodReportById } from './eodReport.api';
 import { fetchLeaveRequestById } from './leave.api';
 import { fetchProfileUpdateRequestById } from './profile.api';
+import { insertInternNotificationAPI } from './notification.api'
 import type { 
     ReportStatus, 
     RecordType,
@@ -80,7 +81,7 @@ export const insertRecord = async (record: RecordInsert): Promise<string> => {
     const { data: recordInsert, error: insertRecordError } = await supabase
     .from('records')
     .insert([record])
-    .select('id')
+    .select('*')
     .single();
 
     if (insertRecordError){
@@ -88,9 +89,11 @@ export const insertRecord = async (record: RecordInsert): Promise<string> => {
         throw insertRecordError;
     }
 
-    console.log('Insert Record: ', recordInsert)
+    console.log('Insert Record: ', recordInsert.id);
 
-    return recordInsert.id
+    await insertInternNotificationAPI(recordInsert);
+
+    return recordInsert.id;
 };
 
 export const updateRecord = async (record_id: string, description: ActivityDescription, status?: ReportStatus) => {
