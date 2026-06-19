@@ -1,13 +1,12 @@
 import { useEffect } from 'react';
 
-import AdminSidebar from '../../AdminSidebar.tsx';
-import Banner from './banner/DashboardBanner.tsx';
-
+import AdminSidebar from '../../AdminSidebar';
 import ActiveInternsCard from './components/ActiveInternsCard';
 import CurrentlyClockedInCard from './components/CurrentlyClockedInCard';
 import PendingApprovalsCard from './components/PendingApprovalsCard';
 import AttendanceTracker from './components/AttendanceTracker';
 import NotificationCard from './components/NotificationCard';
+import Banner from './banner/DashboardBanner'
 
 function AdminDashboard() {
     useEffect(() => {

@@ -189,7 +189,7 @@ function EODReportCard() {
           <textarea disabled={isSubmitted} value={formValues.task_accomplished} onChange={(e) => handleChange('task_accomplished', e.target.value)} className="h-[200px] w-full resize-none rounded bg-[#eeeeee] p-3 text-sm outline-none" />
         </div>
 
-        <div className="flex flex-row gap-3 pt-2">
+        <div className="flex flex-row gap-3 pt-2 justify-end">
         <button
           type="button"
           onClick={handleSave}
