@@ -6,12 +6,12 @@ import ConfirmationModal from '../../../components/feedback/confirmationModal';
 import profilepic from '../../../assets/images/default_pic.png';
 import { insertProfileUpdateRequestAPI, hasPendingProfileUpdateRequestAPI, } from '../../../api/profile.api';
 import type {
-    Profile,
+    ProfileIntern,
 } from '../../../../../shared/types/profile.types';
 
 
 type ProfilePictureCardProps = {
-    profile: Profile;
+    profile: ProfileIntern;
 };
 
 function ProfilePictureCard({ profile }: ProfilePictureCardProps) {

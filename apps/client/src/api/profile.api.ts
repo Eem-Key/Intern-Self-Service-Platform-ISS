@@ -1,7 +1,7 @@
 import { supabase } from '../config/supabase';
 import { getAuthUserId, isAdmin } from '../utils/auth';
 import type { 
-    Profile,
+    ProfileIntern,
     ProfileInsert,
     ProfileUpdate,
     UserProfile,
@@ -17,7 +17,7 @@ import {
     insertRecord 
 } from './record.api'
 
-export async function fetchProfileAPI(): Promise<Profile> {
+export async function fetchProfileAPI(): Promise<ProfileIntern> {
     const userId = await getAuthUserId();
     if (!userId) {
         throw new Error('You must be logged in to fetch your profile.');
@@ -100,10 +100,10 @@ export async function fetchFullNameAPI(
     return fullname;
 }
 
-export async function adminInsertProfileAPI(
+export async function insertAdminProfileAPI(
     profile: ProfileInsert,
     internInfo: InternInfo
-): Promise<Profile> {
+): Promise<ProfileIntern> {
     const adminId = await getAuthUserId();
     if (!adminId) {
         throw new Error('You must be logged in as a user to review profile update requests.');
@@ -124,41 +124,10 @@ export async function adminInsertProfileAPI(
         throw new Error(`Error inserting profile: ${insertError.message}`);
     }
 
-    const insertedProfile = data as Profile;
+    const insertedProfile = data as ProfileIntern;
 
     return insertedProfile;
 }
-
-// export async function adminUpdateProfileAPI(
-//     profileId: string,
-//     profile: ProfileUpdate,
-//     internInfo: InternInfo
-// ): Promise<Profile> {
-//     const adminId = await getAuthUserId();
-//     if (!adminId) {
-//         throw new Error('You must be logged in as a user to update profiles.');
-//     }
-
-//     if (!await isAdmin()) {
-//         throw new Error('You must be an admin to update profiles.');
-//     }
-
-//     const { data, error: updateError } = await supabase
-//         .rpc('update_intern_profile', {
-//             p_id: profileId,
-//             profile_data: profile as unknown as Record<string, any>,
-//             intern_data: internInfo as unknown as Record<string, any>
-//         })
-//         .single();
-
-//     if (updateError) {
-//         throw new Error(`Error updating profile: ${updateError.message}`);
-//     }
-
-//     const updatedProfile = data as Profile;
-
-//     return updatedProfile;
-// }
 
 export async function fetchProfileUpdateRequestById(
     record_id: string

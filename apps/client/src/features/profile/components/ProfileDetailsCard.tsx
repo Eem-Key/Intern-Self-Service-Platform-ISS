@@ -1,7 +1,7 @@
 import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import type {
-    Profile,
+    ProfileIntern,
     ProfileUpdateRequestForm,
 } from '../../../../../shared/types/profile.types';
 import type {
@@ -23,7 +23,7 @@ import RequiredMark from '../../../components/ui/RequiredMark.tsx';
 
 
 type ProfileDetailsCardProps = {
-    profile: Profile;
+    profile: ProfileIntern;
 };
 
 

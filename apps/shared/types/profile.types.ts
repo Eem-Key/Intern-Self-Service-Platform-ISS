@@ -10,37 +10,39 @@ import type {
 import type { InternInfo } from './intern.types'
 
 export type Profile = {
-    id: string;
-    first_name: string;
-    middle_name: string | null;
-    last_name: string;
-    suffix: string | null;
+  id: string;
+  first_name: string;
+  middle_name: string | null;
+  last_name: string;
+  suffix: string | null;
 
-    role: UserRole;
-    position: JobPosition;
-    department: CompanyDepartment;
-    office: OfficeLocation;
+  role: UserRole;
+  position: JobPosition;
+  department: CompanyDepartment;
+  office: OfficeLocation;
 
-    birth_date: string | null;
-    gender: UserGender | null;
-    avatar_url?: string | null;
+  birth_date: string;
+  gender: UserGender;
+  avatar_url?: string | null;
 
-    contact_number: string | null;
-    address: string | null;
-    email: string;
-    created_at: string;
-    updated_at: string;
-    requires_password_change: boolean;
-
-    intern_info?: InternInfo | null;
+  contact_number: string;
+  address: string;
+  email: string;
+  created_at: string;
+  updated_at: string;
+  requires_password_change: boolean;
 }
 
-export type ProfileInsert = Omit<Profile, 'id' | 'created_at' | 'updated_at'>;
+export type ProfileIntern = Profile & {
+    intern_info: InternInfo;
+}
+
+export type ProfileInsert = Omit<ProfileIntern, 'id' | 'created_at' | 'updated_at'>;
 
 export type ProfileUpdate = Partial<ProfileInsert>;
 
 export type UserProfile = Omit<
-  Profile, 
+  ProfileIntern, 
   // 'id' |
   // 'first_name' |
   'middle_name' |

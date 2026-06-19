@@ -1,16 +1,22 @@
 import { supabase } from '../config/supabase.ts';
-import { getAuthUserId } from '../utils/auth';
+import { getAuthUserId, isAdmin } from '../utils/auth';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { fetchAttendanceById } from './attendance.api';
 import { fetchEodReportById } from './eodReport.api';
 import { fetchLeaveRequestById } from './leave.api';
 import { fetchProfileUpdateRequestById } from './profile.api';
-import { insertInternNotificationAPI } from './notification.api'
+import { 
+    insertInternNotificationAPI,
+    insertAdminNotificationAPI
+ } from './notification.api'
 import type { 
     ReportStatus, 
     RecordType,
     ActivityDescription,
+    ProfileUpdateType,
 } from '../../../shared/types/enums.types.ts';
+import type { ProfileUpdate } from '../../../shared/types/profile.types.ts';
+import type { InternInfo } from '../../../shared/types/intern.types.ts';
 import type { 
     Record, 
     RecordInsert,
@@ -44,6 +50,22 @@ export function useFetchRecordsPaginatedIntern(
         staleTime: 30_000,
     });
 }
+
+// export function useUpdateAdminReviewRecord(
+//     record_id: string, 
+//     admin_feedback: string, 
+//     status: ReportStatus,
+//     update_type?: ProfileUpdateType,
+//     profile_data?: Profile,
+//     intern_data?: InternInfo
+// ) {
+//     return useQuery({
+//         queryKey: ['admin_review', page, log_category], 
+//         queryFn: () => fetchRecordsPaginatedIntern(page, pageSize, log_category),
+//         placeholderData: keepPreviousData,
+//         staleTime: 30_000,
+//     });
+// }
 
 export const fetchRecordsPaginatedIntern = async (
     page: number, 
@@ -98,14 +120,14 @@ export const insertRecord = async (record: RecordInsert): Promise<string> => {
 
 export const updateRecord = async (record_id: string, description: ActivityDescription, status?: ReportStatus) => {
     const { data: recordUpdate, error: updateRecordError } = await supabase
-    .from('records')
-    .update({
-        status:status,
-        activity_description: description,
-    })
-    .eq('id', record_id)
-    .select('status')
-    .single();
+        .from('records')
+        .update({
+            status: status,
+            activity_description: description,
+        })
+        .eq('id', record_id)
+        .select('status')
+        .single();
 
     if (updateRecordError){
         console.log(updateRecordError)
@@ -114,3 +136,42 @@ export const updateRecord = async (record_id: string, description: ActivityDescr
 
     console.log('Updated Record: ', recordUpdate)
 };
+
+export async function updateAdminReviewRecord(
+    record_id: string, 
+    admin_feedback: string, 
+    status: ReportStatus,
+    update_type?: ProfileUpdateType,
+    profile_data?: ProfileUpdate,
+    intern_data?: InternInfo
+) {
+    const admin_id = await getAuthUserId();
+    if (!admin_id) {
+        throw new Error('You must be logged in as a user.');
+    }
+
+    if (!await isAdmin()) {
+        throw new Error('Forbidden: You must be an admin.');
+    }
+
+    const { data: recordData, error: updateError } = await supabase
+        .rpc('update_admin_review', {
+            p_record_id: record_id,
+            p_admin_id: admin_id,
+            p_admin_feedback: admin_feedback,
+            p_status: status,
+            p_update_type: update_type || null,
+            p_profile_data: profile_data || null,
+            p_intern_data: intern_data || null
+        })
+        .single();
+
+    if (updateError) {
+        console.error('RPC Error:', updateError);
+        throw updateError;
+    }
+    
+    await insertAdminNotificationAPI(recordData as Record);
+
+    console.log('Record, Profile, and Intern data updated successfully via RPC.');
+}
