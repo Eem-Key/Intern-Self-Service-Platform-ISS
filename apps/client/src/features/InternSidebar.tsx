@@ -11,7 +11,7 @@ import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import profilepic from '../assets/images/default_pic.png';
 import { logoutUserAPI } from '../api/auth.api';
-import { getFullName, getPosition } from '../utils/auth.ts';
+import { getAuthUser, getFullName, getPosition } from '../utils/auth.ts';
 import { supabase } from '../config/supabase';
 
 const navItems = [
@@ -42,11 +42,9 @@ function InternSidebar() {
   const location = useLocation();
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
-  const storedUser = sessionStorage.getItem('authUser');
-  const user = storedUser ? JSON.parse(storedUser) : null;
-
-  const fullName = getFullName(user);
-  const position = getPosition(user);
+  const user = getAuthUser();
+    const fullName = getFullName(user);
+    const position = getPosition(user);
 
   const handleLogout = async () => {
     try {
