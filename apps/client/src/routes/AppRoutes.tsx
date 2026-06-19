@@ -9,8 +9,8 @@ import { LoginPage } from '../features/login/Index';
 import InternProfile from '../features/profile/InternProfile';
 
 import type { Session } from '@supabase/supabase-js';
+import AdminApprovals from '../features/approvals/AdminApprovals';
 import AdminActivityRecords from '../features/dashboard/admin/AdminActivityRecords';
-import AdminApprovals from '../features/dashboard/admin/AdminApprovals';
 import AdminInternList from '../features/dashboard/admin/AdminInternList';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
