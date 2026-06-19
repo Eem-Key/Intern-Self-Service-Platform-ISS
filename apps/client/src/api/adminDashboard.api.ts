@@ -5,12 +5,12 @@ import { getAuthUserId, isAdmin } from '../utils/auth';
 export async function fetchActiveInternsAPI(): Promise<number> {
     const userId = await getAuthUserId();
     if (!userId) {
-        throw new Error('You must be logged in to fetch your profile.');
+        throw new Error('You must be logged in as a user.');
     }
     
     const isAdminCheck = await isAdmin();
     if (!isAdminCheck) {
-        throw new Error('Forbidden: You do not have permission to view this request.');
+        throw new Error('Forbidden: You must be an admin.');
     }
 
     const { count, error: fetchError } = await supabase
@@ -28,12 +28,12 @@ export async function fetchActiveInternsAPI(): Promise<number> {
 export async function fetchActiveAttendanceAPI(): Promise<number> {
     const userId = await getAuthUserId();
     if (!userId) {
-        throw new Error('You must be logged in to fetch your profile.');
+        throw new Error('You must be logged in as a user.');
     }
     
     const isAdminCheck = await isAdmin();
     if (!isAdminCheck) {
-        throw new Error('Forbidden: You do not have permission to view this request.');
+        throw new Error('Forbidden: You must be an admin.');
     }
 
     const today = new Date().toISOString().split('T')[0];
@@ -51,18 +51,41 @@ export async function fetchActiveAttendanceAPI(): Promise<number> {
     return count ?? 0;
 }
 
+export async function fetchPendingRequests(): Promise<number> {
+    const userId = await getAuthUserId();
+    if (!userId) {
+        throw new Error('You must be logged in as a user.');
+    }
+    
+    const isAdminCheck = await isAdmin();
+    if (!isAdminCheck) {
+        throw new Error('Forbidden: You must be an admin.');
+    }
+
+    const { count, error: fetchError } = await supabase
+        .from('records')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending');
+
+    if (fetchError) {
+        throw new Error(`Error fetching count: ${fetchError.message}`);
+    }
+
+    return count ?? 0;
+}
+
 export async function fetchAttendancePerDateRange(
     start_date: string, 
     end_date: string
 ): Promise<AttendanceWithName[]>{
     const userId = await getAuthUserId();
     if (!userId) {
-        throw new Error('You must be logged in to fetch your profile.');
+        throw new Error('You must be logged in as a user.');
     }
     
     const isAdminCheck = await isAdmin();
     if (!isAdminCheck) {
-        throw new Error('Forbidden: You do not have permission to view this request.');
+        throw new Error('Forbidden: You must be an admin.');
     }
 
     const { data: attendanceLogs, error: fetchError } = await supabase

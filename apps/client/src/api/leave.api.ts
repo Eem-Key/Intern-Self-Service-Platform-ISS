@@ -13,35 +13,6 @@ import {
     insertRecord 
 } from './record.api'
 
-/*export const fetchAllLeaveRequestDatesOfIntern = async (
-
-): Promise<{ start_date: string; end_date: string }[]> => {
-    const intern_id = await getAuthUserId();
-    if (!intern_id) {
-        throw new Error(`You must be logged in to fetch your leaves.`);
-    }
-
-    const { data: leaveDates, error: fetchError } = await supabase
-        .from('leave_requests')
-        .select(`
-            start_date, 
-            end_date,   
-            records (
-            id,
-            intern_id,
-            status
-            )
-        `) 
-        .eq('records.intern_id', intern_id)
-        .neq('records.status', 'denied'); 
-
-    if (fetchError) {
-        throw new Error(fetchError.message);
-    }
-
-    return leaveDates || [];
-}*/
-
 export const fetchAllLeaveRequestDatesOfIntern = async (): Promise<
     { start_date: string; end_date: string }[]
 > => {

@@ -10,8 +10,6 @@ import AttendanceTracker from './components/AttendanceTracker';
 import NotificationCard from './components/NotificationCard';
 
 function AdminDashboard() {
-  const pendingApprovals = 0; // replace with API 
-
     useEffect(() => {
         document.title = 'Dashboard | Intern Self Service';
     }, []);
@@ -28,7 +26,7 @@ function AdminDashboard() {
             <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
                 <ActiveInternsCard />
                 <CurrentlyClockedInCard />
-                <PendingApprovalsCard value={pendingApprovals} />
+                <PendingApprovalsCard />
             </div>
 
             {/*add flex-1*/}
