@@ -37,7 +37,7 @@ export async function fetchAttendanceById(
     return fetchData
 }
 
-export async function getAttendanceByDateAPI(
+export async function fetchAttendanceByDateAPI(
     date: string
 ): Promise<AttendanceRecord | null> {
     const intern_id = await getAuthUserId();

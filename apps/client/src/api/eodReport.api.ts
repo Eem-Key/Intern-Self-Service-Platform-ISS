@@ -9,7 +9,7 @@ import type {
     EODReportResponse,
 } from '../../../shared/types/eodReport.types';
 import { useQuery } from '@tanstack/react-query';
-import { getAttendanceByDateAPI } from '../api/attendance.api';
+import { fetchAttendanceByDateAPI } from '../api/attendance.api';
 import type {
     Record,
     RecordInsert,
@@ -22,7 +22,7 @@ import {
 export function useEODAttendance(date: string) {
     return useQuery({
         queryKey: ['attendance-report', date],
-        queryFn: () => getAttendanceByDateAPI(date),
+        queryFn: () => fetchAttendanceByDateAPI(date),
         enabled: !!date,
     });
 }
