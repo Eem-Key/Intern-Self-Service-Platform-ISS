@@ -35,6 +35,30 @@ function formatLogType(type: RecordLog['log_category']) {
     }
 }
 
+function formatLeaveReason(value?: string | null) {
+    switch (value) {
+        case 'sick_medical':
+        return 'Sick / Medical';
+        case 'academic':
+        return 'School Activity / Academic Leave';
+        default:
+        return value ? formatLabel(value) : '--';
+    }
+}
+
+function formatProfileUpdate(value?: string | null) {
+    switch (value) {
+        case 'information_update':
+        return 'Information Update';
+        case 'avatar_update':
+        return 'Avatar Update';
+        case 'password_update':
+        return 'Password Update';
+        default:
+        return value ? formatLabel(value) : '--';
+    }
+}
+
 function formatDate(value?: string | null) {
     if (!value) return '--';
 
@@ -567,7 +591,7 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
 
                     <DetailItem
                     label="Reason"
-                    value={details?.reason_category || '--'}
+                    value={formatLeaveReason(details?.reason_category)}
                     />
                 </div>
 
@@ -595,7 +619,7 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <DetailItem
                             label="Update Type"
-                            value={details?.update_type || record.activity_description}
+                            value={formatProfileUpdate(details?.update_type || record.activity_description)}
                         />
 
                         <DetailItem
