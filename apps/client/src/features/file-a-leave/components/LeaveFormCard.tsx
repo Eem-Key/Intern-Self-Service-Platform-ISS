@@ -7,15 +7,16 @@ import type {
     LeaveRequestFormErrors,
 } from '../../../../../shared/types/leave.types';
 import {
-  checkLeaveRequestDates,
-  fetchAllLeaveRequestDatesOfIntern,
-  insertLeaveRequest,
+    checkLeaveRequestDates,
+    fetchAllLeaveRequestDatesOfIntern,
+    insertLeaveRequest,
 } from '../../../api/leave.api';
 import StatusMessage from '../../../components/feedback/StatusMessage';
 import RequiredMark from '../../../components/ui/RequiredMark';
 import { validateLeaveForm } from '../../../utils/validateLeave.ts';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
+import { supabase } from '../../../config/supabase';
 
 const leaveTypeOptions: { label: string; value: LeaveReason }[] = [
     {
@@ -36,9 +37,13 @@ function LeaveFormCard() {
     const datePickerRef = useRef<HTMLDivElement | null>(null);
 
     const { data: unavailableLeaveDates = [] } = useQuery({
-    queryKey: ['intern-leave-dates'],
-    queryFn: fetchAllLeaveRequestDatesOfIntern,
+        queryKey: ['intern-leave-dates'],
+        queryFn: fetchAllLeaveRequestDatesOfIntern,
+        staleTime: 0,
+        refetchOnMount: 'always',
+        refetchOnWindowFocus: true,
     });
+
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     const [formValues, setFormValues] = useState<LeaveRequestForm>({
@@ -256,6 +261,33 @@ function LeaveFormCard() {
         return dateKey >= leave.start_date && dateKey <= leave.end_date;
     });
     };
+
+    useEffect(() => {
+        const channel = supabase
+            .channel('intern-leave-date-changes')
+            .on(
+                'postgres_changes',
+                {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: 'records',
+                },
+                () => {
+                    queryClient.invalidateQueries({
+                        queryKey: ['intern-leave-dates'],
+                    });
+
+                    queryClient.invalidateQueries({
+                        queryKey: ['records'],
+                    });
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [queryClient]);
 
     return (
         <>
@@ -476,21 +508,21 @@ function LeaveFormCard() {
                 )}
             </div>
 
-            <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-3">
+            <div className="flex flex-row gap-3 pt-3 sm:justify-end">
                 <button
-                type="button"
-                onClick={handleCancel}
-                className="h-11 w-full sm:w-auto sm:min-w-[110px] rounded-full bg-[#eeeeee] px-6 text-sm font-semibold text-black hover:bg-gray-200 border border-gray-300 transition-colors"
+                    type="button"
+                    onClick={handleCancel}
+                    className="h-11 flex-1 rounded-full border border-gray-300 bg-[#eeeeee] px-4 text-sm font-semibold text-black transition-colors hover:bg-gray-200 sm:flex-none sm:min-w-[110px] sm:px-6"
                 >
-                Cancel
+                    Cancel
                 </button>
 
                 <button
-                disabled={submitMutation.isPending}
-                type="submit"
-                className="h-11 w-full sm:w-auto sm:min-w-[110px] rounded-full bg-[#FFBF10] px-6 text-sm font-semibold text-black hover:bg-[#e8a900] transition-colors"
+                    disabled={submitMutation.isPending}
+                    type="submit"
+                    className="h-11 flex-1 rounded-full bg-[#FFBF10] px-4 text-sm font-semibold text-black transition-colors hover:bg-[#e8a900] disabled:cursor-not-allowed disabled:opacity-70 sm:flex-none sm:min-w-[110px] sm:px-6"
                 >
-                {submitMutation.isPending ? 'Submitting...' : 'Submit'}
+                    {submitMutation.isPending ? 'Submitting...' : 'Submit'}
                 </button>
             </div>
             </form>

@@ -149,21 +149,25 @@ function EODReportCard() {
 
       <form onSubmit={handleSubmit} className="mt-3 flex h-[calc(100%-44px)] flex-col space-y-2.5">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div>
+          <div className="min-w-0">
             <label className="text-sm">Date</label>
             <input
-                ref={dateInputRef}
-                type="date"
-                min={yesterday}
-                max={today}
-                value={formValues.date_written}
-                onClick={openDatePicker}
-                onChange={(event) =>
-                  handleChange('date_written', event.target.value)
-                }
-                className="h-10 w-full rounded bg-[#eeeeee] px-4 text-sm outline-none"
-              />
-            {errors.date_written && <p className="text-xs text-red-600">{errors.date_written}</p>}
+              ref={dateInputRef}
+              type="date"
+              min={yesterday}
+              max={today}
+              value={formValues.date_written}
+              onClick={openDatePicker}
+              onChange={(event) =>
+                handleChange('date_written', event.target.value)
+              }
+              className="h-10 w-full min-w-0 max-w-full rounded bg-[#eeeeee] px-3 text-sm outline-none sm:px-4"
+            />
+            {errors.date_written && (
+              <p className="mt-1 break-words text-xs text-red-600">
+                {errors.date_written}
+              </p>
+            )}
           </div>
           <div>
             <label className="text-sm">Hours Spent</label>
@@ -185,33 +189,33 @@ function EODReportCard() {
           <textarea disabled={isSubmitted} value={formValues.task_accomplished} onChange={(e) => handleChange('task_accomplished', e.target.value)} className="h-[200px] w-full resize-none rounded bg-[#eeeeee] p-3 text-sm outline-none" />
         </div>
 
-        <div className="pt-2 flex flex-col-reverse sm:flex-row justify-end gap-3">
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={
-              saveMutation.isPending || 
-              submitMutation.isPending || 
-              isSubmitted
-            }
-            className="rounded-full bg-[#eeeeee] px-7 py-1.5 text-sm font-bold text-gray-500 disabled:cursor-not-allowed disabled:opacity-70 sm:min-w-[85px]"
-          >
-            {saveMutation.isPending ? 'Saving...' : 'Save'}
-          </button>
+        <div className="flex flex-row gap-3 pt-2">
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={
+            saveMutation.isPending ||
+            submitMutation.isPending ||
+            isSubmitted
+          }
+          className="h-10 flex-1 rounded-full bg-[#eeeeee] px-4 text-sm font-bold text-gray-500 disabled:cursor-not-allowed disabled:opacity-70 sm:flex-none sm:min-w-[100px] sm:px-7"
+        >
+          {saveMutation.isPending ? 'Saving...' : 'Save'}
+        </button>
 
-          <button
-            type="submit"
-            disabled={
-              !hasTimedOut ||
-              saveMutation.isPending ||
-              submitMutation.isPending || 
-              isSubmitted
-            }
-            className="rounded-full bg-[#FFBF10] px-7 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:bg-[#eeeeee] disabled:text-gray-500 disabled:opacity-70 sm:min-w-[100px]"
-          >
-            {submitMutation.isPending ? 'Submitting...' : 'Submit'}
-          </button>
-        </div>
+        <button
+          type="submit"
+          disabled={
+            !hasTimedOut ||
+            saveMutation.isPending ||
+            submitMutation.isPending ||
+            isSubmitted
+          }
+          className="h-10 flex-1 rounded-full bg-[#FFBF10] px-4 text-sm font-bold text-white disabled:cursor-not-allowed disabled:bg-[#eeeeee] disabled:text-gray-500 disabled:opacity-70 sm:flex-none sm:min-w-[110px] sm:px-7"
+        >
+          {submitMutation.isPending ? 'Submitting...' : 'Submit'}
+        </button>
+      </div>
       </form>
     </section>
   );

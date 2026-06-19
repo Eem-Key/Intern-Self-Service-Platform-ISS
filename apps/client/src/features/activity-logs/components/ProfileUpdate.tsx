@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../../../config/supabase';
 import { updateProfileUpdateRequestAPI } from '../../../api/profile.api';
 import RequiredMark from '../../../components/ui/RequiredMark';
@@ -55,6 +55,29 @@ function ProfileUpdate({
 
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const pendingAvatarPath = getString(requestedData, 'avatar_url');
+
+    const {
+        data: pendingAvatarUrl = '',
+        isLoading: isPendingAvatarLoading,
+    } = useQuery({
+        queryKey: ['pending-avatar-preview', pendingAvatarPath],
+        queryFn: async () => {
+            if (!pendingAvatarPath) return '';
+
+            const { data, error } = await supabase.storage
+                .from('avatars')
+                .createSignedUrl(pendingAvatarPath, 3600);
+
+            if (error) {
+                console.log('Pending avatar signed URL error:', error.message);
+                return '';
+            }
+
+            return data.signedUrl;
+        },
+        enabled: !!pendingAvatarPath,
+    });
 
     const [formValues, setFormValues] = useState({
         first_name: getString(requestedData, 'first_name'),
@@ -226,15 +249,23 @@ function ProfileUpdate({
 
             <div className="mx-auto mt-4 flex h-40 w-40 items-center justify-center overflow-hidden rounded-full border-4 border-[#FFBF10] bg-[#d9d9d9] shadow-md">
                 {previewUrl ? (
-                <img
-                    src={previewUrl}
-                    alt="Profile preview"
-                    className="h-full w-full object-cover"
-                />
+                    <img
+                        src={previewUrl}
+                        alt="New profile picture preview"
+                        className="h-full w-full object-cover"
+                    />
+                ) : isPendingAvatarLoading && pendingAvatarPath ? (
+                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#EAF0FA] border-t-[#0058DD]" />
+                ) : pendingAvatarUrl ? (
+                    <img
+                        src={pendingAvatarUrl}
+                        alt="Pending profile picture preview"
+                        className="h-full w-full object-cover"
+                    />
                 ) : (
-                <p className="px-4 text-center text-xs text-gray-500">
-                    Select a new photo to replace the pending request.
-                </p>
+                    <p className="px-4 text-center text-xs text-gray-500">
+                        Select a new photo to replace the pending request.
+                    </p>
                 )}
             </div>
 

@@ -1,6 +1,6 @@
 import { supabase } from '../config/supabase.ts';
 import { getAuthUserId } from '../utils/auth';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { fetchAttendanceById } from './attendance.api';
 import { fetchEodReportById } from './eodReport.api';
 import { fetchLeaveRequestById } from './leave.api';
@@ -39,6 +39,8 @@ export function useFetchRecordsPaginatedIntern(
     return useQuery({
         queryKey: ['records', page, log_category], 
         queryFn: () => fetchRecordsPaginatedIntern(page, pageSize, log_category),
+        placeholderData: keepPreviousData,
+        staleTime: 30_000,
     });
 }
 

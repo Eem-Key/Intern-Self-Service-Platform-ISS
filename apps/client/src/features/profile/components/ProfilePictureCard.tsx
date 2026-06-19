@@ -6,8 +6,7 @@ import ConfirmationModal from '../../../components/feedback/confirmationModal';
 import profilepic from '../../../assets/images/default_pic.png';
 import { insertProfileUpdateRequestAPI, hasPendingProfileUpdateRequestAPI, } from '../../../api/profile.api';
 import type {
-  Profile,
-  ProfileUpdateRequest,
+    Profile,
 } from '../../../../../shared/types/profile.types';
 
 
@@ -26,9 +25,14 @@ function ProfilePictureCard({ profile }: ProfilePictureCardProps) {
     );
 
     const { data: hasPendingAvatarRequest = false } = useQuery({
-    queryKey: ['pending-profile-update-request', 'avatar_update', profile.id],
-    queryFn: () => hasPendingProfileUpdateRequestAPI('avatar_update'),
+        queryKey: ['pending-profile-update-request', 'avatar_update', profile.id],
+        queryFn: () => hasPendingProfileUpdateRequestAPI('avatar_update'),
+        staleTime: 0,
+        refetchOnMount: 'always',
+        refetchOnWindowFocus: true,
     });
+
+    console.log('hasPendingAvatarRequest:', hasPendingAvatarRequest);
 
     const [statusMessage, setStatusMessage] = useState<{
         variant: 'success' | 'error';
@@ -156,22 +160,22 @@ function ProfilePictureCard({ profile }: ProfilePictureCardProps) {
             return;
         }
 
-        const { data: auth, error: signedUrlError } = await supabase.storage
+        {/*const { data: auth, error: signedUrlError } = await supabase.storage
             .from('avatars')
             .createSignedUrl(filePath, 60);
 
         if (signedUrlError || !auth.signedUrl) {
             setStatusMessage({ variant: 'error', title: 'Error', message: 'Could not generate access link.' });
             return;
-        }
+        }*/}
 
         avatarUpdateMutation.mutate({
             update_type: 'avatar_update',
             requested_data: {
                 avatar_url: filePath,
-            },
+        },
             reason: 'Intern requested profile picture update.',
-        } as unknown as ProfileUpdateRequest);
+        });
     };
 
     const hasSelectedNewPhoto = Boolean(selectedAvatarUrl);

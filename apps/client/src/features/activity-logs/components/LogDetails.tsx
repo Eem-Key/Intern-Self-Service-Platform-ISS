@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Clock, X } from 'lucide-react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '../../../config/supabase';
 import StatusBadge from './StatusBadge';
 import StatusMessage from '../../../components/feedback/StatusMessage';
 import RequiredMark from '../../../components/ui/RequiredMark';
@@ -71,26 +71,104 @@ function formatSubmittedAt(value: string) {
     return `${datePart} at ${timePart}`;
 }
 
+function formatLabel(key: string) {
+    return key
+        .replaceAll('_', ' ')
+        .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+const profileFieldOrder = [
+    'first_name',
+    'middle_name',
+    'last_name',
+    'suffix',
+    'email',
+    'birth_date',
+    'gender',
+    'contact_number',
+    'address',
+    'position',
+    'department',
+    'office',
+];
+
+const internInfoFieldOrder = [
+    'program',
+    'university',
+    'year_level',
+    'start_date',
+    'required_hours',
+];
+
 function formatRequestedData(data?: Record<string, unknown>) {
-    if (!data) return 'No requested changes provided.';
+    if (!data || Object.keys(data).length === 0) {
+        return 'No requested changes provided.';
+    }
 
-    return Object.entries(data)
-        .map(([key, value]) => {
-        if (key === 'intern_info') {
-            return `Internship Info: ${JSON.stringify(value, null, 2)}`;
+    const lines: string[] = [];
+
+    profileFieldOrder.forEach((key) => {
+        if (key in data) {
+            lines.push(`${formatLabel(key)}: ${String(data[key])}`);
         }
+    });
 
-        return `${key.replaceAll('_', ' ')}: ${String(value)}`;
-        })
-        .join('\n');
+    if (
+        data.intern_info &&
+        typeof data.intern_info === 'object' &&
+        !Array.isArray(data.intern_info)
+    ) {
+        const internInfo = data.intern_info as Record<string, unknown>;
+
+        internInfoFieldOrder.forEach((key) => {
+            if (key in internInfo) {
+                lines.push(
+                    `Internship Info - ${formatLabel(key)}: ${String(internInfo[key])}`
+                );
+            }
+        });
+    }
+
+    return lines.join('\n');
 }
 
 function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
     const queryClient = useQueryClient();
     const isDraftEOD = record.log_category === 'eod_report' && record.status === 'draft';
+    const isDeniedEOD = record.log_category === 'eod_report' && record.status === 'denied';
+    const [isEditingDeniedEOD, setIsEditingDeniedEOD] = useState(false);
 
     const { data: details, isLoading } = useLogDetails(record);
     record.details = details
+
+    const requestedData = details?.requested_data as
+    | Record<string, unknown>
+    | undefined;
+
+    const avatarPath =
+        details?.update_type === 'avatar_update'
+            ? String(requestedData?.avatar_url || '')
+            : '';
+
+    const { data: avatarPreviewUrl = '', isLoading: isAvatarPreviewLoading } =
+        useQuery({
+            queryKey: ['log-avatar-preview', avatarPath],
+            queryFn: async () => {
+                if (!avatarPath) return '';
+
+                const { data, error } = await supabase.storage
+                    .from('avatars')
+                    .createSignedUrl(avatarPath, 3600);
+
+                if (error) {
+                    console.log('Avatar preview error:', error.message);
+                    return '';
+                }
+
+                return data.signedUrl;
+            },
+            enabled: !!avatarPath,
+        });
 
     const [statusMessage, setStatusMessage] = useState<{
         variant: 'success' | 'error';
@@ -104,6 +182,17 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
         project_name: details?.project_name || '',
         task_accomplished: details?.task_accomplished || '',
     });
+
+    useEffect(() => {
+        if (!details) return;
+
+        setEodFormValues({
+            date_written: details.date_written || '',
+            hours_spent: Number(details.hours_spent || 0),
+            project_name: details.project_name || '',
+            task_accomplished: details.task_accomplished || '',
+        });
+    }, [details]);
 
     const [eodErrors, setEodErrors] = useState<EODReportFormErrors>({});
 
@@ -208,7 +297,31 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
         submitEODDraftMutation.mutate(eodFormValues);
     };
 
-    if (isLoading) return <div className="fixed inset-0 z-[99999] flex items-center justify-center">Loading...</div>;
+    const handleResubmitDeniedEOD = () => {
+        const validationErrors = validateEodReport(eodFormValues, 'resubmit');
+
+        if (Object.keys(validationErrors).length > 0) {
+            setEodErrors(validationErrors);
+            return;
+        }
+
+        submitEODDraftMutation.mutate(eodFormValues);
+    };
+
+    {/*if (isLoading) return <div className="fixed inset-0 z-[99999] flex items-center justify-center">Loading...</div>;*/}
+
+    if (isLoading) {
+        return (
+            <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/20 backdrop-blur-sm lg:left-[270px]">
+                <div className="flex flex-col items-center gap-3 rounded-xl bg-white px-8 py-6 shadow-xl">
+                    <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#EAF0FA] border-t-[#0058DD]" />
+                    <p className="text-sm font-semibold text-[#002D6F]">
+                        Loading...
+                    </p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/55 px-4 backdrop-blur-sm lg:left-[270px]">
@@ -230,7 +343,9 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
                     {formatLogType(record.log_category)}
                 </h2>
 
-                <StatusBadge status={record.status ? record.status : ''} />
+                {record.log_category !== 'attendance' && (
+                    <StatusBadge status={record.status ? record.status : ''} />
+                )}
                 </div>
 
                 <p className="mt-1 text-xs text-white/80">
@@ -250,31 +365,38 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
             <div className="max-h-[75vh] space-y-5 overflow-y-auto px-6 py-5">
             {record.log_category === 'attendance' && (
                 <>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                    <DetailItem label="Date" value={formatDate(record?.date_created)} />
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <DetailItem
-                    label="Time In"
-                    value={formatTime(details?.time_in)}
+                        label="Date"
+                        value={formatDate(details?.work_date || record?.date_created)}
                     />
-                    <DetailItem
-                    label="Time Out"
-                    value={formatTime(details?.time_out)}
-                    />
-                </div>
 
-                <DetailItem
-                    label="Hours Logged"
-                    value={
-                    details?.hours_spent !== null &&
-                    details?.hours_spent !== undefined
-                        ? `${details.hours_spent} hrs`
-                        : '--'
-                    }
-                />
+                    <DetailItem
+                        label="Hours Spent"
+                        value={
+                        details?.hours_logged !== null &&
+                        details?.hours_logged !== undefined
+                            ? `${details.hours_logged} Hrs`
+                            : '--'
+                        }
+                    />
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <DetailBox
+                        label="Time In"
+                        value={formatTime(details?.clock_in || details?.time_in)}
+                    />
+
+                    <DetailBox
+                        label="Time Out"
+                        value={formatTime(details?.clock_out || details?.time_out)}
+                    />
+                    </div>
                 </>
             )}
 
-            {record.log_category === 'eod_report' && isDraftEOD && (
+            {record.log_category === 'eod_report' && (isDraftEOD || isEditingDeniedEOD) &&  (
                 <>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     
@@ -353,36 +475,42 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
                 </div>
 
                 <div className="flex flex-col-reverse justify-end gap-3 pt-2 sm:flex-row">
-                    <button
-                    type="button"
-                    onClick={onClose}
-                    disabled={
-                        saveEODDraftMutation.isPending ||
-                        submitEODDraftMutation.isPending
-                    }
-                    className=" px-7 py-2 text-sm font-bold text-gray-600 disabled:cursor-not-allowed disabled:opacity-70"
-                    >
-                    Cancel
-                    </button>
+                    {isDraftEOD && (
+                        <button
+                            type="button"
+                            onClick={handleSaveEODDraft}
+                            disabled={
+                                saveEODDraftMutation.isPending ||
+                                submitEODDraftMutation.isPending
+                            }
+                            className="rounded-full border border-gray-300 bg-white px-7 py-2 text-sm font-bold text-black disabled:cursor-not-allowed disabled:opacity-70"
+                        >
+                            {saveEODDraftMutation.isPending ? 'Saving...' : 'Save'}
+                        </button>
+                    )}
 
                     <button
-                    type="button"
-                    onClick={handleSubmitEODDraft}
-                    disabled={
-                        saveEODDraftMutation.isPending ||
-                        submitEODDraftMutation.isPending
-                    }
-                    className="rounded-full bg-[#FFBF10] px-7 py-2 text-sm font-bold text-black disabled:cursor-not-allowed disabled:bg-[#eeeeee] disabled:text-gray-500 disabled:opacity-70"
+                        type="button"
+                        onClick={isEditingDeniedEOD ? handleResubmitDeniedEOD : handleSubmitEODDraft}
+                        disabled={
+                            saveEODDraftMutation.isPending ||
+                            submitEODDraftMutation.isPending
+                        }
+                        className="rounded-full bg-[#FFBF10] px-7 py-2 text-sm font-bold text-black disabled:cursor-not-allowed disabled:bg-[#eeeeee] disabled:text-gray-500 disabled:opacity-70"
                     >
-                    {submitEODDraftMutation.isPending
-                        ? 'Submitting...'
-                        : 'Submit'}
+                        {submitEODDraftMutation.isPending
+                            ? isEditingDeniedEOD
+                                ? 'Resubmitting...'
+                                : 'Submitting...'
+                            : isEditingDeniedEOD
+                                ? 'Resubmit'
+                                : 'Submit'}
                     </button>
                 </div>
                 </>
             )}
 
-            {record.log_category === 'eod_report' && !isDraftEOD && (
+            {record.log_category === 'eod_report' && !isDraftEOD && !isEditingDeniedEOD && (
                 <>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                     <DetailItem label="Date" value={formatDate(details?.date_written)} />
@@ -411,6 +539,18 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
 
                 {record.status !== 'pending' && (
                     <AdminFeedback value={record?.admin_feedback} />
+                )}
+
+                {isDeniedEOD && (
+                    <div className="flex justify-end pt-2">
+                        <button
+                            type="button"
+                            onClick={() => setIsEditingDeniedEOD(true)}
+                            className="rounded-full bg-[#FFBF10] px-7 py-2 text-sm font-bold text-black transition hover:bg-[#e5aa0e]"
+                        >
+                            Edit
+                        </button>
+                    </div>
                 )}
                 </>
             )}
@@ -451,26 +591,33 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
             )}
 
             {record.log_category === 'profile_update' && record.status !== 'pending' && (
-            <>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <DetailItem
-                    label="Update Type"
-                    value={details?.update_type || record.activity_description}
-                />
+                <>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <DetailItem
+                            label="Update Type"
+                            value={details?.update_type || record.activity_description}
+                        />
 
-                <DetailItem
-                    label="Date Requested"
-                    value={formatDate(record.created_at)}
-                />
-                </div>
+                        <DetailItem
+                            label="Date Requested"
+                            value={formatDate(record.created_at)}
+                        />
+                    </div>
 
-                <DetailBox
-                label="Requested Changes"
-                value={formatRequestedData(details?.requested_data)}
-                />
+                    {details?.update_type === 'avatar_update' ? (
+                        <AvatarRequestedChange
+                            imageUrl={avatarPreviewUrl}
+                            isLoading={isAvatarPreviewLoading}
+                        />
+                    ) : (
+                        <DetailBox
+                            label="Requested Changes"
+                            value={formatRequestedData(details?.requested_data)}
+                        />
+                    )}
 
-                <AdminFeedback value={record?.admin_feedback} />
-            </>
+                    <AdminFeedback value={record?.admin_feedback} />
+                </>
             )}
             </div>
         </div>
@@ -491,9 +638,41 @@ function DetailBox({ label, value }: { label: string; value: string }) {
     return (
         <div>
         <p className="mb-2 text-sm font-bold text-black">{label}</p>
-        <div className="min-h-[110px] whitespace-pre-wrap rounded bg-[#eeeeee] p-4 text-sm leading-relaxed text-gray-800">
+        <div className="min-h-[50px] whitespace-pre-wrap rounded bg-[#eeeeee] p-4 text-sm leading-relaxed text-gray-800">
             {value}
         </div>
+        </div>
+    );
+}
+
+function AvatarRequestedChange({
+    imageUrl,
+    isLoading,
+}: {
+    imageUrl: string;
+    isLoading: boolean;
+}) {
+    return (
+        <div>
+            <p className="mb-2 text-sm font-bold text-black">
+                Requested Profile Picture
+            </p>
+
+            <div className="flex min-h-[180px] items-center justify-center rounded p-5">
+                {isLoading ? (
+                    <div className="h-9 w-9 animate-spin rounded-full border-4 border-[#EAF0FA] border-t-[#0058DD]" />
+                ) : imageUrl ? (
+                    <img
+                        src={imageUrl}
+                        alt="Requested profile picture"
+                        className="h-36 w-36 rounded-full border-4 border-[#FFBF10] object-cover shadow-md"
+                    />
+                ) : (
+                    <p className="text-sm text-gray-500">
+                        No profile picture preview available.
+                    </p>
+                )}
+            </div>
         </div>
     );
 }

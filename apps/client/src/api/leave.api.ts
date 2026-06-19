@@ -13,7 +13,7 @@ import {
     insertRecord 
 } from './record.api'
 
-export const fetchAllLeaveRequestDatesOfIntern = async (
+/*export const fetchAllLeaveRequestDatesOfIntern = async (
 
 ): Promise<{ start_date: string; end_date: string }[]> => {
     const intern_id = await getAuthUserId();
@@ -40,7 +40,37 @@ export const fetchAllLeaveRequestDatesOfIntern = async (
     }
 
     return leaveDates || [];
-}
+}*/
+
+export const fetchAllLeaveRequestDatesOfIntern = async (): Promise<
+    { start_date: string; end_date: string }[]
+> => {
+    const intern_id = await getAuthUserId();
+
+    if (!intern_id) {
+        throw new Error(`You must be logged in to fetch your leaves.`);
+    }
+
+    const { data: leaveDates, error: fetchError } = await supabase
+        .from('leave_requests')
+        .select(`
+            start_date,
+            end_date,
+            records!inner (
+                id,
+                intern_id,
+                status
+            )
+        `)
+        .eq('records.intern_id', intern_id)
+        .in('records.status', ['pending', 'approved']);
+
+    if (fetchError) {
+        throw new Error(fetchError.message);
+    }
+
+    return leaveDates || [];
+};
 
 export async function fetchLeaveRequestById(
     record_id: string
@@ -103,7 +133,7 @@ export const insertLeaveRequest = async (formData: LeaveRequestForm) => {
     return newLeaveData;
 };
 
-export const checkLeaveRequestDates = async (
+/*export const checkLeaveRequestDates = async (
     startDate: string, 
     endDate: string
 ): Promise<boolean> => {
@@ -127,6 +157,39 @@ export const checkLeaveRequestDates = async (
 
     if (error) {
         console.log(error)
+        throw new Error(error.message);
+    }
+
+    return (data?.length ?? 0) > 0;
+};*/
+
+export const checkLeaveRequestDates = async (
+    startDate: string,
+    endDate: string
+): Promise<boolean> => {
+    const intern_id = await getAuthUserId();
+
+    if (!intern_id) {
+        throw new Error('Not authenticated');
+    }
+
+    const { data, error } = await supabase
+        .from('leave_requests')
+        .select(`
+            record_id,
+            records!inner (
+                id,
+                intern_id,
+                status
+            )
+        `)
+        .eq('records.intern_id', intern_id)
+        .in('records.status', ['pending', 'approved'])
+        .lte('start_date', endDate)
+        .gte('end_date', startDate);
+
+    if (error) {
+        console.log(error);
         throw new Error(error.message);
     }
 

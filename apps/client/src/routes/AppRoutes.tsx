@@ -17,13 +17,17 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const accessToken = localStorage.getItem('accessToken');
-
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const checkSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
       setSession(session);
       setLoading(false);
-    });
+    };
+
+    checkSession();
 
     const {
       data: { subscription },
