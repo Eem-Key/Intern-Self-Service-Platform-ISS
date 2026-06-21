@@ -123,14 +123,14 @@ function TimelineExplorer() {
 
     return (
         <>
-        <section className="relative flex max-h-[620px] min-h-[430px] flex-col rounded-xl bg-white shadow-md lg:h-[490px]">
+        <section className="relative flex h-[490px] flex-col rounded-xl bg-white shadow-md">
         {/*<section className="relative rounded-xl bg-white shadow-md">*/}
-            <div className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-            <h2 className="border-l-4 border-[#FFBF10] pl-3 text-xl font-bold sm:text-2xl">
+            <div className="flex items-center justify-between gap-3 px-5 py-4 sm:px-6">
+            <h2 className="border-l-4 border-[#FFBF10] pl-3 text-lg font-bold sm:text-2xl">
                 Timeline Explorer
             </h2>
 
-            <LogTypeDropdown value={selectedType} onChange={handleFilterChange} />
+                <LogTypeDropdown value={selectedType} onChange={handleFilterChange} />
             </div>
 
             <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4 sm:px-5 lg:px-0 lg:pb-0">
