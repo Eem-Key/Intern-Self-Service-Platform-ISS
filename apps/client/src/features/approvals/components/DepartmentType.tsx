@@ -7,17 +7,17 @@ type DepartmentTypeProps = {
 };
 
 const departmentOptions = [
-    { label: 'All Department', value: 'all' },
-    { label: 'SDS', value: 'SDS' },
-    { label: 'ISS', value: 'ISS' },
+    { label: 'All Department', shortLabel: 'All Dept...', value: 'all' },
+    { label: 'SDS', shortLabel: 'SDS', value: 'SDS' },
+    { label: 'ISS', shortLabel: 'ISS', value: 'ISS' },
 ];
 
 function DepartmentType({ value, onChange }: DepartmentTypeProps) {
     const [isOpen, setIsOpen] = useState(false);
 
-    const selectedLabel =
-        departmentOptions.find((option) => option.value === value)?.label ||
-        'All Department';
+    const selectedOption =
+        departmentOptions.find((option) => option.value === value) ||
+        departmentOptions[0];
 
     const handleSelect = (selectedValue: string) => {
         onChange(selectedValue);
@@ -25,17 +25,17 @@ function DepartmentType({ value, onChange }: DepartmentTypeProps) {
     };
 
     return (
-        <div className="relative w-full lg:w-[180px]">
+        <div className="relative w-[125px] shrink-0 sm:w-[170px] lg:w-[180px]">
         <button
             type="button"
             onClick={() => setIsOpen((prev) => !prev)}
-            className={`flex h-10 w-full items-center justify-between rounded-lg bg-white px-4 text-left text-sm shadow-sm outline-none ${
-            value ? 'text-black' : 'text-gray-400'
-            }`}
+            className="flex h-9 w-full items-center justify-between rounded-lg bg-white px-3 text-left text-xs text-black shadow-sm outline-none sm:h-10 sm:px-4 sm:text-sm"
         >
-            <span className="truncate">{selectedLabel}</span>
+            <span className="truncate sm:hidden">{selectedOption.shortLabel}</span>
+            <span className="hidden truncate sm:inline">{selectedOption.label}</span>
+
             <ChevronDown
-            size={18}
+            size={16}
             className={`shrink-0 text-black transition-transform ${
                 isOpen ? 'rotate-180' : ''
             }`}
@@ -43,7 +43,7 @@ function DepartmentType({ value, onChange }: DepartmentTypeProps) {
         </button>
 
         {isOpen && (
-            <div className="absolute left-0 top-full z-30 mt-1 w-full overflow-hidden rounded-lg bg-white shadow-lg">
+            <div className="absolute right-0 top-full z-30 mt-1 w-[170px] overflow-hidden rounded-lg bg-white shadow-lg sm:w-full">
             {departmentOptions.map((option) => (
                 <button
                 key={option.value}

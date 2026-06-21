@@ -250,13 +250,13 @@ useEffect(() => {
                 }}
                 />
 
-                <div className="flex flex-col gap-3 bg-[#EAF0FA] px-4 py-4 lg:flex-row lg:items-center">
-                <SearchBar value={searchValue} onChange={setSearchValue} />
-                <DepartmentType value={department} onChange={setDepartment} />
+                <div className="flex flex-row items-center gap-2 bg-[#EAF0FA] px-3 py-3 sm:gap-3 sm:px-4 sm:py-4">
+                    <SearchBar value={searchValue} onChange={setSearchValue} />
+                    <DepartmentType value={department} onChange={setDepartment} />
                 </div>
 
                 <div className="flex h-[430px] min-h-0 flex-col">
-                <div className="min-h-0 flex-1 divide-y divide-gray-100 overflow-y-auto px-4 py-3">
+                <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-3 py-3 sm:px-4 lg:space-y-0 lg:divide-y lg:divide-gray-100">
                     {isLoading ? (
                     <div className="flex flex-col items-center justify-center gap-3 py-16">
                         <div className="h-9 w-9 animate-spin rounded-full border-4 border-[#EAF0FA] border-t-[#0058DD]" />

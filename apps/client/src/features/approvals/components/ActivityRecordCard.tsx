@@ -7,9 +7,17 @@ type ActivityRecordCardProps = {
 
 function ActivityRecordCard({ record, onView }: ActivityRecordCardProps) {
     return (
-        <div className="flex min-h-[92px] flex-col justify-center gap-3 py-3 lg:min-h-[86px] lg:flex-row lg:items-center lg:justify-between">
+        <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm lg:flex lg:min-h-[86px] lg:items-center lg:justify-between lg:rounded-none lg:border-0 lg:border-b lg:border-gray-100 lg:p-0 lg:py-3 lg:shadow-none">
         <div className="min-w-0 flex-1">
-            <h3 className="truncate text-sm font-bold text-black sm:text-base">
+            <p className="text-xs font-medium text-gray-500 lg:hidden">
+            {record.type === 'eod_report'
+                ? 'EOD Report'
+                : record.type === 'leave_request'
+                ? 'Leave Request'
+                : 'Profile Change'}
+            </p>
+
+            <h3 className="mt-1 break-words text-sm font-bold text-black sm:text-base lg:mt-0 lg:truncate">
             {record.name}
             </h3>
 
@@ -22,13 +30,15 @@ function ActivityRecordCard({ record, onView }: ActivityRecordCardProps) {
             </p>
         </div>
 
-        <button
+        <div className="mt-3 flex justify-end lg:mt-0 lg:pl-4">
+            <button
             type="button"
             onClick={onView}
-            className="self-start px-2.5 py-1 text-[11px] font-bold text-[#0058DD] transition hover:bg-[#EAF0FA] lg:self-center"
-        >
+            className="rounded-full px-3 py-1 text-xs font-bold text-[#0058DD] transition hover:bg-[#EAF0FA] lg:rounded-none lg:px-2.5 lg:py-1 lg:text-[11px]"
+            >
             View
-        </button>
+            </button>
+        </div>
         </div>
     );
 }
