@@ -40,9 +40,23 @@ const navItems = [
     },
 ];
 
-function AdminSidebar() {
+type AdminSidebarProps = {
+    onMobileSidebarChange?: (isOpen: boolean) => void;
+};
+
+function AdminSidebar({ onMobileSidebarChange }: AdminSidebarProps) {
     const navigate = useNavigate();
     const location = useLocation();
+
+    const openMobileSidebar = () => {
+    setIsMobileSidebarOpen(true);
+    onMobileSidebarChange?.(true);
+    };
+
+    const closeMobileSidebar = () => {
+    setIsMobileSidebarOpen(false);
+    onMobileSidebarChange?.(false);
+    };
 
     const { data: adminProfile, isLoading: isAdminProfileLoading } = useQuery({
     queryKey: ['admin-sidebar-profile'],
@@ -113,7 +127,7 @@ function AdminSidebar() {
 
     const handleNavigate = (path: string) => {
         navigate(path);
-        setIsMobileSidebarOpen(false);
+        closeMobileSidebar();
     };
 
     const latestAvatarPath = adminProfile?.avatar_url || null;
@@ -147,7 +161,7 @@ function AdminSidebar() {
         <div className="fixed left-0 top-0 z-[9997] h-16 w-full bg-[#002D6F] shadow-md lg:hidden" />
         <button
             type="button"
-            onClick={() => setIsMobileSidebarOpen(true)}
+            onClick={openMobileSidebar}
             className="fixed left-4 top-2.5 z-[9998] flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white shadow-lg ring-1 ring-white/20 lg:hidden"
         >
             <Menu size={24} />
@@ -158,7 +172,7 @@ function AdminSidebar() {
             <button
             type="button"
             aria-label="Close sidebar overlay"
-            onClick={() => setIsMobileSidebarOpen(false)}
+            onClick={closeMobileSidebar}
             className="fixed inset-0 z-[9998] bg-black/50 backdrop-blur-sm lg:hidden"
             />
         )}
@@ -173,11 +187,11 @@ function AdminSidebar() {
             >
         {/* Mobile Close Button */}
         <button
-            type="button"
-            onClick={() => setIsMobileSidebarOpen(false)}
-            className="absolute right-4 top-4 rounded-full p-1 transition hover:bg-white/10 lg:hidden"
-            >
-            <X size={22} />
+        type="button"
+        onClick={closeMobileSidebar}
+        className="absolute right-4 top-4 rounded-full p-1 transition hover:bg-white/10 lg:hidden"
+        >
+        <X size={22} />
         </button>
 
         <div className="flex flex-col items-center gap-0">
