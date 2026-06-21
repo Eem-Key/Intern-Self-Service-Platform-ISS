@@ -1,93 +1,357 @@
 import { useEffect, useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+
 import AdminSidebar from '../AdminSidebar';
 import Banner from '../approvals/banner/ApprovalBanner';
-import { usefetchPendingRequestsPerRecord } from '../../api/adminApprovals.api';
+import TopFilterBar from '../approvals/components/TopFilterBar';
+import SearchBar from '../approvals/components/SearchBar';
+import DepartmentType from '../approvals/components/DepartmentType';
+import ActivityRecordCard from '../approvals/components/ActivityRecordCard';
+import RecordDetails from '../approvals/components/RecordDetails';
+import {
+    usefetchPendingRequestsPerRecord,
+    useFetchPendingApprovalRecords,
+} from '../../api/adminApprovals.api';
+
+import type {
+    ApprovalTab,
+    ApprovalRecord,
+} from '../../../../shared/types/approvals.types';
+
+import StatusMessage from '../../components/feedback/AdminStatusMessage';
+import { useQueryClient } from '@tanstack/react-query';
 import { updateAdminReviewRecord } from '../../api/record.api';
-import type { ProfileUpdate } from '../../../../shared/types/profile.types'
-import type { InternInfo } from '../../../../shared/types/intern.types'
+import type {
+    ReportStatus,
+    ProfileUpdateType,
+} from '../../../../shared/types/enums.types';
+import type { ProfileUpdate } from '../../../../shared/types/profile.types';
+import type { InternInfo } from '../../../../shared/types/intern.types';
+
+function getPageNumbers(currentPage: number, totalPages: number) {
+    if (totalPages <= 5) {
+        return Array.from({ length: totalPages }, (_, index) => index + 1);
+    }
+
+    if (currentPage <= 3) {
+        return [1, 2, 3, '...', totalPages];
+    }
+
+    if (currentPage >= totalPages - 2) {
+        return [1, '...', totalPages - 2, totalPages - 1, totalPages];
+    }
+
+    return [1, '...', currentPage, '...', totalPages];
+}
+
+function getSuccessTitle(record: ApprovalRecord) {
+    if (record.type === 'eod_report') return 'EOD Report Approved';
+    if (record.type === 'leave_request') return 'Leave Request Approved';
+
+    if (record.details?.update_type === 'avatar_update') {
+        return 'Profile Picture Updated';
+    }
+
+    return 'Changes Saved';
+}
+
+function getSuccessMessage(record: ApprovalRecord) {
+    if (record.type === 'eod_report') {
+        return 'The submission has been verified and recorded.';
+    }
+
+    if (record.type === 'leave_request') {
+        return 'The leave request has been successfully approved and updated in the records.';
+    }
+
+    if (record.details?.update_type === 'avatar_update') {
+        return 'The profile picture has been successfully updated in the system.';
+    }
+
+    return 'The profile information has been successfully updated in the system.';
+}
+
+function getDeclineTitle(record: ApprovalRecord) {
+    if (record.type === 'eod_report') return 'EOD Report Declined';
+    if (record.type === 'leave_request') return 'Request Declined';
+
+    return 'Update Failed';
+}
+
+function getDeclineMessage(record: ApprovalRecord) {
+    if (record.type === 'eod_report') {
+        return 'The submission has been rejected. This entry will be returned to the intern to edit.';
+    }
+
+    if (record.type === 'leave_request') {
+        return 'The leave request has been declined. The intern will be notified of the status change.';
+    }
+
+    return 'The request has been declined. The intern will be notified of the status change.';
+}
 
 function AdminApprovals() {
     const queryClient = useQueryClient();
-    const { data: counts = {}, isLoading, error } = usefetchPendingRequestsPerRecord();
-    const [isUpdating, setIsUpdating] = useState(false);
+
+    const { data: counts = {} } = usefetchPendingRequestsPerRecord();
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const rowsPerPage = 5;
+
+    const [activeTab, setActiveTab] = useState<ApprovalTab>('eod_report');
+    const [searchValue, setSearchValue] = useState('');
+    const [department, setDepartment] = useState('all');
+    const [selectedRecord, setSelectedRecord] = useState<ApprovalRecord | null>(
+        null
+    );
+
+    const [statusMessage, setStatusMessage] = useState<{
+    variant: 'success' | 'error';
+    title: string;
+    message: string;
+    } | null>(null);
+
+    const { data: approvalData, isLoading } = useFetchPendingApprovalRecords(
+        currentPage - 1,
+        rowsPerPage,
+        activeTab,
+        searchValue,
+        department
+    );
+
+    const records = approvalData?.data ?? [];
+    const count = approvalData?.count ?? 0;
+
+    const totalPages = count ? Math.ceil(count / rowsPerPage) : 0;
+    const pageNumbers = getPageNumbers(currentPage, totalPages);
+
+    const startEntry = count === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1;
+    const endEntry = Math.min(currentPage * rowsPerPage, count);
 
     useEffect(() => {
         document.title = 'Approvals | Intern Self Service';
     }, []);
 
-    const handleApprove = async () => {
-        setIsUpdating(true);
-        // const profileData: ProfileUpdate = {
-        //     email: "intern2@equicom.com",
-        //     gender: "male",
-        //     office: "makati",
-        //     suffix: "",
-        //     address: "456 Address St. World",
-        //     position: "Back-end Developer",
-        //     last_name: "Yanga",
-        //     birth_date: "2004-11-30",
-        //     department: "SDS",
-        //     first_name: "Ian",
-        //     middle_name: "Caguimbay",
-        //     contact_number: "01234567892",
-        // };
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [activeTab, searchValue, department]);
 
-        const profileData: ProfileUpdate = {
-            avatar_url: "2f961278-7887-4fea-a718-166b7da9ab69/avatar-1781859276623.webp",
-        };
-
-        // const internData: InternInfo = {
-        //     program: "BS Computer Science major in Software Technology",
-        //     start_date: "2026-06-05",
-        //     university: "De La Salle University",
-        //     year_level: 4,
-        //     required_hours: 500
-        // };
-        try {
-            await updateAdminReviewRecord(
-                '9e0029e2-6ff9-4271-91f6-d4f55165510d', 
-                'approved!', 
-                'approved',
-                'avatar_update',
-                profileData,
-                // internData
-            );
-            queryClient.invalidateQueries({ queryKey: ['pendingRequests'] });
-            alert('Update successful!');
-        } catch (error) {
-            console.error('Failed to update:', error);
-            alert('Error updating record');
-        } finally {
-            setIsUpdating(false);
-        }
-    };
-
-    if (isLoading) return <div>Loading...</div>;
     
+    const handleReview = async (
+    record: ApprovalRecord,
+    status: ReportStatus,
+    feedback: string
+) => {
+    try {
+        const updateType = record.details?.update_type as
+        | ProfileUpdateType
+        | undefined;
+
+    let profileData: ProfileUpdate | undefined;
+    let internData: InternInfo | undefined;
+
+    if (record.type === 'profile_update') {
+        const requestedData = record.details?.requested_data as
+            | (ProfileUpdate & { intern_info?: InternInfo })
+            | undefined;
+
+        if (updateType === 'avatar_update') {
+            profileData = {
+            avatar_url:
+                record.details?.new_avatar_url ||
+                requestedData?.avatar_url ||
+                '',
+            };
+        }
+
+        if (updateType === 'information_update' && requestedData) {
+            const { intern_info, ...profileFields } = requestedData;
+
+            profileData = profileFields as ProfileUpdate;
+            internData = intern_info;
+        }
+    }
+
+    await updateAdminReviewRecord(
+        record.id,
+        feedback,
+        status,
+        updateType,
+        profileData,
+        internData
+    );
+
+    await queryClient.invalidateQueries({
+        queryKey: ['pendingRequests'],
+    });
+
+    await queryClient.invalidateQueries({
+        queryKey: ['admin-approval-records'],
+    });
+
+    setSelectedRecord(null);
+
+    setStatusMessage({
+        variant: status === 'approved' ? 'success' : 'error',
+        title:
+            status === 'approved'
+            ? getSuccessTitle(record)
+            : getDeclineTitle(record),
+        message:
+            status === 'approved'
+            ? getSuccessMessage(record)
+            : getDeclineMessage(record),
+        });
+    } catch (error) {
+        console.error('Failed to review record:', error);
+
+        setStatusMessage({
+        variant: 'error',
+        title: 'Update Failed',
+        message: 'The request could not be updated. Please try again.',
+        });
+    }
+};
+
+useEffect(() => {
+    if (!statusMessage) return;
+
+    const timeout = window.setTimeout(() => {
+        setStatusMessage(null);
+    }, 4000);
+
+    return () => window.clearTimeout(timeout);
+    }, [statusMessage]);
+
     return (
         <main className="min-h-screen bg-[#eeeeee] text-black lg:flex">
+            {statusMessage && (
+            <StatusMessage
+                isFixed
+                variant={statusMessage.variant}
+                title={statusMessage.title}
+                message={statusMessage.message}
+                onClose={() => setStatusMessage(null)}
+            />
+            )}
         <AdminSidebar />
 
         <section className="w-full px-4 pb-4 pt-20 sm:px-5 sm:pt-24 lg:ml-[270px] lg:px-6 lg:py-5">
-        {/*<section className="flex min-h-screen w-full px-4 py-4 sm:px-5 lg:ml-[270px] lg:px-6 lg:py-5">*/}
-            <div className="mx-auto flex min-h-full w-full max-w-[2560px] flex-col">
+            <div className="mx-auto flex min-h-full w-full max-w-[2560px] flex-col gap-5">
             <Banner />
-                {/* For fetch pending counts */}
-                <div className="mt-5 p-4 bg-white border border-gray-300 rounded">
-                    <h3 className="font-bold mb-2">Pending Request Counts:</h3>
-                    <pre>{JSON.stringify(counts, null, 2)}</pre>
+
+            <div className="overflow-hidden rounded-xl bg-white shadow-md">
+                <TopFilterBar
+                activeTab={activeTab}
+                onChange={setActiveTab}
+                counts={{
+                    eod_report: counts.eod_report || 0,
+                    leave_request: counts.leave_request || 0,
+                    profile_update: counts.profile_update || 0,
+                }}
+                />
+
+                <div className="flex flex-col gap-3 bg-[#EAF0FA] px-4 py-4 lg:flex-row lg:items-center">
+                <SearchBar value={searchValue} onChange={setSearchValue} />
+                <DepartmentType value={department} onChange={setDepartment} />
                 </div>
-                {/* For testing approve or deny */}
-                <button 
-                    onClick={handleApprove}
-                    disabled={isUpdating}
-                    className="mt-5 rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:bg-gray-400"
-                >
-                    {isUpdating ? 'Updating...' : 'Approve Record'}
-                </button>
+
+                <div className="flex h-[430px] min-h-0 flex-col">
+                <div className="min-h-0 flex-1 divide-y divide-gray-100 overflow-y-auto px-4 py-3">
+                    {isLoading ? (
+                    <div className="flex flex-col items-center justify-center gap-3 py-16">
+                        <div className="h-9 w-9 animate-spin rounded-full border-4 border-[#EAF0FA] border-t-[#0058DD]" />
+                        <p className="text-sm font-medium text-gray-500">
+                        Loading approvals...
+                        </p>
+                    </div>
+                    ) : records.length > 0 ? (
+                    records.map((record) => (
+                        <ActivityRecordCard
+                        key={record.id}
+                        record={record}
+                        onView={() => setSelectedRecord(record)}
+                        />
+                    ))
+                    ) : (
+                    <p className="py-16 text-center text-sm text-gray-500">
+                        No pending approval requests found.
+                    </p>
+                    )}
+                </div>
+                </div>
+            </div>
+
+            <div className="flex flex-col gap-3 px-3 text-xs text-gray-500 sm:px-5 md:flex-row md:items-center md:justify-between">
+                <p>
+                Showing {startEntry} to {endEntry} of {count} entries
+                </p>
+
+                {totalPages > 1 && (
+                <div className="flex flex-wrap items-center justify-center gap-2 md:justify-end">
+                    <button
+                    type="button"
+                    disabled={currentPage === 1}
+                    onClick={() =>
+                        setCurrentPage((prev) => Math.max(1, prev - 1))
+                    }
+                    className="rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs text-black disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 sm:text-sm"
+                    >
+                    Previous
+                    </button>
+
+                    {pageNumbers.map((page, index) => {
+                    if (typeof page === 'string') {
+                        return (
+                        <span
+                            key={`ellipsis-${index}`}
+                            className="flex h-8 w-8 items-center justify-center text-sm text-gray-400"
+                        >
+                            ...
+                        </span>
+                        );
+                    }
+
+                    return (
+                        <button
+                        key={page}
+                        type="button"
+                        onClick={() => setCurrentPage(page)}
+                        className={`flex h-8 w-8 items-center justify-center rounded-full border text-sm ${
+                            currentPage === page
+                            ? 'border-[#FFBF10] bg-[#FFBF10] text-black'
+                            : 'border-gray-300 bg-white text-black'
+                        }`}
+                        >
+                        {page}
+                        </button>
+                    );
+                    })}
+
+                    <button
+                    type="button"
+                    disabled={currentPage === totalPages}
+                    onClick={() =>
+                        setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+                    }
+                    className="rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs text-black disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 sm:text-sm"
+                    >
+                    Next
+                    </button>
+                </div>
+                )}
+            </div>
             </div>
         </section>
+
+        {selectedRecord && (
+        <RecordDetails
+            record={selectedRecord}
+            onClose={() => setSelectedRecord(null)}
+            onReview={(status, feedback) =>
+                handleReview(selectedRecord, status, feedback)
+            }
+            />
+        )}
         </main>
     );
 }

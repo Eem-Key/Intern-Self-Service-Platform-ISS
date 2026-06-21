@@ -13,12 +13,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 import profilepic from '../assets/images/default_pic.png';
 import { logoutUserAPI } from '../api/auth.api.ts';
-import {
-    getAuthUser,
-    getFullName,
-    getPosition
-} from '../utils/auth.ts';
+
 import { supabase } from '../config/supabase';
+import { useQuery } from '@tanstack/react-query';
 
 const navItems = [
     {
@@ -47,9 +44,50 @@ function AdminSidebar() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const user = getAuthUser();
-    const fullName = getFullName(user);
-    const position = getPosition(user);
+    const { data: adminProfile, isLoading: isAdminProfileLoading } = useQuery({
+    queryKey: ['admin-sidebar-profile'],
+    queryFn: async () => {
+        const {
+        data: { user },
+        error: authError,
+        } = await supabase.auth.getUser();
+
+        if (authError || !user) {
+        console.error('Error getting admin auth user:', authError);
+        return null;
+        }
+
+        const { data, error } = await supabase
+        .from('profiles')
+        .select('id, first_name, middle_name, last_name, suffix, position, avatar_url')
+        .eq('id', user.id)
+        .maybeSingle();
+
+        if (error) {
+        console.error('Error fetching admin profile:', error);
+        return null;
+        }
+
+        return data;
+    },
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
+    });
+
+    const fullName = adminProfile
+    ? [
+        adminProfile.first_name,
+        adminProfile.middle_name
+            ? `${adminProfile.middle_name.charAt(0).toUpperCase()}.`
+            : null,
+        adminProfile.last_name,
+        adminProfile.suffix,
+        ]
+        .filter(Boolean)
+        .join(' ')
+    : 'Admin';
+
+    const position = adminProfile?.position || 'Admin';
 
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
@@ -78,7 +116,30 @@ function AdminSidebar() {
         setIsMobileSidebarOpen(false);
     };
 
-    const userAvatar = user?.avatar_url || profilepic;
+    const latestAvatarPath = adminProfile?.avatar_url || null;
+
+    const { data: signedAvatarUrl, isLoading: isAvatarLoading } = useQuery({
+    queryKey: ['admin-sidebar-avatar-url', latestAvatarPath],
+    queryFn: async () => {
+        if (!latestAvatarPath) return null;
+
+        const { data, error } = await supabase.storage
+        .from('avatars')
+        .createSignedUrl(latestAvatarPath, 3600);
+
+        if (error) {
+        console.error('Error creating admin avatar signed URL:', error);
+        return null;
+        }
+
+        return data?.signedUrl || null;
+    },
+    enabled: !!latestAvatarPath,
+    refetchInterval: 1000 * 60 * 50,
+    });
+
+    const hasAvatarPath = Boolean(latestAvatarPath);
+    const userAvatar = signedAvatarUrl || (!hasAvatarPath ? profilepic : null);
 
     return (
         <>
@@ -120,14 +181,16 @@ function AdminSidebar() {
         </button>
 
         <div className="flex flex-col items-center gap-0">
-            {userAvatar ? (
-            <img
-                src={userAvatar}
-                alt={`${fullName} profile`}
-                className="h-16 w-16 rounded-full object-cover sm:h-20 sm:w-20 lg:h-28 lg:w-28"
-            />
-            ) : (
-            <div className="h-16 w-16 rounded-full bg-[#d9d9d9] sm:h-20 sm:w-20 lg:h-28 lg:w-28" />
+            {(isAdminProfileLoading || isAvatarLoading) && hasAvatarPath ? (
+                <div className="h-16 w-16 animate-pulse rounded-full bg-white/20 sm:h-20 sm:w-20 lg:h-28 lg:w-28" />
+                ) : userAvatar ? (
+                <img
+                    src={userAvatar}
+                    alt={`${fullName} profile`}
+                    className="h-16 w-16 rounded-full object-cover sm:h-20 sm:w-20 lg:h-28 lg:w-28"
+                />
+                ) : (
+                <div className="h-16 w-16 rounded-full bg-[#d9d9d9] sm:h-20 sm:w-20 lg:h-28 lg:w-28" />
             )}
 
             <div className="text-center">

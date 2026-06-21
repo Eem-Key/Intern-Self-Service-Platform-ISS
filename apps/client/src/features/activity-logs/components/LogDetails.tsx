@@ -165,6 +165,33 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
     const { data: details, isLoading } = useLogDetails(record);
     record.details = details
 
+    const { data: latestRecord } = useQuery({
+    queryKey: ['latest-record-feedback', record.id],
+    queryFn: async () => {
+        const { data, error } = await supabase
+        .from('records')
+        .select('admin_feedback, status')
+        .eq('id', record.id)
+        .maybeSingle();
+
+        if (error) {
+        console.error('Error fetching latest feedback:', error);
+        return null;
+        }
+
+        return data;
+    },
+    enabled: !!record.id,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
+    });
+
+    const adminFeedback =
+    latestRecord?.admin_feedback ||
+    details?.admin_feedback ||
+    record.admin_feedback ||
+    null;
+
     const requestedData = details?.requested_data as
     | Record<string, unknown>
     | undefined;
@@ -562,7 +589,7 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
                 />
 
                 {record.status !== 'pending' && (
-                    <AdminFeedback value={record?.admin_feedback} />
+                <AdminFeedback value={adminFeedback} />
                 )}
 
                 {isDeniedEOD && (
@@ -601,7 +628,7 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
                 />
 
                 {record.status !== 'pending' && (
-                    <AdminFeedback value={record?.admin_feedback} />
+                <AdminFeedback value={adminFeedback} />
                 )}
                 </>
             )}
@@ -640,7 +667,6 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
                         />
                     )}
 
-                    <AdminFeedback value={record?.admin_feedback} />
                 </>
             )}
             </div>

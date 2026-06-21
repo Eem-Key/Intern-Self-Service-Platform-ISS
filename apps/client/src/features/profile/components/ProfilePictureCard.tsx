@@ -40,14 +40,21 @@ function ProfilePictureCard({ profile }: ProfilePictureCardProps) {
         message: string;
     } | null>(null);
 
-    const { data: signedUrlData } = useQuery({
+    const { data: signedUrlData, isLoading: isAvatarLoading } = useQuery({
         queryKey: ['avatar-url', profile.avatar_url],
         queryFn: async () => {
             if (!profile.avatar_url) return null;
-            const { data } = await supabase.storage
-                .from('avatars')
-                .createSignedUrl(profile.avatar_url, 3600);
-            return data?.signedUrl;
+
+            const { data, error } = await supabase.storage
+            .from('avatars')
+            .createSignedUrl(profile.avatar_url, 3600);
+
+            if (error) {
+            console.error('Error creating avatar signed URL:', error);
+            return null;
+            }
+
+            return data?.signedUrl || null;
         },
         enabled: !!profile.avatar_url,
         refetchInterval: 1000 * 60 * 50,
@@ -125,13 +132,13 @@ function ProfilePictureCard({ profile }: ProfilePictureCardProps) {
 
         if (!file) return;
 
-        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
     
         if (!allowedTypes.includes(file.type)) {
             setStatusMessage({
                 variant: 'error',
                 title: 'Invalid File Type',
-                message: 'Please upload a JPEG, PNG, or WebP image.',
+                message: 'Please upload a JPEG, JPG, PNG, or WebP image.',
             });
             return;
         }
@@ -170,16 +177,19 @@ function ProfilePictureCard({ profile }: ProfilePictureCardProps) {
         }*/}
 
         avatarUpdateMutation.mutate({
-            update_type: 'avatar_update',
-            requested_data: {
-                avatar_url: filePath,
+        update_type: 'avatar_update',
+        requested_data: {
+            avatar_url: filePath,
+            old_avatar_url: profile.avatar_url || null,
         },
-            reason: 'Intern requested profile picture update.',
+        reason: 'Intern requested profile picture update.',
         });
     };
 
     const hasSelectedNewPhoto = Boolean(selectedAvatarUrl);
-    const displayedAvatar = previewUrl || signedUrlData || profilepic;
+    const hasAvatarPath = Boolean(profile.avatar_url);
+    const displayedAvatar =
+    previewUrl || signedUrlData || (!hasAvatarPath ? profilepic : null);
 
     const showPendingRequestMessage = () => {
         setStatusMessage({
@@ -224,11 +234,17 @@ function ProfilePictureCard({ profile }: ProfilePictureCardProps) {
             <h2 className="mb-5 text-2xl font-bold">Profile Picture</h2>
 
             <div className="mx-auto flex h-44 w-44 items-center justify-center overflow-hidden rounded-full border-4 border-[#FFBF10] bg-[#d9d9d9] shadow-md">
-                <img
-                src={displayedAvatar}
-                alt="Profile preview"
-                className="h-full w-full object-cover"
-                />
+                {isAvatarLoading && hasAvatarPath && !previewUrl ? (
+                    <div className="h-full w-full animate-pulse bg-gray-300" />
+                ) : displayedAvatar ? (
+                    <img
+                    src={displayedAvatar}
+                    alt="Profile preview"
+                    className="h-full w-full object-cover"
+                    />
+                ) : (
+                    <div className="h-full w-full animate-pulse bg-gray-300" />
+                )}
             </div>
 
             <input

@@ -8,6 +8,7 @@ import {
   X,
 } from 'lucide-react';
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useLocation, useNavigate } from 'react-router-dom';
 import profilepic from '../assets/images/default_pic.png';
 import { logoutUserAPI } from '../api/auth.api';
@@ -47,8 +48,51 @@ function InternSidebar({ onMobileSidebarChange }: InternSidebarProps) {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   const user = getAuthUser();
-    const fullName = getFullName(user);
-    const position = getPosition(user);
+  const fullName = getFullName(user);
+  const position = getPosition(user);
+
+    const { data: latestAvatarPath } = useQuery({
+    queryKey: ['sidebar-avatar-path', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('avatar_url')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error fetching sidebar avatar:', error);
+        return user?.avatar_url || null;
+      }
+
+      return data?.avatar_url || user?.avatar_url || null;
+    },
+    enabled: !!user?.id,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
+  });
+
+  const { data: signedAvatarUrl, isLoading: isAvatarLoading } = useQuery({
+    queryKey: ['sidebar-avatar-signed-url', latestAvatarPath],
+    queryFn: async () => {
+      if (!latestAvatarPath) return null;
+
+      const { data, error } = await supabase.storage
+        .from('avatars')
+        .createSignedUrl(latestAvatarPath, 3600);
+
+      if (error) {
+        console.error('Error creating sidebar avatar signed URL:', error);
+        return null;
+      }
+
+      return data?.signedUrl || null;
+    },
+    enabled: !!latestAvatarPath,
+    refetchInterval: 1000 * 60 * 50,
+  });
 
   const handleLogout = async () => {
     try {
@@ -85,7 +129,8 @@ function InternSidebar({ onMobileSidebarChange }: InternSidebarProps) {
     closeMobileSidebar();
   };
 
-  const userAvatar = user?.avatar_url || profilepic;
+  const hasAvatarPath = Boolean(latestAvatarPath);
+  const userAvatar = signedAvatarUrl || (!hasAvatarPath ? profilepic : null); 
 
   return (
     <>
@@ -128,7 +173,9 @@ function InternSidebar({ onMobileSidebarChange }: InternSidebarProps) {
         </button>
 
         <div className="flex flex-col items-center gap-0">
-          {userAvatar ? (
+          {isAvatarLoading && hasAvatarPath ? (
+            <div className="h-28 w-28 animate-pulse rounded-full bg-white/20" />
+          ) : userAvatar ? (
             <img
               src={userAvatar}
               alt={`${fullName} profile`}
