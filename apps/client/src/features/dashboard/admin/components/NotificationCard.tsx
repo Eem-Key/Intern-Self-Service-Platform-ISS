@@ -105,9 +105,12 @@ function NotificationCard() {
             <div className="min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
             {/*<div className="max-h-[320px] space-y-3 overflow-y-auto pr-1 sm:max-h-[380px] md:max-h-[420px] lg:max-h-[calc(100vh-360px)] xl:max-h-[calc(100vh-280px)]">*/}
             {isLoading && (
-                <p className="py-6 text-center text-sm text-gray-500">
-                Loading notifications...
-                </p>
+                <div className="flex flex-col items-center justify-center gap-3 py-6">
+                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#EAF0FA] border-t-[#0058DD]" />
+                        <p className="text-sm font-medium text-gray-500">
+                        Loading notifications...
+                        </p>
+                </div>
             )}
 
             {!isLoading && notifications.length === 0 && (

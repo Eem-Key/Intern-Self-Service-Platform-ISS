@@ -166,12 +166,14 @@ function AttendanceTracker() {
             <tbody>
                 {isLoading && (
                 <tr>
-                    <td
-                    colSpan={5}
-                    className="px-6 py-10 text-center text-sm text-gray-500"
-                    >
-                    Loading attendance records...
-                    </td>
+                <td colSpan={5} className="px-6 py-10">
+                    <div className="flex flex-col items-center justify-center gap-3">
+                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#EAF0FA] border-t-[#0058DD]" />
+                    <p className="text-sm font-medium text-gray-500">
+                        Loading attendance records...
+                    </p>
+                    </div>
+                </td>
                 </tr>
                 )}
 
