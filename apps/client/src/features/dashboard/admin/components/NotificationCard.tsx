@@ -138,7 +138,7 @@ function NotificationCard() {
                     <div className="min-w-0 flex-1">
                         <div className="flex flex-col justify-between gap-x-2 gap-y-0.5 pr-4 sm:flex-row sm:items-baseline">
                         <h3 className="truncate text-sm font-bold text-gray-900 sm:text-base">
-                            {notification.title}
+                            {getNotificationName(notification)}
                         </h3>
 
                         <span className="shrink-0 text-[11px] text-gray-400">
@@ -178,7 +178,7 @@ function NotificationCard() {
                 <div className="flex items-start justify-between bg-[#002D6F] px-5 py-4 text-white sm:px-6 sm:py-5">
                 <div className="min-w-0 pr-4">
                     <h3 className="truncate text-xl font-bold sm:text-2xl">
-                    {selectedNotification.title}
+                        {getNotificationName(selectedNotification)}
                     </h3>
 
                     <p className="mt-1 text-xs text-white/75 sm:text-sm">
@@ -206,6 +206,37 @@ function NotificationCard() {
         )}
         </>
     );
+}
+
+type NotificationWithName = Notification & {
+  Name?: {
+    first_name?: string | null;
+    middle_name?: string | null;
+    last_name?: string | null;
+    suffix?: string | null;
+  } | null;
+};
+
+function getNotificationName(notification: Notification) {
+    const item = notification as NotificationWithName;
+
+    if (!item.Name) return notification.title || '--';
+
+    const middleInitial = item.Name.middle_name
+        ? `${item.Name.middle_name.charAt(0).toUpperCase()}.`
+        : null;
+
+    const fullName = [
+        item.Name.first_name,
+        middleInitial,
+        item.Name.last_name,
+        item.Name.suffix,
+    ]
+        .filter(Boolean)
+        .join(' ')
+        .trim();
+
+    return fullName || notification.title || '--';
 }
 
 export default NotificationCard;
