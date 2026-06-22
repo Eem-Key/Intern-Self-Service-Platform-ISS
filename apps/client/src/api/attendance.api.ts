@@ -1,5 +1,5 @@
 import { supabase } from '../config/supabase';
-import { getAuthUserId } from '../utils/auth';
+import { getAuthUserId } from '../utils/auth.util';
 import type { WorkSetup } from '../../../shared/types/enums.types';
 import type {
     AttendanceRecord,

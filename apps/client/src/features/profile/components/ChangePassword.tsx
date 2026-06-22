@@ -1,10 +1,12 @@
 import { Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
-import type { ChangePasswordValues } from '../../../../../shared/schemas/changePassword.schema';
-import type { Profile } from '../../../../../shared/types/profile.types';
+import type { ProfileIntern } from '../../../../../shared/types/profile.types';
 import ChangePassButton from '../../../components/ui/changePassButton';
 import PasswordStrength from '../../../components/ui/passwordStrength';
-import type { ChangePasswordErrors } from '../../../utils/validateChangePassword';
+import type { 
+    ChangePasswordValues, 
+    ChangePasswordErrors 
+} from '../../../../../shared/types/login.types';
 import validateChangePassword from '../../../utils/validateChangePassword';
 
 import { updatePasswordAPI } from '../../../api/auth.api';
@@ -12,7 +14,7 @@ import { supabase } from '../../../config/supabase';
 import PasswordStatusModal from './PasswordStatusModal';
 
 type ProfileChangePasswordCardProps = {
-    profile: Profile;
+    profile: ProfileIntern;
 };
 
 type ModalState =
