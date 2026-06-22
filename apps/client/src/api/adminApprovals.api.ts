@@ -3,6 +3,7 @@ import { getAuthUserId, isAdmin } from '../utils/auth';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import type { RecordType } from '../../../shared/types/enums.types';
 import type { ApprovalRecord } from '../../../shared/types/approvals.types';
+import { fetchRecordDetails } from '../api/record.api';
 
 
 export function usefetchPendingRequestsPerRecord() {
@@ -43,8 +44,6 @@ export async function fetchPendingRequestsPerRecord(): Promise<globalThis.Record
 }
 
 
-
-// new
 export function useFetchPendingApprovalRecords(
     page: number,
     pageSize: number,
@@ -73,6 +72,7 @@ export function useFetchPendingApprovalRecords(
         refetchOnWindowFocus: true,
     });
 }
+
 export async function fetchPendingApprovalRecords(
     page: number,
     pageSize: number,
@@ -100,12 +100,12 @@ export async function fetchPendingApprovalRecords(
             interns (
                 intern_position,
                 profiles (
-                first_name,
-                middle_name,
-                last_name,
-                suffix,
-                position,
-                department
+                    first_name,
+                    middle_name,
+                    last_name,
+                    suffix,
+                    position,
+                    department
                 )
             )
         `)
@@ -118,57 +118,56 @@ export async function fetchPendingApprovalRecords(
         }
 
     const mappedRecords = await Promise.all(
-        (data || []).map(async (item: any) => {
-        const profile = item.interns?.profiles;
+        (data || []).map(async (record: any) => {
+            const profile = record.interns?.profiles;
 
-        const middleInitial = profile?.middle_name
-            ? `${profile.middle_name.charAt(0).toUpperCase()}.`
-            : null;
+            const middleInitial = profile?.middle_name
+                ? `${profile.middle_name.charAt(0).toUpperCase()}.`
+                : null;
 
-        const name = [
-            profile?.first_name,
-            middleInitial,
-            profile?.last_name,
-            profile?.suffix,
-        ]
+            const name = [
+                profile?.first_name,
+                middleInitial,
+                profile?.last_name,
+                profile?.suffix,
+            ]
             .filter(Boolean)
             .join(' ')
             .trim();
 
-        let details;
+            let details= {
+                date_submitted: record.created_at,
+                time_submitted: formatTime(record.created_at),
+            }
 
-        try {
-        details = await getApprovalDetails(item);
-        } catch (detailsError) {
-        console.error('Error fetching approval details:', detailsError);
+            try {
+                const approval_details = await fetchRecordDetails(record.id, record.log_category);
+                details = {
+                    ...details,
+                    ...(approval_details || {})
+                }
+            } catch (detailsError) {
+                console.error('Error fetching approval details:', detailsError);
+            }
 
-        details = {
-            date_submitted: item.created_at,
-            time_submitted: formatTime(item.created_at),
-        };
-        }
+            return {
+                id: record.id,
+                intern_id: record.intern_id,
+                log_category: record.log_category,
+                created_at: record.created_at,
+                date_created: record.date_created,
+                activity_description: record.activity_description,
+                status: record.status,
+                admin_id: record.admin_id,
+                reviewed_at: record.reviewed_at,
+                admin_feedback: record.admin_feedback,
 
-        return {
-            id: item.id,
-            intern_id: item.intern_id,
-            log_category: item.log_category,
-            type: item.log_category,
-            created_at: item.created_at,
-            date_created: item.date_created,
-            display_date: item.created_at,
-            activity_description: item.activity_description,
-            description: item.activity_description,
-            status: item.status,
-            admin_id: item.admin_id,
-            reviewed_at: item.reviewed_at,
-            admin_feedback: item.admin_feedback,
+                name: name || '--',
+                position: profile?.position || record.interns?.intern_position || '--',
+                department: profile?.department || '--',
 
-            name: name || '--',
-            position: profile?.position || item.interns?.intern_position || '--',
-            department: profile?.department || '--',
-
-            details,
-        };
+                details,
+            };
         })
     );
 
@@ -183,99 +182,13 @@ export async function fetchPendingApprovalRecords(
         return matchesSearch && matchesDepartment;
     });
 
-  const from = page * pageSize;
+    const from = page * pageSize;
     const to = from + pageSize;
 
     return {
         data: filteredRecords.slice(from, to),
         count: filteredRecords.length,
     };
-}
-
-async function getApprovalDetails(item: any) {
-    const baseDetails = {
-        date_submitted: item.created_at,
-        time_submitted: formatTime(item.created_at),
-    };
-
-if (item.log_category === 'eod_report') {
-        const { data, error } = await supabase
-        .from('eod_reports')
-        .select('*')
-        .eq('record_id', item.id)
-        .limit(1);
-
-    if (error) {
-        console.error('Error fetching EOD details:', error);
-    }
-
-    const eod = data?.[0];
-
-    return {
-        ...baseDetails,
-        project_name: eod?.project_name || null,
-        task_accomplished: eod?.task_accomplished || null,
-        hours_spent: eod?.hours_spent || null,
-        intern_role:
-            item.interns?.profiles?.position ||
-            item.interns?.intern_position ||
-            null,
-        };
-    }
-
-if (item.log_category === 'leave_request') {
-    const { data, error } = await supabase
-        .from('leave_requests')
-        .select('*')
-        .eq('record_id', item.id)
-        .limit(1);
-
-    if (error) {
-        console.error('Error fetching leave request details:', error);
-    }
-
-    const leave = data?.[0];
-
-    return {
-        ...baseDetails,
-        reason_category: leave?.reason_category || null,
-        description: leave?.description || null,
-        start_date: leave?.start_date || null,
-        end_date: leave?.end_date || null,
-        };
-    }
-
-if (item.log_category === 'profile_update') {
-    const { data, error } = await supabase
-        .from('profile_update_requests')
-        .select('*')
-        .eq('record_id', item.id)
-        .limit(1);
-
-    if (error) {
-        console.error('Error fetching profile update details:', error);
-    }
-
-    const profileUpdate = data?.[0];
-
-    return {
-        ...baseDetails,
-        update_type: profileUpdate?.update_type || null,
-        requested_data: profileUpdate?.requested_data || null,
-
-        old_avatar_url:
-            profileUpdate?.old_avatar_url ||
-            profileUpdate?.requested_data?.old_avatar_url ||
-            null,
-
-        new_avatar_url:
-            profileUpdate?.new_avatar_url ||
-            profileUpdate?.requested_data?.avatar_url ||
-            null,
-        };
-    }
-
-    return baseDetails;
 }
 
 function formatTime(value?: string | null) {

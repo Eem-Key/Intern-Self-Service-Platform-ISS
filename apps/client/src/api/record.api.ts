@@ -98,6 +98,22 @@ export const fetchRecordsPaginatedIntern = async (
     return { data: data || [], count: count ?? 0 };
 };
 
+export async function fetchRecordDetails(record_id: string, record_category: RecordType) {
+     try {
+        switch (record_category) {
+            case 'attendance': return await fetchAttendanceById(record_id);
+            case 'eod_report': return await fetchEodReportById(record_id);
+            case 'leave_request': return await fetchLeaveRequestById(record_id);
+            case 'profile_update': return await fetchProfileUpdateRequestById(record_id);
+            default: 
+                console.warn(`No handler for category: ${record_category}`);
+                return null;
+        }
+    } catch (error) {
+        console.error(`Error fetching details for ${record_category}:`, error);
+        return null;
+    }
+}
 export const insertRecord = async (record: RecordInsert): Promise<string> => {
     const { data: recordInsert, error: insertRecordError } = await supabase
     .from('records')
@@ -115,8 +131,6 @@ export const insertRecord = async (record: RecordInsert): Promise<string> => {
     if(record.log_category !== 'attendance'){
         await insertInternNotificationAPI(recordInsert);
     }
-    // await insertInternNotificationAPI(recordInsert);
-
 
     return recordInsert.id;
 };

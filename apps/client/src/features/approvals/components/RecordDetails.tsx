@@ -40,7 +40,7 @@ function RecordDetails({ record, onClose, onReview }: RecordDetailsProps) {
         <div className="relative flex max-h-[calc(100dvh-1.5rem)] w-full max-w-[560px] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl sm:max-h-[calc(100dvh-2rem)] md:max-w-[620px]">
             <div className="flex shrink-0 items-center justify-between  bg-gradient-to-r from-[#005de8] to-[#003d8f] px-4 py-3 text-white sm:px-5 sm:py-4">
             <h2 className="min-w-0 truncate pr-3 text-base font-bold sm:text-lg md:text-xl">
-                {getTitle(record.type)}
+                {getTitle(record.log_category)}
             </h2>
 
             <button
@@ -65,7 +65,7 @@ function RecordDetails({ record, onClose, onReview }: RecordDetailsProps) {
             </div>
 
             <div className="space-y-4 px-4 py-4 sm:px-5 sm:py-5">
-                {record.type === 'eod_report' && (
+                {record.log_category === 'eod_report' && (
                 <>
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     <DetailItem
@@ -99,7 +99,7 @@ function RecordDetails({ record, onClose, onReview }: RecordDetailsProps) {
                 </>
                 )}
 
-                {record.type === 'leave_request' && (
+                {record.log_category === 'leave_request' && (
                 <>
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <DetailItem
@@ -128,7 +128,7 @@ function RecordDetails({ record, onClose, onReview }: RecordDetailsProps) {
                 </>
             )}
 
-            {record.type === 'profile_update' && (
+            {record.log_category === 'profile_update' && (
                 <>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <DetailItem
@@ -140,7 +140,7 @@ function RecordDetails({ record, onClose, onReview }: RecordDetailsProps) {
 
                 <DetailBox
                     label="Description"
-                    value={record.description || 'No description provided.'}
+                    value={record.activity_description || 'No description provided.'}
                 />
 
                 {record.details?.update_type === 'avatar_update' && (
@@ -304,7 +304,7 @@ function ProfilePhotoBox({
     );
 }
 
-function getTitle(type: ApprovalRecord['type']) {
+function getTitle(type: ApprovalRecord['log_category']) {
     switch (type) {
         case 'eod_report':
         return 'End of Day Report';

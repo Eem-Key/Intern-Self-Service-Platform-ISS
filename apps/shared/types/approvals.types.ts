@@ -5,7 +5,7 @@ import type {
     LeaveReason,
 } from './enums.types';
 
-import type { RecordLog } from './record.types';
+import type { Record } from './record.types';
 
 export type ApprovalTab = Exclude<RecordType, 'attendance'>;
 
@@ -41,10 +41,12 @@ export type ApprovalDetails = {
     new_avatar_url?: string | null;
 };
 
-export type ApprovalRecord = Omit<RecordLog, 'details'> &
-    ApprovalInternInfo & {
-        type: ApprovalTab;
+export type ApprovalRecord = 
+Record &
+    ApprovalInternInfo & 
+    {
+        log_category: ApprovalTab;
         status: ReportStatus;
-        description: string;
+        activity_description: string;
         details?: ApprovalDetails;
-};
+    };

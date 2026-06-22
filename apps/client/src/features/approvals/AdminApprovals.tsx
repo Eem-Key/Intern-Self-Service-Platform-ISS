@@ -44,8 +44,8 @@ function getPageNumbers(currentPage: number, totalPages: number) {
 }
 
 function getSuccessTitle(record: ApprovalRecord) {
-    if (record.type === 'eod_report') return 'EOD Report Approved';
-    if (record.type === 'leave_request') return 'Leave Request Approved';
+    if (record.log_category === 'eod_report') return 'EOD Report Approved';
+    if (record.log_category === 'leave_request') return 'Leave Request Approved';
 
     if (record.details?.update_type === 'avatar_update') {
         return 'Profile Picture Updated';
@@ -55,11 +55,11 @@ function getSuccessTitle(record: ApprovalRecord) {
 }
 
 function getSuccessMessage(record: ApprovalRecord) {
-    if (record.type === 'eod_report') {
+    if (record.log_category === 'eod_report') {
         return 'The submission has been verified and recorded.';
     }
 
-    if (record.type === 'leave_request') {
+    if (record.log_category === 'leave_request') {
         return 'The leave request has been successfully approved and updated in the records.';
     }
 
@@ -71,18 +71,18 @@ function getSuccessMessage(record: ApprovalRecord) {
 }
 
 function getDeclineTitle(record: ApprovalRecord) {
-    if (record.type === 'eod_report') return 'EOD Report Declined';
-    if (record.type === 'leave_request') return 'Request Declined';
+    if (record.log_category === 'eod_report') return 'EOD Report Declined';
+    if (record.log_category === 'leave_request') return 'Request Declined';
 
     return 'Update Failed';
 }
 
 function getDeclineMessage(record: ApprovalRecord) {
-    if (record.type === 'eod_report') {
+    if (record.log_category === 'eod_report') {
         return 'The submission has been rejected. This entry will be returned to the intern to edit.';
     }
 
-    if (record.type === 'leave_request') {
+    if (record.log_category === 'leave_request') {
         return 'The leave request has been declined. The intern will be notified of the status change.';
     }
 
@@ -118,6 +118,8 @@ function AdminApprovals() {
         department
     );
 
+    console.log('approval data: ', approvalData)
+
     const records = approvalData?.data ?? [];
     const count = approvalData?.count ?? 0;
 
@@ -149,7 +151,7 @@ function AdminApprovals() {
     let profileData: ProfileUpdate | undefined;
     let internData: InternInfo | undefined;
 
-    if (record.type === 'profile_update') {
+    if (record.log_category === 'profile_update') {
         const requestedData = record.details?.requested_data as
             | (ProfileUpdate & { intern_info?: InternInfo })
             | undefined;
