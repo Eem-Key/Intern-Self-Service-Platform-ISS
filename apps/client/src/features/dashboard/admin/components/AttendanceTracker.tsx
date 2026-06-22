@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-
 import type { AttendanceWithName } from '../../../../../../shared/types/attendance.types';
 import { fetchAttendancePerDateRange } from '../../../../api/adminDashboard.api';
 
@@ -40,43 +39,65 @@ function AttendanceTracker() {
         <section className="flex max-h-[620px] min-h-[430px] min-w-0 flex-col rounded-xl bg-white shadow-md lg:h-[calc(100vh-360px)] xl:h-[calc(100vh-280px)] xl:max-h-[520px]">
         {/*<section className="flex h-[360px] min-h-0 min-w-0 flex-col rounded-xl bg-white shadow-md sm:h-[420px] lg:h-[calc(100vh-360px)] xl:h-[calc(100vh-280px)] xl:max-h-[520px]">*/}
         {/*</section><section className="flex min-w-0 flex-col rounded-xl bg-white shadow-md">*/}
-        <div className="flex shrink-0 flex-col gap-3 px-4 py-4 sm:px-5 md:px-6 lg:flex-row lg:items-center lg:justify-between">
-        <h2 className="border-l-4 border-[#FFBF10] pl-3 text-xl font-bold sm:text-2xl">
+        <div className="flex shrink-0 flex-row items-center justify-between gap-3 px-3 py-4 sm:px-5 md:px-6">
+        <h2 className="shrink-0 border-l-4 border-[#FFBF10] pl-2 text-sm font-bold sm:pl-3 sm:text-2xl">
             Attendance Tracker
         </h2>
 
-        <div className="w-full rounded-xl bg-[#FFF3C4] px-3 py-2 text-[#9A6B00] ring-1 ring-[#FFE28A] lg:w-auto">
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
-            <div className="flex min-w-0 items-center justify-between gap-2">
-                <span className="text-xs font-semibold text-[#9A6B00]/70 sm:text-sm">
-                From
+        <div className="min-w-0 rounded-xl bg-[#FFF3C4] px-2 py-1.5 text-[#9A6B00] ring-1 ring-[#FFE28A] sm:px-3 sm:py-2">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-1.5 sm:gap-2">
+                <div className="flex min-w-0 items-center gap-1.5">
+                <span className="shrink-0 text-[10px] font-semibold text-[#9A6B00]/70 sm:text-xs xl:text-sm">
+                    From
                 </span>
 
                 <input
-                type="date"
-                value={startDate}
-                onChange={(event) => handleStartDateChange(event.target.value)}
-                className="min-w-0 flex-1 bg-transparent text-right text-xs font-semibold text-[#9A6B00] outline-none sm:w-[125px] sm:flex-none"
+                    type="date"
+                    value={startDate}
+                    onChange={(event) => handleStartDateChange(event.target.value)}
+                    className="min-w-0 flex-1 bg-transparent text-right font-semibold leading-none text-[#9A6B00] outline-none
+                    [&::-webkit-datetime-edit]:text-[10px]
+                    [&::-webkit-datetime-edit-fields-wrapper]:text-[10px]
+                    [&::-webkit-datetime-edit-text]:px-0
+                    [&::-webkit-calendar-picker-indicator]:ml-0.5
+                    [&::-webkit-calendar-picker-indicator]:h-3.5
+                    [&::-webkit-calendar-picker-indicator]:w-3.5
+                    [&::-webkit-calendar-picker-indicator]:p-0
+                    sm:[&::-webkit-datetime-edit]:text-xs
+                    sm:[&::-webkit-datetime-edit-fields-wrapper]:text-xs
+                    xl:[&::-webkit-datetime-edit]:text-sm
+                    xl:[&::-webkit-datetime-edit-fields-wrapper]:text-sm"
                 />
-            </div>
+                </div>
 
-            <span className="hidden h-6 w-px bg-[#D8A600]/35 sm:block" />
+                <span className="block h-6 w-px bg-[#D8A600]/35" />
 
-            <div className="flex min-w-0 items-center justify-between gap-2">
-                <span className="text-xs font-semibold text-[#9A6B00]/70 sm:text-sm">
-                To
+                <div className="flex min-w-0 items-center gap-1.5">
+                <span className="shrink-0 text-[10px] font-semibold text-[#9A6B00]/70 sm:text-xs xl:text-sm">
+                    To
                 </span>
 
                 <input
-                type="date"
-                value={endDate}
-                min={startDate}
-                onChange={(event) => handleEndDateChange(event.target.value)}
-                className="min-w-0 flex-1 bg-transparent text-right text-xs font-semibold text-[#9A6B00] outline-none sm:w-[125px] sm:flex-none"
+                    type="date"
+                    value={endDate}
+                    min={startDate}
+                    onChange={(event) => handleEndDateChange(event.target.value)}
+                    className="min-w-0 flex-1 bg-transparent text-right font-semibold leading-none text-[#9A6B00] outline-none
+                    [&::-webkit-datetime-edit]:text-[10px]
+                    [&::-webkit-datetime-edit-fields-wrapper]:text-[10px]
+                    [&::-webkit-datetime-edit-text]:px-0
+                    [&::-webkit-calendar-picker-indicator]:ml-0.5
+                    [&::-webkit-calendar-picker-indicator]:h-3.5
+                    [&::-webkit-calendar-picker-indicator]:w-3.5
+                    [&::-webkit-calendar-picker-indicator]:p-0
+                    sm:[&::-webkit-datetime-edit]:text-xs
+                    sm:[&::-webkit-datetime-edit-fields-wrapper]:text-xs
+                    xl:[&::-webkit-datetime-edit]:text-sm
+                    xl:[&::-webkit-datetime-edit-fields-wrapper]:text-sm"
                 />
+                </div>
             </div>
             </div>
-        </div>
         </div>
 
         

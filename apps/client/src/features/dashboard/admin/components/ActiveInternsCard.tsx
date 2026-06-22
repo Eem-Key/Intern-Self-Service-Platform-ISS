@@ -14,16 +14,18 @@ function ActiveInternsCard() {
     });
 
     return (
-        <section className="flex items-center justify-between rounded-xl bg-white px-5 py-4 shadow-md sm:px-6">
+        <section className="flex min-w-0 items-center justify-between gap-2 rounded-xl bg-white px-2 py-3 shadow-md sm:px-6 sm:py-4">
         <div>
-            <span className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-[#0058DD] text-white">
-            <UsersRound size={24} />
+            <span className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-[#0058DD] text-white sm:mb-4 sm:h-12 sm:w-12">
+                <UsersRound size={18} className="sm:h-6 sm:w-6" />
             </span>
 
-            <p className="text-sm font-medium text-gray-700">Active Interns</p>
+            <p className="text-[10px] font-medium leading-tight text-gray-700 sm:text-sm">
+                Active Interns
+            </p>
         </div>
 
-        <p className="text-4xl font-bold text-black">
+        <p className="text-2xl font-bold text-black sm:text-4xl">
             {isLoading ? '...' : isError ? '--' : activeInterns}
         </p>
         </section>

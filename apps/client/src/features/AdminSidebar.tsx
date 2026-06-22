@@ -158,11 +158,11 @@ function AdminSidebar({ onMobileSidebarChange }: AdminSidebarProps) {
     return (
         <>
         {/* Mobile / Tablet Top Bar */}
-        <div className="fixed left-0 top-0 z-[9997] h-16 w-full bg-[#002D6F] shadow-md lg:hidden" />
+        <div className="fixed left-0 top-0 z-[9997] h-16 w-full bg-[#002D6F] shadow-md xl:hidden" />
         <button
             type="button"
             onClick={openMobileSidebar}
-            className="fixed left-4 top-2.5 z-[9998] flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white shadow-lg ring-1 ring-white/20 lg:hidden"
+            className="fixed left-4 top-2.5 z-[9998] flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white shadow-lg ring-1 ring-white/20 xl:hidden"
         >
             <Menu size={24} />
         </button>
@@ -173,7 +173,7 @@ function AdminSidebar({ onMobileSidebarChange }: AdminSidebarProps) {
             type="button"
             aria-label="Close sidebar overlay"
             onClick={closeMobileSidebar}
-            className="fixed inset-0 z-[9998] bg-black/50 backdrop-blur-sm lg:hidden"
+            className="fixed inset-0 z-[9998] bg-black/50 backdrop-blur-sm xl:hidden"
             />
         )}
             <aside
@@ -181,30 +181,30 @@ function AdminSidebar({ onMobileSidebarChange }: AdminSidebarProps) {
                 ${
                     isMobileSidebarOpen
                     ? 'translate-x-0'
-                    : '-translate-x-full lg:translate-x-0'
+                    : '-translate-x-full xl:translate-x-0'
                 }
-                lg:fixed lg:left-0 lg:top-0 lg:h-screen lg:w-[270px]`}
+                xl:fixed xl:left-0 xl:top-0 xl:h-screen xl:w-[270px]`}
             >
         {/* Mobile Close Button */}
         <button
         type="button"
         onClick={closeMobileSidebar}
-        className="absolute right-4 top-4 rounded-full p-1 transition hover:bg-white/10 lg:hidden"
+        className="absolute right-4 top-4 rounded-full p-1 transition hover:bg-white/10 xl:hidden"
         >
         <X size={22} />
         </button>
 
         <div className="flex flex-col items-center gap-0">
             {(isAdminProfileLoading || isAvatarLoading) && hasAvatarPath ? (
-                <div className="h-16 w-16 animate-pulse rounded-full bg-white/20 sm:h-20 sm:w-20 lg:h-28 lg:w-28" />
+                <div className="h-16 w-16 animate-pulse rounded-full bg-white/20 sm:h-20 sm:w-20 xl:h-28 xl:w-28" />
                 ) : userAvatar ? (
                 <img
                     src={userAvatar}
                     alt={`${fullName} profile`}
-                    className="h-16 w-16 rounded-full object-cover sm:h-20 sm:w-20 lg:h-28 lg:w-28"
+                    className="h-16 w-16 rounded-full object-cover sm:h-20 sm:w-20 xl:h-28 xl:w-28"
                 />
                 ) : (
-                <div className="h-16 w-16 rounded-full bg-[#d9d9d9] sm:h-20 sm:w-20 lg:h-28 lg:w-28" />
+                <div className="h-16 w-16 rounded-full bg-[#d9d9d9] sm:h-20 sm:w-20 xl:h-28 xl:w-28" />
             )}
 
             <div className="text-center">
