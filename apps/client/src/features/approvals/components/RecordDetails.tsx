@@ -14,6 +14,70 @@ type RecordDetailsProps = {
     onReview?: (status: ReportStatus, feedback: string) => void | Promise<void>;
 };
 
+
+function formatLabel(key: string) {
+    return key
+        .replaceAll('_', ' ')
+        .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+const profileFieldOrder = [
+    'first_name',
+    'middle_name',
+    'last_name',
+    'suffix',
+    'email',
+    'birth_date',
+    'gender',
+    'contact_number',
+    'address',
+    'position',
+    'department',
+    'office',
+];
+
+const internInfoFieldOrder = [
+    'program',
+    'university',
+    'year_level',
+    'start_date',
+    'required_hours',
+];
+
+function formatRequestedData(data?: Record<string, unknown>) {
+    if (!data || Object.keys(data).length === 0) {
+        return 'No requested changes provided.';
+    }
+
+    const lines: string[] = [];
+
+    profileFieldOrder.forEach((key) => {
+        if (key in data) {
+        lines.push(`${formatLabel(key)}: ${String(data[key])}`);
+        }
+    });
+
+    if (
+        data.intern_info &&
+        typeof data.intern_info === 'object' &&
+        !Array.isArray(data.intern_info)
+    ) {
+        const internInfo = data.intern_info as Record<string, unknown>;
+
+        internInfoFieldOrder.forEach((key) => {
+        if (key in internInfo) {
+            lines.push(
+            `Internship Info - ${formatLabel(key)}: ${String(internInfo[key])}`
+            );
+        }
+        });
+    }
+
+    return lines.length > 0
+        ? lines.join('\n')
+        : 'No requested changes provided.';
+}
+
 function RecordDetails({ record, onClose, onReview }: RecordDetailsProps) {
     const [feedback, setFeedback] = useState(record.admin_feedback || '');
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -132,46 +196,52 @@ function RecordDetails({ record, onClose, onReview }: RecordDetailsProps) {
             )}
 
             {record.log_category === 'profile_update' && (
-                <>
+            <>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <DetailItem
+                <DetailItem
                     label="Time Submitted"
                     value={record.details?.time_submitted || '--'}
-                    />
-                    <StatusDetailItem label="Status" status={record.status} />
+                />
+                <StatusDetailItem label="Status" status={record.status} />
                 </div>
 
+                {record.details?.update_type === 'information_update' && (
                 <DetailBox
-                    label="Description"
-                    value={record.activity_description || 'No description provided.'}
+                    label="Requested Changes"
+                    value={formatRequestedData(
+                    record.details?.requested_data as Record<string, unknown> | undefined
+                    )}
                 />
+                )}
 
                 {record.details?.update_type === 'avatar_update' && (
+                <>
                     <div className="grid grid-cols-1 gap-5 pt-2 sm:grid-cols-2">
-                        <ProfilePhotoBox
+                    <ProfilePhotoBox
                         label="Old Profile Photo"
                         imageUrl={
-                        typeof record.details?.requested_data?.old_avatar_url === 'string' && 
+                        typeof record.details?.requested_data?.old_avatar_url === 'string' &&
                         record.details.requested_data.old_avatar_url.length > 0
-                            ? record.details.requested_data.old_avatar_url 
-                            : profilepic
+                            ? record.details.requested_data.old_avatar_url
+                            : null
                         }
                         useDefault
-                        />
+                    />
 
-                        <ProfilePhotoBox
+                    <ProfilePhotoBox
                         label="New Profile Photo"
                         imageUrl={
-                        typeof record.details?.requested_data?.avatar_url === 'string' && 
+                        typeof record.details?.requested_data?.avatar_url === 'string' &&
                         record.details.requested_data.avatar_url.length > 0
-                            ? record.details.requested_data.avatar_url 
-                            : profilepic
+                            ? record.details.requested_data.avatar_url
+                            : null
                         }
-                        />
+                    />
                     </div>
-                    )}
                 </>
                 )}
+            </>
+            )}
             </div>
             </div>
 
@@ -237,13 +307,12 @@ function DetailBox({ label, value }: { label: string; value: string }) {
         <div>
         <p className="mb-2 text-sm font-bold text-black">{label}</p>
 
-        <div className="max-h-[180px] min-h-[50px] overflow-y-auto rounded-lg bg-[#f5f5f5] p-4 text-sm leading-relaxed text-gray-700 sm:max-h-[220px]">
+        <div className="max-h-[180px] min-h-[50px] overflow-y-auto whitespace-pre-wrap rounded-lg bg-[#f5f5f5] p-4 text-sm leading-relaxed text-gray-700 sm:max-h-[220px]">
             {value}
         </div>
         </div>
     );
 }
-
 function FeedbackBox({
     value,
     onChange,
