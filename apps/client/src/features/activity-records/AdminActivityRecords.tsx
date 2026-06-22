@@ -4,7 +4,7 @@ import Banner from '../activity-records/banner/ActivityRecordBanner'
 
 function AdminActivityRecords() {
     useEffect(() => {
-        document.title = 'Activity Records| Intern Self Service';
+        document.title = 'Activity Records | Intern Self Service';
     }, []);
 
     return (
