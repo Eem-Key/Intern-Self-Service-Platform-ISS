@@ -20,18 +20,17 @@ import type { InternInfo } from '../../../shared/types/intern.types.ts';
 import type { 
     Record, 
     RecordInsert,
-    RecordLog
 } from '../../../shared/types/record.types.ts';
 
-export function useLogDetails(record: RecordLog) {
+export function useFetchRecordDetails(record_id: string, record_category: RecordType) {
     return useQuery({
-        queryKey: ['log-details', record.id],
+        queryKey: ['log-details', record_id],
         queryFn: async () => {
-            switch (record.log_category) {
-                case 'attendance': return await fetchAttendanceById(record.id);
-                case 'eod_report': return await fetchEodReportById(record.id);
-                case 'leave_request': return await fetchLeaveRequestById(record.id);
-                case 'profile_update': return await fetchProfileUpdateRequestById(record.id);
+            switch (record_category) {
+                case 'attendance': return await fetchAttendanceById(record_id);
+                case 'eod_report': return await fetchEodReportById(record_id);
+                case 'leave_request': return await fetchLeaveRequestById(record_id);
+                case 'profile_update': return await fetchProfileUpdateRequestById(record_id);
                 default: return null;
             }
         },
@@ -113,7 +112,11 @@ export const insertRecord = async (record: RecordInsert): Promise<string> => {
 
     console.log('Insert Record: ', recordInsert.id);
 
-    await insertInternNotificationAPI(recordInsert);
+    if(record.log_category !== 'attendance'){
+        await insertInternNotificationAPI(recordInsert);
+    }
+    // await insertInternNotificationAPI(recordInsert);
+
 
     return recordInsert.id;
 };

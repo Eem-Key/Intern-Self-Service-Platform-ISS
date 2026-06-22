@@ -5,7 +5,7 @@ import { supabase } from '../../../config/supabase';
 import StatusBadge from './StatusBadge';
 import StatusMessage from '../../../components/feedback/StatusMessage';
 import RequiredMark from '../../../components/ui/RequiredMark';
-import { useLogDetails } from '../../../api/record.api';
+import { useFetchRecordDetails } from '../../../api/record.api';
 import { updateEODReportAPI } from '../../../api/eodReport.api';
 import { validateEodReport } from '../../../utils/validateEodReport';
 import type { RecordLog } from '../../../../../shared/types/record.types';
@@ -162,7 +162,7 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
     const isDeniedEOD = record.log_category === 'eod_report' && record.status === 'denied';
     const [isEditingDeniedEOD, setIsEditingDeniedEOD] = useState(false);
 
-    const { data: details, isLoading } = useLogDetails(record);
+    const { data: details, isLoading } = useFetchRecordDetails(record.id, record.log_category);
     record.details = details
 
     const { data: latestRecord } = useQuery({
