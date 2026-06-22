@@ -301,7 +301,7 @@ function ProfileDetailsCard(
     return (
         <>
         
-            {statusMessage && (
+        {statusMessage && (
         <StatusMessage
             variant={statusMessage.variant}
             title={statusMessage.title}
@@ -326,7 +326,7 @@ function ProfileDetailsCard(
         />
 
         <section className="rounded-xl bg-white px-4 py-4 shadow-md sm:px-6 sm:py-5 xl:px-8 xl:py-6">
-        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mb-6 flex flex-row items-center justify-between gap-3">
             <h2 className="border-l-4 border-[#FFBF10] pl-2 text-2xl font-bold">
             Personal Information
             </h2>
@@ -351,7 +351,7 @@ function ProfileDetailsCard(
                 Edit Info
             </button>
             ) : (
-            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:gap-3">
+            <div className="flex flex-row gap-2 sm:gap-3">
                 <button
                 type="button"
                 onClick={handleCancel}
@@ -392,7 +392,7 @@ function ProfileDetailsCard(
             )}
         </div>
 
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
             <ProfileField
             label="First Name"
             value={formValues.first_name}
@@ -455,7 +455,7 @@ function ProfileDetailsCard(
             onChange={(value) => handleChange('suffix', value)}
             />
 
-            <div className="md:col-span-2">
+            <div className="col-span-2">
             <ProfileField
                 label="Email"
                 value={formValues.email}
@@ -475,7 +475,7 @@ function ProfileDetailsCard(
             onChange={(value) => handleChange('contact_number', value)}
             />
 
-            <div className="md:col-span-3">
+            <div className="col-span-3">
             <ProfileField
                 label="Address"
                 value={formValues.address}
@@ -491,7 +491,7 @@ function ProfileDetailsCard(
             Academics
         </h2>
 
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-[0.45fr_1fr]">
+        <div className="grid grid-cols-[0.45fr_1fr] gap-2 sm:gap-3">
             <ProfileField
                 label="Year Level"
                 value={formValues.year_level}
@@ -511,7 +511,7 @@ function ProfileDetailsCard(
             />
 
 
-            <div className="md:col-span-2">
+            <div className="col-span-2">
             <ProfileField
                 label="University"
                 value={formValues.university}
@@ -527,7 +527,7 @@ function ProfileDetailsCard(
             Internship Information
         </h2>
 
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3">
             <ProfileField
             label="Position"
             value={formValues.position}
@@ -553,7 +553,7 @@ function ProfileDetailsCard(
             onChange={(value) => handleChange('supervisor', value)}
             /> */}
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
 
             <ProfileField
                 label="Start Date"
@@ -627,7 +627,7 @@ function ProfileField({
             value={value}
             disabled={disabled}
             onChange={(event) => onChange(event.target.value)}
-            className="h-9 w-full rounded bg-[#eeeeee] px-3 text-sm outline-none disabled:cursor-not-allowed disabled:text-gray-600"
+            className="h-9 w-full min-w-0 rounded bg-[#eeeeee] px-2 text-xs outline-none disabled:cursor-not-allowed disabled:text-gray-600 sm:px-3 sm:text-sm"
         />
 
         {error && <p className="mt-1 text-xs font-medium text-red-600">{error}</p>}
@@ -678,7 +678,7 @@ function ProfileDropdownField({
             type="button"
             disabled={disabled}
             onClick={onToggle}
-            className={`flex h-9 w-full items-center justify-between rounded bg-[#eeeeee] px-3 text-left text-sm outline-none disabled:cursor-not-allowed disabled:text-gray-600 ${
+            className={`flex h-9 w-full min-w-0 items-center justify-between rounded bg-[#eeeeee] px-2 text-left text-xs outline-none disabled:cursor-not-allowed disabled:text-gray-600 sm:px-3 sm:text-sm ${
                 value ? 'text-black' : 'text-gray-400'
             }`}
             >
