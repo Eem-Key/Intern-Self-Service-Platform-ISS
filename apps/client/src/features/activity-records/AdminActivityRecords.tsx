@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import AdminSidebar from '../AdminSidebar';
-<<<<<<< HEAD
 import Banner from '../activity-records/banner/ActivityRecordBanner'
 
 function AdminActivityRecords() {
@@ -18,20 +17,6 @@ function AdminActivityRecords() {
             <Banner />
             </div>
         </section>
-=======
-
-function AdminActivityRecords() {
-
-    useEffect(() => {
-            document.title = 'Activity Records | Intern Self Service';
-            }, []);
-    
-            
-    return (
-        <main className="flex min-h-screen items-center justify-center bg-[#eeeeee]">
-            <AdminSidebar />
-        <h1 className="text-2xl font-bold text-black">Activity Records</h1>
->>>>>>> 03b6408c3bd529842e9ff7cfddfa24a5bb64c710
         </main>
     );
 }
