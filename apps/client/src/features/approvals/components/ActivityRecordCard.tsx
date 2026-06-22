@@ -10,9 +10,9 @@ function ActivityRecordCard({ record, onView }: ActivityRecordCardProps) {
         <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm lg:flex lg:min-h-[86px] lg:items-center lg:justify-between lg:rounded-none lg:border-0 lg:border-b lg:border-gray-100 lg:p-0 lg:py-3 lg:shadow-none">
         <div className="min-w-0 flex-1">
             <p className="text-xs font-medium text-gray-500 lg:hidden">
-            {record.type === 'eod_report'
+            {record.log_category === 'eod_report'
                 ? 'EOD Report'
-                : record.type === 'leave_request'
+                : record.log_category === 'leave_request'
                 ? 'Leave Request'
                 : 'Profile Change'}
             </p>
@@ -26,7 +26,7 @@ function ActivityRecordCard({ record, onView }: ActivityRecordCardProps) {
             </p>
 
             <p className="mt-1 line-clamp-2 text-xs leading-snug text-gray-600 sm:text-sm">
-            {record.description}
+            {record.activity_description}
             </p>
         </div>
 

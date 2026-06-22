@@ -1,8 +1,43 @@
 import { useEffect } from 'react';
 import AdminSidebar from '../AdminSidebar';
 import Banner from '../activity-records/banner/ActivityRecordBanner'
+import type { 
+    RecordType,
+    ReportStatus,
+    CompanyDepartment
+} from '../../../../shared/types/enums.types';
+import {
+    useFetchReviewedApprovalRecords,
+} from '../../api/adminActivityRecords.api';
 
 function AdminActivityRecords() {
+    const currentPage = 1;
+    const rowsPerPage = 5;
+    const department: CompanyDepartment | null = 'SDS';
+    const log_category: Exclude<RecordType, 'attendance'> | null = null;
+    const status: ReportStatus | null = 'denied';
+
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+
+    const start_date = null;
+    const end_date = null;
+    // const start_date = yesterday.toISOString().split('T')[0];
+    // const end_date = today.toISOString().split('T')[0];
+
+    const { data: reviewedData, isLoading } = useFetchReviewedApprovalRecords(
+            currentPage - 1,
+            rowsPerPage,
+            department,
+            log_category,
+            status,
+            start_date,
+            end_date
+        );
+    
+    console.log('AdminActivityRecords: ', reviewedData)
+
     useEffect(() => {
         document.title = 'Activity Records | Intern Self Service';
     }, []);
