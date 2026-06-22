@@ -27,6 +27,23 @@ function getElapsedTime(sentAt: string) {
   return `${diffInDays} days ago`;
 }
 
+function isNotificationUnread(notification: Notification) {
+  const item = notification as Notification & {
+    is_read?: boolean | null;
+    isRead?: boolean | null;
+    read_at?: string | null;
+    readAt?: string | null;
+  };
+
+  if (typeof item.is_read === 'boolean') return !item.is_read;
+  if (typeof item.isRead === 'boolean') return !item.isRead;
+
+  if ('read_at' in item) return !item.read_at;
+  if ('readAt' in item) return !item.readAt;
+
+  return false;
+}
+
 type NotificationCardProps = {
   hidden?: boolean;
   isFloatingOnly?: boolean;
@@ -45,7 +62,7 @@ function NotificationCard({ hidden = false, isFloatingOnly = false, isDesktopOnl
   });
 
   const notifications = data?.data ?? [];
-  const unreadCount = notifications.filter((n) => !n.is_read).length;
+  const unreadCount = notifications.filter(isNotificationUnread).length;
 
   const markAsReadMutation = useMutation({
     mutationFn: updateInternNotificationsAsRead,
@@ -66,7 +83,9 @@ function NotificationCard({ hidden = false, isFloatingOnly = false, isDesktopOnl
 
   const handleReadMore = (notification: Notification) => {
     setSelectedNotification(notification);
-    if (!notification.is_read) markAsReadMutation.mutate(notification.id);
+    if (isNotificationUnread(notification)) {
+      markAsReadMutation.mutate(notification.id);
+    }
   };
 
   const handleCloseModal = () => setSelectedNotification(null);
@@ -77,7 +96,7 @@ function NotificationCard({ hidden = false, isFloatingOnly = false, isDesktopOnl
     {!isDesktopOnly && (
           <button
             type="button"
-            onClick={() => setIsOpen ((Prev => !Prev))}
+            onClick={() => setIsOpen ((prev => !prev))}
             className={`fixed right-4 top-2.5 z-[9998] flex h-11 w-11 items-center justify-center rounded-full  bg-white/10 text-white shadow-lg ring-1 ring-white/30 xl:hidden ${
             hidden ? 'hidden' : 'flex'
           }`}   
@@ -128,10 +147,17 @@ function NotificationCard({ hidden = false, isFloatingOnly = false, isDesktopOnl
           )}
 
           {!isLoading &&
-            notifications.map((notification) => (
+          notifications.map((notification) => {
+            const isUnread = isNotificationUnread(notification);
+
+            return (
               <div
                 key={notification.record_id}
-                className="relative flex w-full items-start gap-3 rounded-xl border border-gray-100 bg-white p-3 text-left shadow-sm transition-colors hover:bg-gray-50/50"
+                className={`relative flex w-full items-start gap-3 rounded-xl border p-3 text-left shadow-sm transition-colors ${
+                  isUnread
+                    ? 'border-[#FFBF10]/40 bg-[#FFFDF4]'
+                    : 'border-gray-100 bg-white hover:bg-gray-50/50'
+                }`}
               >
                 <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#FFDB4A]/50">
                   <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#FFBF10] text-white">
@@ -163,11 +189,12 @@ function NotificationCard({ hidden = false, isFloatingOnly = false, isDesktopOnl
                   </button>
                 </div>
 
-                {!notification.is_read && (
+                {isUnread && (
                   <span className="absolute right-3 top-4 h-2 w-2 rounded-full bg-red-600" />
                 )}
               </div>
-            ))}
+            );
+          })}
         </div>
       </div>
     )}
@@ -217,10 +244,17 @@ function NotificationCard({ hidden = false, isFloatingOnly = false, isDesktopOnl
           )}
 
           {!isLoading &&
-            notifications.map((notification) => (
+            notifications.map((notification) => {
+            const isUnread = isNotificationUnread(notification);
+
+            return (
               <div
                 key={notification.id}
-                className="relative flex w-full items-start gap-3 rounded-xl border border-gray-100 bg-white p-3 text-left shadow-sm transition-colors hover:bg-gray-50/50"
+                className={`relative flex w-full items-start gap-3 rounded-xl border p-3 text-left shadow-sm transition-colors ${
+                  isUnread
+                    ? 'border-[#FFBF10]/40 bg-[#FFFDF4]'
+                    : 'border-gray-100 bg-white hover:bg-gray-50/50'
+                }`}
               >
                 <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#FFDB4A]/50">
                   <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#FFBF10] text-white">
@@ -252,11 +286,12 @@ function NotificationCard({ hidden = false, isFloatingOnly = false, isDesktopOnl
                   </button>
                 </div>
 
-                {!notification.is_read && (
+                {isUnread && (
                   <span className="absolute right-3 top-4 h-2 w-2 rounded-full bg-red-600" />
                 )}
               </div>
-            ))}
+            );
+          })}
         </div>
       )}
     </section>
