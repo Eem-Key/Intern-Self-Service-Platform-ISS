@@ -143,9 +143,12 @@ function NotificationCard({ hidden = false, isFloatingOnly = false, isDesktopOnl
 
             <div className="space-y-3">
             {isLoading && (
-                <p className="py-6 text-center text-sm text-gray-500">
-                Loading notifications...
+            <div className="flex h-[300px] flex-col items-center justify-center gap-3">
+                <div className="h-9 w-9 animate-spin rounded-full border-4 border-[#EAF0FA] border-t-[#0058DD]" />
+                <p className="text-sm font-medium text-gray-500">
+                Loading attendance records...
                 </p>
+            </div>
             )}
 
             {!isLoading && notifications.length === 0 && (
@@ -155,11 +158,18 @@ function NotificationCard({ hidden = false, isFloatingOnly = false, isDesktopOnl
             )}
 
             {!isLoading &&
-                notifications.map((notification) => (
-                <div
-                    key={notification.id}
-                    className="relative flex w-full items-start gap-3 rounded-xl border border-gray-100 bg-white p-3 text-left shadow-sm transition-colors hover:bg-gray-50/50"
-                >
+                notifications.map((notification) => {
+                    const isUnread = isNotificationUnread(notification);
+
+                    return (
+                    <div
+                        key={notification.id}
+                        className={`relative flex w-full items-start gap-3 rounded-xl border p-3 text-left shadow-sm transition-colors ${
+                        isUnread
+                            ? 'border-[#FFBF10]/40 bg-[#FFFDF4]'
+                            : 'border-gray-100 bg-white hover:bg-gray-50/50'
+                        }`}
+                    >
                     <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#FFDB4A]/50">
                     <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#FFBF10] text-white">
                         <Bell size={11} fill="white" />
@@ -190,11 +200,12 @@ function NotificationCard({ hidden = false, isFloatingOnly = false, isDesktopOnl
                     </button>
                     </div>
 
-                    {!notification.is_read && (
-                    <span className="absolute right-3 top-4 h-2 w-2 rounded-full bg-red-600" />
+                    {isUnread && (
+                        <span className="absolute right-3 top-4 h-2 w-2 rounded-full bg-red-600" />
                     )}
-                </div>
-                ))}
+                    </div>
+                    );
+                })}
             </div>
         </div>
     )}
@@ -220,12 +231,12 @@ function NotificationCard({ hidden = false, isFloatingOnly = false, isDesktopOnl
             <div className="min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
             {/*<div className="max-h-[320px] space-y-3 overflow-y-auto pr-1 sm:max-h-[380px] md:max-h-[420px] lg:max-h-[calc(100vh-360px)] xl:max-h-[calc(100vh-280px)]">*/}
             {isLoading && (
-                <div className="flex flex-col items-center justify-center gap-3 py-6">
-                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#EAF0FA] border-t-[#0058DD]" />
-                        <p className="text-sm font-medium text-gray-500">
+                    <div className="flex h-full flex-col items-center justify-center gap-3">
+                        <div className="h-9 w-9 animate-spin rounded-full border-4 border-[#EAF0FA] border-t-[#0058DD]" />
+                        <p className="text-sm font-semibold text-gray-500">
                         Loading notifications...
                         </p>
-                </div>
+                    </div>
             )}
 
             {!isLoading && notifications.length === 0 && (

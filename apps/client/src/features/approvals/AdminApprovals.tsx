@@ -258,10 +258,10 @@ useEffect(() => {
                 <div className="flex h-[430px] min-h-0 flex-col">
                 <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-3 py-3 sm:px-4 lg:space-y-0 lg:divide-y lg:divide-gray-100">
                     {isLoading ? (
-                    <div className="flex flex-col items-center justify-center gap-3 py-16">
+                    <div className="flex h-full flex-col items-center justify-center gap-3">
                         <div className="h-9 w-9 animate-spin rounded-full border-4 border-[#EAF0FA] border-t-[#0058DD]" />
                         <p className="text-sm font-medium text-gray-500">
-                        Loading approvals...
+                        Loading pending records...
                         </p>
                     </div>
                     ) : records.length > 0 ? (
@@ -273,9 +273,11 @@ useEffect(() => {
                         />
                     ))
                     ) : (
-                    <p className="py-16 text-center text-sm text-gray-500">
+                    <div className="flex h-full items-center justify-center">
+                        <p className="text-center text-sm text-gray-500">
                         No pending approval requests found.
-                    </p>
+                        </p>
+                    </div>
                     )}
                 </div>
                 </div>

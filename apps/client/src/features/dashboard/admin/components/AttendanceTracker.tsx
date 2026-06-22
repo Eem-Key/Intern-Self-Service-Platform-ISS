@@ -84,8 +84,11 @@ function AttendanceTracker() {
         {/* Mobile / Tablet Card Layout */}
         <div className="space-y-3 lg:hidden">
             {isLoading && (
-            <div className="py-10 text-center text-sm text-gray-500">
+            <div className="flex h-[300px] flex-col items-center justify-center gap-3">
+                <div className="h-9 w-9 animate-spin rounded-full border-4 border-[#EAF0FA] border-t-[#0058DD]" />
+                <p className="text-sm font-medium text-gray-500">
                 Loading attendance records...
+                </p>
             </div>
             )}
 
@@ -166,14 +169,14 @@ function AttendanceTracker() {
             <tbody>
                 {isLoading && (
                 <tr>
-                <td colSpan={5} className="px-6 py-10">
-                    <div className="flex flex-col items-center justify-center gap-3">
-                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#EAF0FA] border-t-[#0058DD]" />
-                    <p className="text-sm font-medium text-gray-500">
+                    <td colSpan={5} className="h-[300px] px-6 py-10">
+                    <div className="flex h-full flex-col items-center justify-center gap-3">
+                        <div className="h-9 w-9 animate-spin rounded-full border-4 border-[#EAF0FA] border-t-[#0058DD]" />
+                        <p className="text-sm font-medium text-gray-500">
                         Loading attendance records...
-                    </p>
+                        </p>
                     </div>
-                </td>
+                    </td>
                 </tr>
                 )}
 
