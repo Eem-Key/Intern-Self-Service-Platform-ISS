@@ -33,6 +33,16 @@ function formatTime(time?: string | null) {
   });
 }
 
+function isHalfDayClockIn(clockIn?: string | null) {
+  if (!clockIn) return false;
+
+  const clockInDate = new Date(clockIn);
+  const hours = clockInDate.getHours();
+  const minutes = clockInDate.getMinutes();
+
+  return hours > 10 || (hours === 10 && minutes >= 0);
+}
+
 function AttendanceCard() {
   const [selectedWorkSetup, setSelectedWorkSetup] = useState<WorkSetup | ''>('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -69,6 +79,7 @@ function AttendanceCard() {
 
   const hasTimedIn = Boolean(todayAttendance?.clock_in);
   const hasTimedOut = Boolean(todayAttendance?.clock_out);
+  const isHalfDay = isHalfDayClockIn(todayAttendance?.clock_in);
   const hasAttendanceForToday = Boolean(todayAttendance);
   const currentWorkSetup = todayAttendance?.work_setup || selectedWorkSetup;
 
@@ -251,11 +262,17 @@ function AttendanceCard() {
         />
       )}
 
-      <div className="border-b-4 border-[#FFBF10] pb-1">
-      <div className="flex items-center justify-between gap-3">
-        <h2 className="text-lg font-bold sm:text-xl xl:text-2xl">
-          Online Attendance
-        </h2>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+      <h2 className="text-lg font-bold sm:text-xl xl:text-2xl">
+        Online Attendance
+      </h2>
+
+      <div className="flex flex-wrap items-center gap-2">
+        {isHalfDay && hasTimedIn && (
+          <span className="rounded-full bg-[#FFE8E8] px-3 py-1 text-xs font-semibold text-[#B42318]">
+            Half day
+          </span>
+        )}
 
         {isLunchBreak && hasTimedIn && !hasTimedOut && (
           <span className="rounded-full bg-[#FFF3C4] px-3 py-1 text-xs font-semibold text-[#9A6B00]">

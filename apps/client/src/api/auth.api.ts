@@ -6,7 +6,7 @@ import type {
 } from '../../../shared/types/login.types';
 import type { UserProfile } from '../../../shared/types/profile.types';
 import { fetchUserProfileAPI } from './profile.api'
-import { isAccountActive } from '../utils/auth';
+import { isAccountActive } from '../utils/auth.util';
 
 export async function loginUserAPI(payload: LoginFormValues): Promise<LoginResponse> {
     const { data: authData, error: authError } = await supabase.auth.signInWithPassword({

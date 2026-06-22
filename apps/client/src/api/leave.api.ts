@@ -1,5 +1,5 @@
 import { supabase } from '../config/supabase.ts';
-import { getAuthUserId } from '../utils/auth.ts';
+import { getAuthUserId } from '../utils/auth.util.ts';
 import type { LeaveReason } from '../../../shared/types/enums.types.ts';
 import type { 
     LeaveRequest, 
@@ -103,36 +103,6 @@ export const insertLeaveRequest = async (formData: LeaveRequestForm) => {
 
     return newLeaveData;
 };
-
-/*export const checkLeaveRequestDates = async (
-    startDate: string, 
-    endDate: string
-): Promise<boolean> => {
-    const intern_id = await getAuthUserId();
-    if (!intern_id) throw new Error("Not authenticated");
-
-    const { data, error} = await supabase
-        .from('leave_requests')
-        .select(`
-            record_id, 
-            records (
-            id,
-            intern_id,
-            status
-            )
-        `)
-        .eq('records.intern_id', intern_id)
-        .lte('start_date', endDate)
-        .gte('end_date', startDate)
-        .neq('records. status', 'denied');
-
-    if (error) {
-        console.log(error)
-        throw new Error(error.message);
-    }
-
-    return (data?.length ?? 0) > 0;
-};*/
 
 export const checkLeaveRequestDates = async (
     startDate: string,

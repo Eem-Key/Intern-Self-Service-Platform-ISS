@@ -1,6 +1,6 @@
 import { supabase } from '../config/supabase';
 import type { AttendanceWithName } from '../../../shared/types/attendance.types';
-import { getAuthUserId, isAdmin } from '../utils/auth';
+import { getAuthUserId, isAdmin } from '../utils/auth.util';
 
 export async function fetchActiveInternsAPI(): Promise<number> {
     const userId = await getAuthUserId();

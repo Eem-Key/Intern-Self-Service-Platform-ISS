@@ -1,5 +1,5 @@
 import { supabase } from '../config/supabase.ts';
-import { getAuthUserId, isAdmin } from '../utils/auth.ts';
+import { getAuthUserId, isAdmin } from '../utils/auth.util.ts';
 import type { Record } from '../../../shared/types/record.types.ts';
 import type {
     NotificationInsert,

@@ -1,3 +1,5 @@
+import { calculateProfileChanges } from '../../../utils/profile.util'
+import { validateProfileUpdateRequest } from '../../../utils/validateProfile.ts';
 import { useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../../../config/supabase';
@@ -5,7 +7,10 @@ import { updateProfileUpdateRequestAPI } from '../../../api/profile.api';
 import RequiredMark from '../../../components/ui/RequiredMark';
 
 import type { RecordLog } from '../../../../../shared/types/record.types';
-import type { ProfileUpdateRequestForm } from '../../../../../shared/types/profile.types';
+import type { 
+    ProfileIntern,
+    ProfileUpdateRequestForm 
+} from '../../../../../shared/types/profile.types';
 
 type PendingProfileUpdateEditorProps = {
     record: RecordLog;
@@ -146,34 +151,48 @@ function ProfileUpdate({
         }
 
         const payload: ProfileUpdateRequestForm = {
-        update_type: 'information_update',
-        requested_data: {
-            first_name: formValues.first_name,
-            middle_name: formValues.middle_name,
-            last_name: formValues.last_name,
-            suffix: formValues.suffix,
-            birth_date: formValues.birth_date,
-            gender: formValues.gender,
-            email: formValues.email,
-            contact_number: formValues.contact_number,
-            address: formValues.address,
+            update_type: 'information_update',
+            requested_data: {
+                first_name: formValues.first_name,
+                middle_name: formValues.middle_name,
+                last_name: formValues.last_name,
+                suffix: formValues.suffix,
+                birth_date: formValues.birth_date,
+                gender: formValues.gender,
+                email: formValues.email,
+                contact_number: formValues.contact_number,
+                address: formValues.address,
 
-            position: formValues.position,
-            department: formValues.department,
-            office: formValues.office,
+                position: formValues.position,
+                department: formValues.department,
+                office: formValues.office,
 
-            intern_info: {
-            university: formValues.university,
-            year_level: Number(formValues.year_level),
-            program: formValues.program,
-            required_hours: Number(formValues.required_hours),
-            start_date: formValues.start_date,
+                intern_info: {
+                    university: formValues.university,
+                    year_level: Number(formValues.year_level),
+                    program: formValues.program,
+                    required_hours: Number(formValues.required_hours),
+                    start_date: formValues.start_date,
+                },
             },
-        },
-        reason: 'Intern updated pending profile information request.',
+            reason: 'Intern updated pending profile information request.',
         };
 
-        updateMutation.mutate(payload);
+        const validationErrors = validateProfileUpdateRequest(payload);
+            
+        if (Object.keys(validationErrors).length > 0) {
+            console.error("Validation Errors:", validationErrors);
+            return;
+        }
+
+        const changes = calculateProfileChanges(formValues, requestedData as ProfileIntern);
+
+        if (!changes) {
+            console.error("No information was updated.");
+            return;
+        }
+
+        updateMutation.mutate(changes as ProfileUpdateRequestForm);
     };
 
     const handleChooseFile = () => {

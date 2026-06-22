@@ -43,7 +43,14 @@ function isNotificationUnread(notification: Notification) {
     return false;
 }
 
-function NotificationCard() {
+type NotificationCardProps = {
+    hidden?: boolean;
+    isFloatingOnly?: boolean;
+    isDesktopOnly?: boolean;
+};
+
+function NotificationCard({ hidden = false, isFloatingOnly = false, isDesktopOnly = false, }: NotificationCardProps) {
+    const [isOpen, setIsOpen] = useState(false);
     const [selectedNotification, setSelectedNotification] =
         useState<Notification | null>(null);
     const [, setCurrentTime] = useState(Date.now());
@@ -71,6 +78,13 @@ function NotificationCard() {
         return () => window.clearInterval(timer);
     }, []);
 
+    useEffect(() => {
+    if (hidden) {
+        setIsOpen(false);
+        setSelectedNotification(null);
+    }
+    }, [hidden]);
+
     const handleReadMore = (notification: Notification) => {
         setSelectedNotification(notification);
 
@@ -85,7 +99,108 @@ function NotificationCard() {
 
     return (
         <>
-        <section className="flex h-[calc(100vh-280px)] min-h-[360px] max-h-[520px] min-w-0 flex-col rounded-xl bg-white px-5 py-4 shadow-md sm:px-6">
+        {/* Mobile / Tablet Floating Bell */}
+{/*Mobile*/}
+    {!isDesktopOnly && (
+          <button
+            type="button"
+            onClick={() => setIsOpen ((Prev => !Prev))}
+            className={`fixed right-4 top-2.5 z-[9998] flex h-11 w-11 items-center justify-center rounded-full  bg-white/10 text-white shadow-lg ring-1 ring-white/30 xl:hidden ${
+            hidden ? 'hidden' : 'flex'
+          }`}   
+          >
+        
+        <Bell size={22} fill="white" />
+        {unreadCount > 0 && (
+            <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#FFBF10] px-1 text-[11px] font-bold text-white">
+              {unreadCount}
+            </span>
+          )}
+        </button>
+    )}
+
+    {!isDesktopOnly && isOpen && !hidden && (
+      <div className="fixed left-4 right-4 top-[72px] z-[9998] max-h-[420px] overflow-y-auto rounded-2xl border border-gray-100 bg-white p-3 shadow-2xl xl:hidden">
+        <div className="mb-3 flex items-center justify-between border-b border-gray-100 pb-3">
+          <div className="flex items-center gap-2">
+            <h2 className="text-base font-bold text-black">Notifications</h2>
+
+            {unreadCount > 0 && (
+              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#FFBF10] px-1.5 text-[11px] font-bold text-white">
+                {unreadCount}
+              </span>
+            )}
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setIsOpen(false)}
+            className="rounded-full p-1 text-gray-500 transition hover:bg-gray-100"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="space-y-3">
+          {isLoading && (
+            <p className="py-6 text-center text-sm text-gray-500">
+              Loading notifications...
+            </p>
+          )}
+
+          {!isLoading && notifications.length === 0 && (
+            <p className="py-6 text-center text-sm text-gray-500">
+              No notifications yet.
+            </p>
+          )}
+
+          {!isLoading &&
+            notifications.map((notification) => (
+              <div
+                key={notification.record_id}
+                className="relative flex w-full items-start gap-3 rounded-xl border border-gray-100 bg-white p-3 text-left shadow-sm transition-colors hover:bg-gray-50/50"
+              >
+                <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#FFDB4A]/50">
+                  <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#FFBF10] text-white">
+                    <Bell size={11} fill="white" />
+                  </div>
+                </div>
+
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-start justify-between gap-2 pr-4">
+                    <h3 className="min-w-0 truncate text-sm font-bold text-gray-900">
+                      {notification.title}
+                    </h3>
+
+                    <span className="shrink-0 text-[10px] text-gray-400">
+                      {getElapsedTime(notification.sent_at)}
+                    </span>
+                  </div>
+
+                  <p className="mt-1 line-clamp-2 text-xs text-gray-500">
+                    {notification.message}
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={() => handleReadMore(notification)}
+                    className="mt-2 block text-xs font-bold text-[#0058DD] hover:underline"
+                  >
+                    Read more
+                  </button>
+                </div>
+
+                {!notification.is_read && (
+                  <span className="absolute right-3 top-4 h-2 w-2 rounded-full bg-red-600" />
+                )}
+              </div>
+            ))}
+        </div>
+      </div>
+    )}
+
+
+        {!isFloatingOnly && ( <section className="hidden h-[calc(100vh-280px)] min-h-[360px] max-h-[520px] min-w-0 flex-col rounded-xl bg-white px-5 py-4 shadow-md sm:px-6 xl:flex">
         {/*<section className="flex min-w-0 flex-col rounded-xl bg-white px-5 py-4 shadow-md sm:px-6">*/}
             <div className="mb-4 flex shrink-0 items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
@@ -105,9 +220,12 @@ function NotificationCard() {
             <div className="min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
             {/*<div className="max-h-[320px] space-y-3 overflow-y-auto pr-1 sm:max-h-[380px] md:max-h-[420px] lg:max-h-[calc(100vh-360px)] xl:max-h-[calc(100vh-280px)]">*/}
             {isLoading && (
-                <p className="py-6 text-center text-sm text-gray-500">
-                Loading notifications...
-                </p>
+                <div className="flex flex-col items-center justify-center gap-3 py-6">
+                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#EAF0FA] border-t-[#0058DD]" />
+                        <p className="text-sm font-medium text-gray-500">
+                        Loading notifications...
+                        </p>
+                </div>
             )}
 
             {!isLoading && notifications.length === 0 && (
@@ -138,7 +256,7 @@ function NotificationCard() {
                     <div className="min-w-0 flex-1">
                         <div className="flex flex-col justify-between gap-x-2 gap-y-0.5 pr-4 sm:flex-row sm:items-baseline">
                         <h3 className="truncate text-sm font-bold text-gray-900 sm:text-base">
-                            {notification.title}
+                            {getNotificationName(notification)}
                         </h3>
 
                         <span className="shrink-0 text-[11px] text-gray-400">
@@ -169,6 +287,7 @@ function NotificationCard() {
                 })}
             </div>
         </section>
+        )}
 
         {selectedNotification && (
             <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm lg:left-[270px]">
@@ -178,7 +297,7 @@ function NotificationCard() {
                 <div className="flex items-start justify-between bg-[#002D6F] px-5 py-4 text-white sm:px-6 sm:py-5">
                 <div className="min-w-0 pr-4">
                     <h3 className="truncate text-xl font-bold sm:text-2xl">
-                    {selectedNotification.title}
+                        {getNotificationName(selectedNotification)}
                     </h3>
 
                     <p className="mt-1 text-xs text-white/75 sm:text-sm">
@@ -206,6 +325,37 @@ function NotificationCard() {
         )}
         </>
     );
+}
+
+type NotificationWithName = Notification & {
+    Name?: {
+        first_name?: string | null;
+        middle_name?: string | null;
+        last_name?: string | null;
+        suffix?: string | null;
+    } | null;
+};
+
+function getNotificationName(notification: Notification) {
+    const item = notification as NotificationWithName;
+
+    if (!item.Name) return notification.title || '--';
+
+    const middleInitial = item.Name.middle_name
+        ? `${item.Name.middle_name.charAt(0).toUpperCase()}.`
+        : null;
+
+    const fullName = [
+        item.Name.first_name,
+        middleInitial,
+        item.Name.last_name,
+        item.Name.suffix,
+    ]
+        .filter(Boolean)
+        .join(' ')
+        .trim();
+
+    return fullName || notification.title || '--';
 }
 
 export default NotificationCard;
