@@ -157,7 +157,7 @@ function NotificationCard({ hidden = false, isFloatingOnly = false, isDesktopOnl
           {!isLoading &&
             notifications.map((notification) => (
               <div
-                key={notification.record_id}
+                key={notification.id}
                 className="relative flex w-full items-start gap-3 rounded-xl border border-gray-100 bg-white p-3 text-left shadow-sm transition-colors hover:bg-gray-50/50"
               >
                 <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#FFDB4A]/50">

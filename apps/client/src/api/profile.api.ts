@@ -8,7 +8,10 @@ import type {
     ProfileUpdateRequest,
     ProfileUpdateRequestForm,
 } from '../../../shared/types/profile.types';
-import type{ InternInfo } from '../../../shared/types/intern.types';
+import type{ 
+    InternInfo, 
+    ProgramProgressResponse 
+} from '../../../shared/types/intern.types';
 import type {
     Record,
     RecordInsert,
@@ -287,6 +290,35 @@ export async function updateProfileUpdateRequestAPI(
     }
 
     return updatedRequest;
+}
+
+export async function fetchProgramProgressAPI(id: string): Promise<ProgramProgressResponse> {
+    const { data: summary, error: summaryError } = await supabase
+        .from('intern_hours_summary')
+        .select('*')
+        .eq('intern_id', id)
+        .maybeSingle();
+
+    const { data: intern, error: internError } = await supabase
+        .from('interns')
+        .select('required_hours')
+        .eq('id', id)
+        .single();
+    
+    if (internError) {
+        throw new Error(`Failed to fetch intern data: ${internError.message}`);
+    }
+
+    return {
+        message: 'Program progress fetched successfully',
+        data: {
+            required_hours: intern.required_hours,
+            rendered_hours: summary?.rendered_hours,
+            hours_left: Math.max(0, (intern.required_hours || 0) - (summary?.rendered_hours || 0)),
+            wfh_hours: summary?.total_online_hours,
+            onsite_hours: summary?.total_onsite_hours,
+        }
+    };
 }
 
 export async function hasPendingProfileUpdateRequestAPI(updateType: string) {

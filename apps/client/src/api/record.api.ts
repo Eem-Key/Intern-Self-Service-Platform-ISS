@@ -79,7 +79,7 @@ export const fetchRecordsPaginatedIntern = async (
     const to = from + pageSize - 1;
 
     let query = supabase
-        .from('view_all_timeline_records')
+        .from('records_with_display_date') 
         .select('*', { count: 'exact' })
         .eq('intern_id', intern_id);
 
@@ -90,7 +90,11 @@ export const fetchRecordsPaginatedIntern = async (
     const { data, error, count } = await query
         .order('display_date', { ascending: false })
         .range(from, to);
-    if (error) throw error;
+    
+    if (error){
+        console.log(error)
+        throw error;
+    } 
     
     return { data: data || [], count: count ?? 0 };
 };

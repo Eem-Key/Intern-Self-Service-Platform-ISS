@@ -100,7 +100,6 @@ export async function timeInAPI(
         .insert([
             {
                 record_id: record_id,
-                intern_id: intern_id,
                 work_setup: setup,
             },
         ])

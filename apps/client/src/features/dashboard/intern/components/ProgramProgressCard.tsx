@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getProgramProgressAPI } from '../../../../api/programProgress.api';
+import { fetchProgramProgressAPI } from '../../../../api/profile.api';
 import { getAuthUserId } from '../../../../utils/auth.util.ts';
 import { Home, Building2 } from 'lucide-react';
 
@@ -10,7 +10,7 @@ function ProgramProgressCard() {
       const id = await getAuthUserId();
       if (!id) throw new Error("User not authenticated");
       
-      return getProgramProgressAPI(id);
+      return fetchProgramProgressAPI(id);
     },
     
   });
