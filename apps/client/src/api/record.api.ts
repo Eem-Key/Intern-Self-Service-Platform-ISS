@@ -1,10 +1,13 @@
 import { supabase } from '../config/supabase.ts';
-import { getAuthUserId, isAdmin } from '../utils/auth';
+import { getAuthUserId, isAdmin } from '../utils/auth.util.ts';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { fetchAttendanceById } from './attendance.api';
 import { fetchEodReportById } from './eodReport.api';
 import { fetchLeaveRequestById } from './leave.api';
-import { fetchProfileUpdateRequestById } from './profile.api';
+import { 
+    fetchProfileUpdateRequestById,
+    fetchProfileUpdateRequestWithProfileById 
+} from './profile.api';
 import { 
     insertInternNotificationAPI,
     insertAdminNotificationAPI
@@ -22,7 +25,11 @@ import type {
     RecordInsert,
 } from '../../../shared/types/record.types.ts';
 
-export function useFetchRecordDetails(record_id: string, record_category: RecordType) {
+export function useFetchCompleteRecordDetails(
+    record_id: string, 
+    record_category: RecordType, 
+    status: ReportStatus
+) {
     return useQuery({
         queryKey: ['log-details', record_id],
         queryFn: async () => {
@@ -30,7 +37,13 @@ export function useFetchRecordDetails(record_id: string, record_category: Record
                 case 'attendance': return await fetchAttendanceById(record_id);
                 case 'eod_report': return await fetchEodReportById(record_id);
                 case 'leave_request': return await fetchLeaveRequestById(record_id);
-                case 'profile_update': return await fetchProfileUpdateRequestById(record_id);
+                case 'profile_update': 
+                    if (status === 'pending'){
+                        return await fetchProfileUpdateRequestWithProfileById(record_id);
+                    }
+                    else {
+                        return await fetchProfileUpdateRequestById(record_id);
+                    }
                 default: return null;
             }
         },
@@ -49,22 +62,6 @@ export function useFetchRecordsPaginatedIntern(
         staleTime: 30_000,
     });
 }
-
-// export function useUpdateAdminReviewRecord(
-//     record_id: string, 
-//     admin_feedback: string, 
-//     status: ReportStatus,
-//     update_type?: ProfileUpdateType,
-//     profile_data?: Profile,
-//     intern_data?: InternInfo
-// ) {
-//     return useQuery({
-//         queryKey: ['admin_review', page, log_category], 
-//         queryFn: () => fetchRecordsPaginatedIntern(page, pageSize, log_category),
-//         placeholderData: keepPreviousData,
-//         staleTime: 30_000,
-//     });
-// }
 
 export const fetchRecordsPaginatedIntern = async (
     page: number, 
@@ -114,6 +111,7 @@ export async function fetchRecordDetails(record_id: string, record_category: Rec
         return null;
     }
 }
+
 export const insertRecord = async (record: RecordInsert): Promise<string> => {
     const { data: recordInsert, error: insertRecordError } = await supabase
     .from('records')

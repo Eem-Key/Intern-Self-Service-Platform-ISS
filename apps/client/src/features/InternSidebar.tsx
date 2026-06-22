@@ -12,7 +12,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useLocation, useNavigate } from 'react-router-dom';
 import profilepic from '../assets/images/default_pic.png';
 import { logoutUserAPI } from '../api/auth.api';
-import { getAuthUser, getFullName, getPosition } from '../utils/auth.ts';
+import { getAuthUser, getFullName, getPosition } from '../utils/auth.util.ts';
 import { supabase } from '../config/supabase';
 
 const navItems = [

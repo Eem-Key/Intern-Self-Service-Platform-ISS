@@ -38,7 +38,7 @@ export type ApprovalDetails = {
 
     // Avatar update
     old_avatar_url?: string | null;
-    new_avatar_url?: string | null;
+    avatar_url?: string | null;
 };
 
 export type ApprovalRecord = 

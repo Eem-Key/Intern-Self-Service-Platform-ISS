@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import StatusMessage from '../../../../components/feedback/StatusMessage';
 import {
-  getAttendanceByDateAPI,
+  fetchAttendanceByDateAPI,
   timeInAPI,
   timeOutAPI,
 } from '../../../../api/attendance.api';
@@ -63,7 +63,7 @@ function AttendanceCard() {
     queryKey: ['attendance-by-date', todayDateKey],
     queryFn: async () => {
       try {
-        return await getAttendanceByDateAPI(todayDateKey);
+        return await fetchAttendanceByDateAPI(todayDateKey);
       } catch (error: any) {
         if (
           error?.code === 'PGRST116' ||

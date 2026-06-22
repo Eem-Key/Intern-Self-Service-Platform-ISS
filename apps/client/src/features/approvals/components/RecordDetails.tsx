@@ -147,13 +147,23 @@ function RecordDetails({ record, onClose, onReview }: RecordDetailsProps) {
                     <div className="grid grid-cols-1 gap-5 pt-2 sm:grid-cols-2">
                         <ProfilePhotoBox
                         label="Old Profile Photo"
-                        imageUrl={record.details.old_avatar_url}
+                        imageUrl={
+                        typeof record.details?.requested_data?.old_avatar_url === 'string' && 
+                        record.details.requested_data.old_avatar_url.length > 0
+                            ? record.details.requested_data.old_avatar_url 
+                            : profilepic
+                        }
                         useDefault
                         />
 
                         <ProfilePhotoBox
                         label="New Profile Photo"
-                        imageUrl={record.details.new_avatar_url}
+                        imageUrl={
+                        typeof record.details?.requested_data?.avatar_url === 'string' && 
+                        record.details.requested_data.avatar_url.length > 0
+                            ? record.details.requested_data.avatar_url 
+                            : profilepic
+                        }
                         />
                     </div>
                     )}

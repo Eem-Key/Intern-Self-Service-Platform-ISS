@@ -1,16 +1,19 @@
 import { leaveFormSchema } from '../../../shared/schemas/leave.schema';
-import type { LeaveForm, LeaveFormErrors } from '../../../shared/types/leave.types';
+import type { 
+  LeaveRequestForm, 
+  LeaveRequestFormErrors 
+} from '../../../shared/types/leave.types';
 
 export const validateLeaveForm = (
-  data: LeaveForm
-): LeaveFormErrors => {
+  data: LeaveRequestForm
+): LeaveRequestFormErrors => {
   const result = leaveFormSchema.safeParse(data);
 
   if (result.success) return {};
 
-  const errors: LeaveFormErrors = {};
+  const errors: LeaveRequestFormErrors = {};
   result.error.issues.forEach((issue) => {
-    const field = issue.path[0] as keyof LeaveForm;
+    const field = issue.path[0] as keyof LeaveRequestForm;
     if (field) {
       errors[field] = issue.message;
     }

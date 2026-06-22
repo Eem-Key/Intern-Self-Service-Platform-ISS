@@ -5,9 +5,10 @@ import { supabase } from '../../../config/supabase';
 import StatusBadge from './StatusBadge';
 import StatusMessage from '../../../components/feedback/StatusMessage';
 import RequiredMark from '../../../components/ui/RequiredMark';
-import { useFetchRecordDetails } from '../../../api/record.api';
+import { useFetchCompleteRecordDetails } from '../../../api/record.api';
 import { updateEODReportAPI } from '../../../api/eodReport.api';
 import { validateEodReport } from '../../../utils/validateEodReport';
+import type { ReportStatus } from '../../../../../shared/types/enums.types';
 import type { RecordLog } from '../../../../../shared/types/record.types';
 import type {
     EODReportForm,
@@ -162,7 +163,11 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
     const isDeniedEOD = record.log_category === 'eod_report' && record.status === 'denied';
     const [isEditingDeniedEOD, setIsEditingDeniedEOD] = useState(false);
 
-    const { data: details, isLoading } = useFetchRecordDetails(record.id, record.log_category);
+    const { data: details, isLoading } = useFetchCompleteRecordDetails(
+        record.id, 
+        record.log_category, 
+        record.status as ReportStatus
+    );
     record.details = details
 
     const { data: latestRecord } = useQuery({

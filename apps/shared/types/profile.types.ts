@@ -3,7 +3,6 @@ import type {
     JobPosition, 
     OfficeLocation, 
     ProfileUpdateType, 
-    ReportStatus, 
     UserGender, 
     UserRole 
 } from './enums.types';
@@ -68,7 +67,6 @@ export type UserProfile = Omit<
   'intern_info'
 >
 
-
 export type ProfileUpdateRequest = {
   record_id: string; 
   update_type: ProfileUpdateType;
@@ -79,10 +77,3 @@ export type ProfileUpdateRequest = {
 export type ProfileUpdateRequestForm = Omit<ProfileUpdateRequest, 'record_id' >
 
 export type ProfileUpdateRequestUpdate = Omit<ProfileUpdateRequest, 'record_id' | 'update_type'>
-
-// export type AdminReviewProfileUpdateRequest = Pick<
-//   ProfileUpdateRequest, 
-//   'status' | 'admin_id' | 'reviewed_at' | 'admin_feedback'
-// > & {
-//   id: string;
-// };

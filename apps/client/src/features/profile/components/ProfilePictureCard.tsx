@@ -32,8 +32,6 @@ function ProfilePictureCard({ profile }: ProfilePictureCardProps) {
         refetchOnWindowFocus: true,
     });
 
-    console.log('hasPendingAvatarRequest:', hasPendingAvatarRequest);
-
     const [statusMessage, setStatusMessage] = useState<{
         variant: 'success' | 'error';
         title: string;

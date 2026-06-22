@@ -1,5 +1,5 @@
 import { supabase } from '../config/supabase';
-import { getAuthUserId, isAdmin } from '../utils/auth';
+import { getAuthUserId, isAdmin } from '../utils/auth.util';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import type { RecordType } from '../../../shared/types/enums.types';
 import type { ApprovalRecord } from '../../../shared/types/approvals.types';

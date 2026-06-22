@@ -118,8 +118,6 @@ function AdminApprovals() {
         department
     );
 
-    console.log('approval data: ', approvalData)
-
     const records = approvalData?.data ?? [];
     const count = approvalData?.count ?? 0;
 
@@ -159,7 +157,7 @@ function AdminApprovals() {
         if (updateType === 'avatar_update') {
             profileData = {
             avatar_url:
-                record.details?.new_avatar_url ||
+                record.details?.avatar_url ||
                 requestedData?.avatar_url ||
                 '',
             };

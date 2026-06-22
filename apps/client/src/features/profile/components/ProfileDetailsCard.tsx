@@ -1,3 +1,5 @@
+import { calculateProfileChanges } from '../../../utils/profile.util'
+import { validateProfileUpdateRequest } from '../../../utils/validateProfile.ts';
 import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import type {
@@ -13,7 +15,6 @@ import {
 } from '../../../api/profile.api';
 import StatusMessage from '../../../components/feedback/StatusMessage';
 import ConfirmationModal from '../../../components/feedback/confirmationModal';
-import { validateProfileUpdateRequest } from '../../../utils/validateProfile.ts';
 import {
     USER_GENDER_VALUES,
     type UserGender,
@@ -270,7 +271,18 @@ function ProfileDetailsCard(
             return;
         }
 
-        updateRequestMutation.mutate(payload);
+        const changes = calculateProfileChanges(formValues, profile);
+
+        if (!changes) {
+            setStatusMessage({ 
+                variant: 'error', 
+                title: 'No Changes', 
+                message: 'No information was updated.' 
+            });
+            return;
+        }
+
+        updateRequestMutation.mutate(changes as ProfileUpdateRequestForm);
     };
 
     const showPendingRequestMessage = () => {

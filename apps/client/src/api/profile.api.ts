@@ -1,5 +1,5 @@
 import { supabase } from '../config/supabase';
-import { getAuthUserId, isAdmin } from '../utils/auth';
+import { getAuthUserId, isAdmin } from '../utils/auth.util';
 import type { 
     ProfileIntern,
     ProfileInsert,
@@ -151,6 +151,59 @@ export async function fetchProfileUpdateRequestById(
     return updateRequest;
 }
 
+export async function fetchProfileUpdateRequestWithProfileById(
+    record_id: string
+) {
+    const userId = await getAuthUserId();
+    if (!userId) {
+        throw new Error('You must be logged in to fetch a profile update request.');
+    }
+
+    const { data: updateRequest, error: fetchError } = await supabase
+        .from('profile_update_requests')
+        .select(`
+            *,
+            records!inner (
+                interns!records_intern_id_fkey (
+                    *,
+                    profiles (*)
+                )
+            )
+            `)
+        .eq('record_id', record_id)
+        .single();
+
+    if (fetchError) {
+        console.log(fetchError)
+        throw new Error(`Error fetching profile update requests: ${fetchError.message}`);
+    }
+
+    const profile = updateRequest.records?.interns?.profiles;
+    const internDetails = updateRequest.records?.interns;
+
+    const mergedData = {
+        record_id: updateRequest.record_id,
+        update_type: updateRequest.update_type,
+        reason: updateRequest.reason,
+        
+        requested_data: {
+            ...profile,
+            ...updateRequest.requested_data,
+            
+            intern_info: {
+                university: internDetails?.university,
+                year_level: internDetails?.year_level,
+                program: internDetails?.program,
+                required_hours: internDetails?.required_hours,
+                start_date: internDetails?.start_date,
+                ...(updateRequest.requested_data?.intern_info || {})
+            }
+        }
+    };
+
+    return mergedData;
+}
+
 export async function insertProfileUpdateRequestAPI(
     updateRequest: ProfileUpdateRequestForm
 ): Promise<ProfileUpdateRequest> {
@@ -191,6 +244,51 @@ export async function insertProfileUpdateRequestAPI(
     return insertedUpdateRequest;
 }
 
+export async function updateProfileUpdateRequestAPI(
+    record_id: string,
+    partialUpdate: Partial<ProfileUpdateRequestForm>
+): Promise<ProfileUpdateRequest> {
+    console.log('updateProfileUpdateRequestAPI: ', partialUpdate)
+    const userId = await getAuthUserId();
+
+    if (!userId) {
+        throw new Error('You must be logged in to update a profile update request.');
+    }
+
+    const { data: existing, error: fetchError } = await supabase
+        .from('profile_update_requests')
+        .select('*')
+        .eq('record_id', record_id)
+        .single();
+
+    if (fetchError) throw fetchError;
+
+    const newRequestedData = {
+        ...existing.requested_data,
+        ...partialUpdate.requested_data,
+        intern_info: {
+            ...existing.requested_data?.intern_info,
+            ...partialUpdate.requested_data?.intern_info
+        }
+    };
+
+    const { data: updatedRequest, error: updateError } = await supabase
+        .from('profile_update_requests')
+        .update({
+            requested_data: newRequestedData,
+            reason: partialUpdate.reason || existing.reason,
+        })
+        .eq('record_id', record_id)
+        .select()
+        .single();
+    
+    if (updateError) {
+        throw new Error(`Error updating profile update request: ${updateError.message}`);
+    }
+
+    return updatedRequest;
+}
+
 export async function hasPendingProfileUpdateRequestAPI(updateType: string) {
     const {
         data: { user },
@@ -223,33 +321,5 @@ export async function hasPendingProfileUpdateRequestAPI(updateType: string) {
         throw new Error(error.message);
     }
 
-    console.log('pending profile request result:', data);
-
     return !!data;
-}
-
-export async function updateProfileUpdateRequestAPI(
-    record_id: string,
-    updateRequest: ProfileUpdateRequestForm
-): Promise<ProfileUpdateRequest> {
-    const userId = await getAuthUserId();
-
-    if (!userId) {
-        throw new Error('You must be logged in to update a profile update request.');
-    }
-    const { data: updatedRequest, error } = await supabase
-        .from('profile_update_requests')
-        .update({
-        requested_data: updateRequest.requested_data,
-        reason: updateRequest.reason || null,
-        })
-        .eq('record_id', record_id)
-        .select()
-        .single();
-    
-    if (error) {
-        throw new Error(`Error updating profile update request: ${error.message}`);
-    }
-
-    return updatedRequest;
 }
