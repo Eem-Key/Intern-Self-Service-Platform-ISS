@@ -9,9 +9,9 @@ import { LoginPage } from '../features/login/Index';
 import InternProfile from '../features/profile/InternProfile';
 
 import type { Session } from '@supabase/supabase-js';
+import AdminActivityRecords from '../features/activity-records/AdminActivityRecords';
 import AdminApprovals from '../features/approvals/AdminApprovals';
-import AdminActivityRecords from '../features/dashboard/admin/AdminActivityRecords';
-import AdminInternList from '../features/dashboard/admin/AdminInternList';
+import AdminInternList from '../features/intern-list/AdminInternList';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);

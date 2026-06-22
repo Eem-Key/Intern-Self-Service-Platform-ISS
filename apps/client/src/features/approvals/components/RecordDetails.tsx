@@ -6,6 +6,7 @@ import StatusBadge from './StatusBadge';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../../../config/supabase';
 import profilepic from '../../../assets/images/default_pic.png';
+import {validateAdminFeedback} from '../../../utils/validateAdminFeedback';
 
 type RecordDetailsProps = {
     record: ApprovalRecord;
@@ -16,9 +17,11 @@ type RecordDetailsProps = {
 function RecordDetails({ record, onClose, onReview }: RecordDetailsProps) {
     const [feedback, setFeedback] = useState(record.admin_feedback || '');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const error = validateAdminFeedback(feedback);
 
     const handleReview = async (status: ReportStatus) => {
         if (!onReview) return;
+        if (error) return;
 
     try {
         setIsSubmitting(true);
@@ -95,7 +98,7 @@ function RecordDetails({ record, onClose, onReview }: RecordDetailsProps) {
                     }
                     />
 
-                    <FeedbackBox value={feedback} onChange={setFeedback} />
+                    <FeedbackBox value={feedback} onChange={setFeedback} error={error} />
                 </>
                 )}
 
@@ -124,7 +127,7 @@ function RecordDetails({ record, onClose, onReview }: RecordDetailsProps) {
                     value={record.details?.description || 'No description provided.'}
                     />
 
-                    <FeedbackBox value={feedback} onChange={setFeedback} />
+                    <FeedbackBox value={feedback} onChange={setFeedback} error={error} />
                 </>
             )}
 
@@ -244,22 +247,33 @@ function DetailBox({ label, value }: { label: string; value: string }) {
 function FeedbackBox({
     value,
     onChange,
+    error,
 }: {
     value: string;
     onChange: (value: string) => void;
+    error?: string;
 }) {
     return (
         <div>
-        <h3 className="border-l-4 border-[#FFBF10] pl-3 text-lg font-bold text-[#002D6F] sm:text-xl">
-            Your Feedback
-        </h3>
+            <h3 className="border-l-4 border-[#FFBF10] pl-3 text-lg font-bold text-[#002D6F] sm:text-xl">
+                Your Feedback
+            </h3>
 
-        <textarea
-            value={value}
-            onChange={(event) => onChange(event.target.value)}
-            placeholder="Enter your feedback here..."
-            className="mt-3 min-h-[100px] w-full resize-none rounded-lg border border-dashed border-gray-300 bg-white p-4 text-sm leading-relaxed text-gray-700 outline-none transition focus:border-[#0058DD] focus:ring-2 focus:ring-[#0058DD]/20 sm:min-h-[110px]"
-        />
+            <textarea
+                value={value}
+                onChange={(event) => onChange(event.target.value)}
+                placeholder="Enter your feedback here..."
+                className={`mt-3 min-h-[100px] w-full resize-none rounded-lg border border-dashed bg-white p-4 text-sm leading-relaxed text-gray-700 outline-none transition sm:min-h-[110px] ${
+                    error
+                        ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20'
+                        : 'border-gray-300 focus:border-[#0058DD] focus:ring-2 focus:ring-[#0058DD]/20'
+                }`}
+            />
+
+            <div className="mt-1 flex items-center justify-between text-xs">
+                <p className="text-red-600">{error || ''}</p>
+                <p className="text-gray-500">{value.length}/500</p>
+            </div>
         </div>
     );
 }
