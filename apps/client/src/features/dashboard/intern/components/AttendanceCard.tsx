@@ -317,7 +317,7 @@ function AttendanceCard() {
           {formatToday()}
         </p>
 
-        <div className="mx-auto mt-7 grid w-full max-w-[520px] grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_160px] xl:max-w-[1440px]">
+        <div className="mx-auto mt-7 grid w-full max-w-[520px] grid-cols-[minmax(0,1fr)_150px] gap-3 sm:grid-cols-[minmax(0,1fr)_170px] sm:gap-4 xl:max-w-[1440px] xl:grid-cols-[minmax(0,1fr)_180px]">
           <div className="relative w-full">
             <button
               type="button"
@@ -366,10 +366,10 @@ function AttendanceCard() {
             type="button"
             onClick={handleMainAction}
             disabled={isMainButtonDisabled}
-            className={`flex h-12 w-full items-center justify-center gap-2 rounded-full px-6 text-sm font-bold transition-all active:scale-95 disabled:pointer-events-none ${mainButtonClass}`}
+            className={`flex h-12 w-full items-center justify-center gap-2 rounded-full px-3 text-xs font-bold transition-all active:scale-95 disabled:pointer-events-none sm:px-5 sm:text-sm ${mainButtonClass}`}
           >
             {!hasTimedIn ? (
-              <span className="text-xs">▶</span>
+              <span className="text-[10px] sm:text-xs">▶</span>
             ) : (
               <Square size={9} fill="currentColor" />
             )}

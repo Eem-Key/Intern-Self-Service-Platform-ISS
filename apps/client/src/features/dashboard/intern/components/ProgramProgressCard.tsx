@@ -47,58 +47,60 @@ function ProgramProgressCard() {
       Program Progress
     </h2>
 
-    <div className="mt-6 grid grid-cols-1 items-center gap-6 md:grid-cols-[minmax(120px,0.8fr)_1px_minmax(100px,0.7fr)_minmax(180px,1fr)] md:gap-5 xl:gap-8">
-      <div className="flex flex-col items-center justify-center">
-        <div
-          className="relative h-28 w-28 rounded-full sm:h-32 sm:w-32 xl:h-36 xl:w-36"
-          style={{ background: donutGradient }}
-        >
-          <div className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full bg-white text-center sm:h-20 sm:w-20 xl:h-24 xl:w-24">
-            <p className="text-sm font-bold leading-none sm:text-base xl:text-xl">
-              {isLoading ? '--' : `${Math.round(renderedPercentage)}%`}
-            </p>
-            <p className="text-[10px] leading-tight text-gray-500">rendered</p>
-          </div>
-        </div>
-
-        <div className="mt-3 text-center">
-          <p className="text-xs font-bold sm:text-sm">
-            {isLoading ? '--' : renderedHours} /{' '}
-            {isLoading ? '--' : requiredHours} hrs
+    <div className="mt-5 grid grid-cols-[minmax(90px,0.85fr)_1px_minmax(70px,0.55fr)_minmax(105px,1fr)] items-center gap-3 sm:grid-cols-[minmax(110px,0.8fr)_1px_minmax(90px,0.7fr)_minmax(160px,1fr)] sm:gap-5 xl:gap-8">
+    <div className="flex flex-col items-center justify-center">
+      <div
+        className="relative h-24 w-24 rounded-full sm:h-32 sm:w-32 xl:h-36 xl:w-36"
+        style={{ background: donutGradient }}
+      >
+        <div className="absolute left-1/2 top-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full bg-white text-center sm:h-20 sm:w-20 xl:h-24 xl:w-24">
+          <p className="text-xs font-bold leading-none sm:text-base xl:text-xl">
+            {isLoading ? '--' : `${Math.round(renderedPercentage)}%`}
           </p>
-          <p className="text-xs text-gray-500">
-            {isLoading ? '--' : hoursLeft} hours left
+          <p className="text-[9px] leading-tight text-gray-500 sm:text-[10px]">
+            rendered
           </p>
         </div>
       </div>
 
-      <div className="hidden h-32 w-px bg-gray-300 md:block xl:h-36" />
-
-      <div className="text-center md:text-left">
-        <p className="text-5xl font-bold leading-none xl:text-6xl">
-          {isLoading ? '--' : renderedHours}
+      <div className="mt-2 text-center sm:mt-3">
+        <p className="text-[10px] font-bold sm:text-sm">
+          {isLoading ? '--' : renderedHours} /{' '}
+          {isLoading ? '--' : requiredHours} hrs
         </p>
-        <p className="mt-1 text-xs sm:text-sm">hours rendered</p>
-      </div>
-      
-      <div className="text-center md:text-left">
-        <p className="text-xs font-medium text-black sm:text-md">
-          Breakdown of Hours Rendered
+        <p className="text-[10px] text-gray-500 sm:text-xs">
+          {isLoading ? '--' : hoursLeft} hours left
         </p>
-
-        <div className="mt-4 flex flex-col gap-2 text-xs text-gray-700 sm:text-md">
-          <p className="flex items-center gap-2">
-            <Home size={18} className="shrink-0 text-[#000000]" />
-            <span>WFH - {isLoading ? '--' : wfhHours} hrs</span>
-          </p>
-
-          <p className="flex items-center gap-2">
-            <Building2 size={18} className="shrink-0 text-[#000000]" />
-            <span>Onsite - {isLoading ? '--' : onsiteHours} hrs</span>
-          </p>
-        </div>
       </div>
     </div>
+
+    <div className="h-28 w-px bg-gray-300 sm:h-32 xl:h-36" />
+
+    <div className="text-center sm:text-left">
+      <p className="text-3xl font-bold leading-none sm:text-5xl xl:text-6xl">
+        {isLoading ? '--' : renderedHours}
+      </p>
+      <p className="mt-1 text-[10px] sm:text-sm">hours rendered</p>
+    </div>
+
+    <div className="text-left">
+      <p className="text-[10px] font-medium text-black sm:text-sm">
+        Breakdown of Hours Rendered
+      </p>
+
+      <div className="mt-3 flex flex-col gap-2 text-[10px] text-gray-700 sm:mt-4 sm:text-sm">
+        <p className="flex items-center gap-1.5 sm:gap-2">
+          <Home size={14} className="shrink-0 text-black sm:h-[18px] sm:w-[18px]" />
+          <span>WFH - {isLoading ? '--' : wfhHours} hrs</span>
+        </p>
+
+        <p className="flex items-center gap-1.5 sm:gap-2">
+          <Building2 size={14} className="shrink-0 text-black sm:h-[18px] sm:w-[18px]" />
+          <span>Onsite - {isLoading ? '--' : onsiteHours} hrs</span>
+        </p>
+      </div>
+    </div>
+  </div>
   </section>
 );
 }

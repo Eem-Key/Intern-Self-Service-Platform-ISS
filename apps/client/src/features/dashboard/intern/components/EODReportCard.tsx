@@ -147,8 +147,8 @@ function EODReportCard() {
       
       <h2 className="border-b-4 border-[#FFBF10] pb-1 text-xl font-bold xl:text-2xl">End of Day (EOD) Report</h2>
 
-      <form onSubmit={handleSubmit} className="mt-3 flex h-[calc(100%-44px)] flex-col space-y-2.5">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <form onSubmit={handleSubmit} className="mt-3 flex h-[calc(100%-44px)] flex-col space-y-3">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-2">
           <div className="min-w-0">
             <label className="text-sm">Date</label>
             <input
@@ -172,8 +172,16 @@ function EODReportCard() {
           <div>
             <label className="text-sm">Hours Spent</label>
             <div className="relative">
-              <input type="text" value={hasTimedOut ? formValues.hours_spent : 'Available after time out.'} disabled className="h-10 w-full rounded bg-[#eeeeee] px-4 text-[8px] text-gray-300 outline-none"/>
-              <Clock size={17} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500" />
+              <input
+                type="text"
+                value={hasTimedOut ? `${formValues.hours_spent}` : 'Available after time out.'}
+                disabled
+                className="h-10 w-full rounded bg-[#eeeeee] px-2 pr-7 text-[9px] text-gray-500 outline-none sm:text-[10px] md:text-xs lg:px-4 lg:pr-8 lg:text-sm"
+              />
+              <Clock
+                size={17}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-black lg:right-3 lg:h-[17px] lg:w-[17px]"
+              />
             </div>
             
           </div>
