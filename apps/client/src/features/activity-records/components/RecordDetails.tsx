@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { X } from 'lucide-react';
-
+import { fetchFullNameAPI } from '../../../api/profile.api';
 import type { ApprovalRecord } from '../../../../../shared/types/approvals.types';
 import profilepic from '../../../assets/images/default_pic.png';
 import { supabase } from '../../../config/supabase';
@@ -189,7 +189,7 @@ function RecordDetails({ record, onClose }: RecordDetailsProps) {
                     }
                     />
 
-                    <AdminFeedback value={record.admin_feedback} />
+                    <AdminFeedback value={record.admin_feedback} admin_id={record.admin_id} />
                 </>
                 )}
 
@@ -221,7 +221,7 @@ function RecordDetails({ record, onClose }: RecordDetailsProps) {
                     value={record.details?.description || 'No description provided.'}
                     />
 
-                    <AdminFeedback value={record.admin_feedback} />
+                    <AdminFeedback value={record.admin_feedback} admin_id={record.admin_id} />
                 </>
                 )}
 
@@ -323,19 +323,99 @@ function DetailCard({ label, value }: { label: string; value: string }) {
     );
 }
 
-function AdminFeedback({ value }: { value?: string | null }) {
+
+function AdminFeedback({
+    value,
+    admin_id,
+}: {
+    value?: string | null;
+    admin_id?: string | null;
+}) {
+    const { data: adminName, isLoading } = useQuery({
+        queryKey: ['feedback-admin-name', admin_id],
+        queryFn: async () => {
+            if (!admin_id) return null;
+
+            try {
+                return await fetchFullNameAPI(admin_id);
+            } catch (error) {
+                console.error('Error fetching feedback admin name:', error);
+                return null;
+            }
+        },
+        enabled: !!admin_id,
+    });
+
     return (
         <div>
-        <h3 className="border-l-4 border-[#FFBF10] pl-3 text-xl font-bold text-[#002D6F] sm:text-2xl">
-            Your Feedback
-        </h3>
+            <h3 className="border-l-4 border-[#FFBF10] pl-3 text-xl font-bold text-[#002D6F] sm:text-2xl">
+                Your Feedback
+            </h3>
 
-        <div className="mt-3 min-h-[100px] whitespace-pre-wrap rounded-lg border border-dashed border-gray-300 bg-white p-4 text-sm leading-relaxed text-gray-500 shadow-sm">
-            {value || 'No feedback provided.'}
-        </div>
+            <div className="mt-3 min-h-[100px] whitespace-pre-wrap rounded-lg border border-dashed border-gray-300 bg-white p-4 text-sm leading-relaxed text-gray-500 shadow-sm">
+                {value || 'No feedback provided.'}
+            </div>
+
+            <p className="mt-2 text-right text-xs font-medium text-gray-500">
+                By:{' '}
+                <span className="font-bold text-black">
+                    {!admin_id
+                        ? 'No reviewing admin recorded'
+                        : isLoading
+                        ? 'Loading...'
+                        : adminName || 'Unknown admin'}
+                </span>
+            </p>
         </div>
     );
 }
+
+{/*Ver 2*/}
+{/*function AdminFeedback({
+    value,
+    admin_id,
+}: {
+    value?: string | null;
+    admin_id?: string | null;
+}) {
+    const hasFeedback = Boolean(value?.trim());
+
+    const { data: adminName, isLoading } = useQuery({
+        queryKey: ['feedback-admin-name', admin_id],
+        queryFn: async () => {
+            if (!admin_id) return null;
+
+            try {
+                return await fetchFullNameAPI(admin_id);
+            } catch (error) {
+                console.error('Error fetching feedback admin name:', error);
+                return null;
+            }
+        },
+        enabled: hasFeedback && !!admin_id,
+    });
+
+    return (
+        <div>
+            <h3 className="border-l-4 border-[#FFBF10] pl-3 text-xl font-bold text-[#002D6F] sm:text-2xl">
+                Your Feedback
+            </h3>
+
+            <div className="mt-3 min-h-[100px] whitespace-pre-wrap rounded-lg border border-dashed border-gray-300 bg-white p-4 text-sm leading-relaxed text-gray-500 shadow-sm">
+                {hasFeedback ? value : 'No feedback provided.'}
+            </div>
+
+            {hasFeedback && admin_id && (
+                <p className="mt-2 text-right text-xs font-medium text-gray-500">
+                    By:{' '}
+                    <span className="font-bold text-black">
+                        {isLoading ? 'Loading...' : adminName || 'Unknown admin'}
+                    </span>
+                </p>
+            )}
+        </div>
+    );
+}*/}
 
 function ProfilePhotoBox({
     label,

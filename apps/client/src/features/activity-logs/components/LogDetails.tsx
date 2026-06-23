@@ -15,6 +15,7 @@ import type {
     EODReportFormErrors,
 } from '../../../../../shared/types/eodReport.types';
 import ProfileUpdate from './ProfileUpdate';
+import { fetchFullNameAPI } from '../../../api/profile.api';
 
 type LogDetailsModalProps = {
     record: RecordLog;
@@ -175,7 +176,7 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
     queryFn: async () => {
         const { data, error } = await supabase
         .from('records')
-        .select('admin_feedback, status')
+        .select('admin_feedback, status, admin_id')
         .eq('id', record.id)
         .maybeSingle();
 
@@ -195,6 +196,11 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
     latestRecord?.admin_feedback ||
     details?.admin_feedback ||
     record.admin_feedback ||
+    null;
+
+    const feedbackAdminId =
+    latestRecord?.admin_id ||
+    record.admin_id ||
     null;
 
     const requestedData = details?.requested_data as
@@ -594,7 +600,7 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
                 />
 
                 {record.status !== 'pending' && (
-                <AdminFeedback value={adminFeedback} />
+                <AdminFeedback value={adminFeedback} admin_id={feedbackAdminId} />
                 )}
 
                 {isDeniedEOD && (
@@ -633,7 +639,7 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
                 />
 
                 {record.status !== 'pending' && (
-                <AdminFeedback value={adminFeedback} />
+                <AdminFeedback value={adminFeedback} admin_id={feedbackAdminId} />
                 )}
                 </>
             )}
@@ -732,18 +738,44 @@ function AvatarRequestedChange({
     );
 }
 
-function AdminFeedback({ value }: { value?: string | null }) {
+function AdminFeedback({
+    value,
+    admin_id,
+}: {
+    value?: string | null;
+    admin_id?: string | null;
+}) {
+    const hasFeedback = Boolean(value?.trim());
+
+    const { data: adminName, isLoading } = useQuery({
+        queryKey: ['log-feedback-admin-name', admin_id],
+        queryFn: async () => {
+            if (!admin_id) return null;
+            return fetchFullNameAPI(admin_id);
+        },
+        enabled: hasFeedback && !!admin_id,
+        retry: false,
+    });
+
     return (
         <div>
-        <h3 className="border-l-4 border-[#FFBF10] pl-2 text-xl font-bold text-[#002D6F]">
-            Admin Feedback
-        </h3>
+            <h3 className="border-l-4 border-[#FFBF10] pl-2 text-xl font-bold text-[#002D6F]">
+                Admin Feedback
+            </h3>
 
-        <div className="mt-3 min-h-[80px] rounded border border-dashed border-gray-300 bg-[#eeeeee] p-4 text-sm leading-relaxed text-gray-700">
-            {value || 'No further feedback...'}
-        </div>
+            <div className="mt-3 min-h-[80px] rounded border border-dashed border-gray-300 bg-[#eeeeee] p-4 text-sm leading-relaxed text-gray-700">
+                {hasFeedback ? value : 'No further feedback...'}
+            </div>
+
+            {hasFeedback && admin_id && (
+                <p className="mt-2 text-right text-xs font-medium text-gray-500">
+                    By:{' '}
+                    <span className="font-bold text-black">
+                        {isLoading ? 'Loading...' : adminName || 'Unknown admin'}
+                    </span>
+                </p>
+            )}
         </div>
     );
 }
-
 export default LogDetailsModal;
