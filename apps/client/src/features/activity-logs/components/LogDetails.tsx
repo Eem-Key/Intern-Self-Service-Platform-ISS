@@ -753,7 +753,7 @@ function AdminFeedback({
             if (!admin_id) return null;
             return fetchFullNameAPI(admin_id);
         },
-        enabled: hasFeedback && !!admin_id,
+        enabled: !!admin_id,
         retry: false,
     });
 
@@ -767,7 +767,7 @@ function AdminFeedback({
                 {hasFeedback ? value : 'No further feedback...'}
             </div>
 
-            {hasFeedback && admin_id && (
+            {admin_id && (
                 <p className="mt-2 text-right text-xs font-medium text-gray-500">
                     By:{' '}
                     <span className="font-bold text-black">
