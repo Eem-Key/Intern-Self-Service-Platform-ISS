@@ -14,11 +14,29 @@ import type { StatusTypeFilter } from './components/StatusType';
 
 import { useFetchReviewedApprovalRecords } from '../../api/adminActivityRecords.api';
 
-function getPageNumbers(currentPage: number, totalPages: number) {
-    if (totalPages <= 5) {
+function getPageNumbers(
+    currentPage: number,
+    totalPages: number,
+    maxVisible: number
+) {
+    if (totalPages <= maxVisible) {
         return Array.from({ length: totalPages }, (_, index) => index + 1);
     }
 
+    // Mobile / tablet: show only 2 page numbers minimum
+    if (maxVisible === 2) {
+        if (currentPage <= 1) {
+            return [1, 2, '...', totalPages];
+        }
+
+        if (currentPage >= totalPages) {
+            return [1, '...', totalPages - 1, totalPages];
+        }
+
+        return [currentPage, '...', totalPages];
+    }
+
+    // Desktop / laptop
     if (currentPage <= 3) {
         return [1, 2, 3, '...', totalPages];
     }
@@ -61,7 +79,12 @@ function AdminActivityRecords() {
     const records = (data?.data ?? []) as AdminActivityRecordItem[];
     const count = data?.count ?? 0;
     const totalPages = count ? Math.ceil(count / rowsPerPage) : 0;
-    const pageNumbers = getPageNumbers(currentPage, totalPages);
+    const [isMobileOrTablet, setIsMobileOrTablet] = useState(false);
+    const pageNumbers = getPageNumbers(
+        currentPage,
+        totalPages,
+        isMobileOrTablet ? 2 : 5
+    );
 
     const startEntry = count === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1;
     const endEntry = Math.min(currentPage * rowsPerPage, count);
@@ -93,6 +116,21 @@ function AdminActivityRecords() {
         setStartDate(today);
         setEndDate(today);
     };
+
+    
+
+    useEffect(() => {
+        const updateScreenSize = () => {
+            setIsMobileOrTablet(window.innerWidth < 768);
+        };
+
+        updateScreenSize();
+        window.addEventListener('resize', updateScreenSize);
+
+        return () => {
+            window.removeEventListener('resize', updateScreenSize);
+        };
+    }, []);
 
     return (
         <main className="min-h-screen bg-[#eeeeee] text-black lg:flex">
@@ -178,65 +216,66 @@ function AdminActivityRecords() {
                 </div>
             </div>
 
-            <div className="flex flex-col gap-3 px-3 text-xs text-gray-500 sm:px-5 md:flex-row md:items-center md:justify-between">
-                <p>
-                Showing {startEntry} to {endEntry} of {count} entries
-                </p>
+<div className="flex w-full items-center justify-between gap-2 overflow-x-auto px-3 text-xs text-gray-500 sm:px-5">
+    <p className="shrink-0 whitespace-nowrap text-[11px] sm:text-xs">
+        Showing {startEntry} to {endEntry} of {count} entries
+    </p>
 
-                {totalPages > 1 && (
-                <div className="flex flex-wrap items-center justify-center gap-2 md:justify-end">
-                    <button
-                    type="button"
-                    disabled={currentPage === 1}
-                    onClick={() =>
-                        setCurrentPage((prev) => Math.max(1, prev - 1))
-                    }
-                    className="rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs text-black disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 sm:text-sm"
-                    >
-                    Previous
-                    </button>
+    {totalPages > 1 && (
+        <div className="flex shrink-0 items-center justify-end gap-1 whitespace-nowrap">
+            <button
+                type="button"
+                disabled={currentPage === 1}
+                onClick={() =>
+                    setCurrentPage((prev) => Math.max(1, prev - 1))
+                }
+                className="shrink-0 rounded-full border border-gray-300 bg-white px-2 py-1.5 text-[10px] text-black disabled:cursor-not-allowed disabled:opacity-50 sm:px-3 sm:text-xs md:px-4 md:text-sm"
+            >
+                <span className="sm:hidden">Prev</span>
+                <span className="hidden sm:inline">Previous</span>
+            </button>
 
-                    {pageNumbers.map((page, index) => {
-                    if (typeof page === 'string') {
-                        return (
+            {pageNumbers.map((page, index) => {
+                if (typeof page === 'string') {
+                    return (
                         <span
                             key={`ellipsis-${index}`}
-                            className="flex h-8 w-8 items-center justify-center text-sm text-gray-400"
+                            className="flex h-7 w-4 shrink-0 items-center justify-center text-[10px] text-gray-400 sm:h-8 sm:w-6 sm:text-sm md:w-8"
                         >
                             ...
                         </span>
-                        );
-                    }
+                    );
+                }
 
-                    return (
-                        <button
+                return (
+                    <button
                         key={page}
                         type="button"
                         onClick={() => setCurrentPage(page)}
-                        className={`flex h-8 w-8 items-center justify-center rounded-full border text-sm ${
+                        className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-[11px] sm:h-8 sm:w-8 sm:text-sm ${
                             currentPage === page
-                            ? 'border-[#FFBF10] bg-[#FFBF10] text-black'
-                            : 'border-gray-300 bg-white text-black'
+                                ? 'border-[#FFBF10] bg-[#FFBF10] text-black'
+                                : 'border-gray-300 bg-white text-black'
                         }`}
-                        >
-                        {page}
-                        </button>
-                    );
-                    })}
-
-                    <button
-                    type="button"
-                    disabled={currentPage === totalPages}
-                    onClick={() =>
-                        setCurrentPage((prev) => Math.min(totalPages, prev + 1))
-                    }
-                    className="rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs text-black disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 sm:text-sm"
                     >
-                    Next
+                        {page}
                     </button>
-                </div>
-                )}
-            </div>
+                );
+            })}
+
+            <button
+                type="button"
+                disabled={currentPage === totalPages}
+                onClick={() =>
+                    setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+                }
+                className="shrink-0 rounded-full border border-gray-300 bg-white px-2 py-1.5 text-[10px] text-black disabled:cursor-not-allowed disabled:opacity-50 sm:px-3 sm:text-xs md:px-4 md:text-sm"
+            >
+                Next
+            </button>
+        </div>
+    )}
+</div>
             </div>
         </section>
 
