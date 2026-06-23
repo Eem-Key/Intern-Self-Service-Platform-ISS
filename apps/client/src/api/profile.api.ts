@@ -1,24 +1,44 @@
 import { supabase } from '../config/supabase';
 import { getAuthUserId, isAdmin } from '../utils/auth.util';
+import { useQuery } from '@tanstack/react-query';
 import type { 
     ProfileIntern,
     ProfileInsert,
-    ProfileUpdate,
     UserProfile,
     ProfileUpdateRequest,
     ProfileUpdateRequestForm,
 } from '../../../shared/types/profile.types';
 import type{ 
     InternInfo, 
-    ProgramProgressResponse 
+    ProgramProgressResponse ,
+    ProgramProgressHours
 } from '../../../shared/types/intern.types';
 import type {
-    Record,
     RecordInsert,
 } from '../../../shared/types/record.types';
 import { 
     insertRecord 
 } from './record.api'
+
+export const useFetchProfileAPI = () => {
+    return useQuery({
+        queryKey: ['intern-profile'],
+        queryFn: fetchProfileAPI,
+        staleTime: 0,
+        refetchOnMount: 'always',
+        refetchOnWindowFocus: true,
+    });
+};
+
+export const useProgramProgressHours = (id: string) => {
+    return useQuery({
+        queryKey: ['admin-program-progress', id],
+        queryFn: () => fetchProgramProgressHoursAPI(id),
+        enabled: !!id,
+        staleTime: 1000 * 60,
+        refetchOnWindowFocus: true,
+    });
+};
 
 export async function fetchProfileAPI(): Promise<ProfileIntern> {
     const userId = await getAuthUserId();
@@ -108,8 +128,8 @@ export async function insertAdminProfileAPI(
     profile: ProfileInsert,
     internInfo: InternInfo
 ): Promise<ProfileIntern> {
-    const adminId = await getAuthUserId();
-    if (!adminId) {
+    const admin_id = await getAuthUserId();
+    if (!admin_id) {
         throw new Error('You must be logged in as a user to review profile update requests.');
     }
 
@@ -294,33 +314,67 @@ export async function updateProfileUpdateRequestAPI(
 }
 
 export async function fetchProgramProgressAPI(id: string): Promise<ProgramProgressResponse> {
+    const userId = await getAuthUserId();
+    if (!userId) {
+        throw new Error('You must be logged in to fetch your profile.');
+    }
+    
+    const isAdminCheck = await isAdmin();
+
     const { data: summary, error: summaryError } = await supabase
         .from('intern_hours_summary')
         .select('*')
         .eq('intern_id', id)
         .maybeSingle();
 
-    const { data: intern, error: internError } = await supabase
-        .from('interns')
-        .select('required_hours')
-        .eq('id', id)
-        .single();
-    
-    if (internError) {
-        throw new Error(`Failed to fetch intern data: ${internError.message}`);
+    if (!isAdminCheck && summary.intern_id !== userId) {
+        throw new Error('Forbidden: You do not have permission to view this request.');
+    }
+
+    if (summaryError) {
+        throw new Error(`Failed to fetch intern data: ${summaryError.message}`);
     }
 
     return {
         message: 'Program progress fetched successfully',
         data: {
-            required_hours: intern.required_hours,
+            required_hours: summary.required_hours,
             rendered_hours: summary?.rendered_hours,
-            hours_left: Math.max(0, (intern.required_hours || 0) - (summary?.rendered_hours || 0)),
+            hours_left: Math.max(0, (summary.required_hours || 0) - (summary?.rendered_hours || 0)),
             wfh_hours: summary?.total_online_hours,
             onsite_hours: summary?.total_onsite_hours,
         }
     };
 }
+
+export async function fetchProgramProgressHoursAPI(id: string): Promise<ProgramProgressHours> {
+    const userId = await getAuthUserId();
+    if (!userId) {
+        throw new Error('You must be logged in to fetch your profile.');
+    }
+    
+    const isAdminCheck = await isAdmin();
+
+    const { data: summary, error: summaryError } = await supabase
+        .from('intern_hours_summary')
+        .select('*')
+        .eq('intern_id', id)
+        .maybeSingle();
+
+    if (!isAdminCheck && summary.intern_id !== userId) {
+        throw new Error('Forbidden: You do not have permission to view this request.');
+    }
+
+    if (summaryError) {
+        throw new Error(`Failed to fetch intern data: ${summaryError.message}`);
+    }
+
+    return {
+        required_hours: summary.required_hours,
+        rendered_hours: summary?.rendered_hours,
+        remaining_hours: Math.max(0, (summary.required_hours || 0) - (summary?.rendered_hours || 0)),
+    }
+};
 
 export async function hasPendingProfileUpdateRequestAPI(updateType: string) {
     const {

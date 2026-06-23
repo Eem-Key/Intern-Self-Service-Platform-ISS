@@ -32,8 +32,8 @@ export async function fetchInternNotificationsAPI(): Promise<NotificationsRespon
 }
 
 export async function fetchAdminNotificationsAPI(): Promise<NotificationsResponse> {
-    const adminId = await getAuthUserId();
-    if (!adminId) {
+    const admin_id = await getAuthUserId();
+    if (!admin_id) {
         throw new Error('You must be logged in as a user.');
     }
 
@@ -127,8 +127,8 @@ export async function updateInternNotificationsAsRead(id: string){
 
 
 export async function updateAdminNotificationsAsRead(id: string){
-    const adminId = await getAuthUserId();
-    if (!adminId) {
+    const admin_id = await getAuthUserId();
+    if (!admin_id) {
         throw new Error('You must be logged in as a user.');
     }
 

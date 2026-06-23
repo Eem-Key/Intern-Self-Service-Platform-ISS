@@ -1,32 +1,21 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect } from 'react';
-import { fetchProfileAPI } from '../../api/profile.api';
-import InternSidebar from '../InternSidebar';
-import Banner from './banner/ProfileBanner';
-
 import ProfileChangePasswordCard from './components/ChangePassword';
 import ProfileDetailsCard from './components/ProfileDetailsCard';
 import ProfilePictureCard from './components/ProfilePictureCard';
+import InternSidebar from '../InternSidebar';
+import Banner from './banner/ProfileBanner';
 import { supabase } from '../../config/supabase';
+import { useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { useFetchProfileAPI } from '../../api/profile.api';
+
 
 function InternProfile() {
-
     const queryClient = useQueryClient();
     useEffect(() => {
                 document.title = 'Profile | Intern Self Service';
                 }, []);
 
-    const {
-        data: profile,
-        isLoading,
-        error,
-    } = useQuery({
-        queryKey: ['intern-profile'],
-        queryFn: fetchProfileAPI,
-        staleTime: 0,
-        refetchOnMount: 'always',
-        refetchOnWindowFocus: true,
-    });
+    const { data: profile, isLoading, error } = useFetchProfileAPI();
 
     useEffect(() => {
     if (!profile?.id) return;

@@ -56,9 +56,9 @@ export async function fetchReviewedApprovalRecords(
     data: ApprovalRecord[];
     count: number;
 }> {
-    const adminId = await getAuthUserId();
+    const admin_id = await getAuthUserId();
 
-    if (!adminId) {
+    if (!admin_id) {
         throw new Error('You must be logged in as a user.');
     }
 

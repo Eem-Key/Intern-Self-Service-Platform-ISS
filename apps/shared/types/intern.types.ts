@@ -57,6 +57,12 @@ export type ProgramProgress = {
     onsite_hours: number;
 };
 
+export type ProgramProgressHours = {
+    required_hours: number;
+    rendered_hours: number;
+    remaining_hours: number;
+}
+
 export type ProgramProgressResponse = {
     message: string;
     data: ProgramProgress;

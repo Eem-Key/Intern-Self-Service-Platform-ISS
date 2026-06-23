@@ -4,7 +4,6 @@ export type EODReport = {
     project_name: string;
     task_accomplished: string;
     hours_spent: number;
-    updated_at: string;
 };
 
 export type EODReportFormErrors = Partial<Record<keyof EODReportInsert, string>>;
