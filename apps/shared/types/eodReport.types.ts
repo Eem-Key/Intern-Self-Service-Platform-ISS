@@ -14,6 +14,14 @@ export type EODReportInsert = Omit<EODReport, 'updated_at'>
 
 export type EODReportUpdate = Omit<EODReport, 'record_id' |'date_written' | 'updated_at'>
 
+export type EODReportAdminReviewed = 
+    EODReport 
+    & {
+        admin_id: string | null,
+        admin_feedback: string | null,
+        reviewed_at: string | null
+    }
+
 export type EODReportResponse = {
     message: string;
     data: EODReport;

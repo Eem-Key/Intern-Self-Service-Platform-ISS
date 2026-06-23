@@ -5,7 +5,7 @@ import type {
     AttendanceRecord 
 } from '../../../shared/types/attendance.types';
 import type { 
-    EODReport 
+    EODReportAdminReviewed 
 } from '../../../shared/types/eodReport.types';
 import type { 
     ProfileIntern,
@@ -219,7 +219,7 @@ export async function fetchAllAttendanceByIdAPI(user_id: string): Promise<Attend
 }
 
 
-export async function fetchAllEodReportByIdAPI(user_id: string): Promise<EODReport[]>{
+export async function fetchAllEodReportByIdAPI(user_id: string): Promise<EODReportAdminReviewed[]>{
     const admin_id = await getAuthUserId();
 
     if (!admin_id) {
@@ -230,11 +230,15 @@ export async function fetchAllEodReportByIdAPI(user_id: string): Promise<EODRepo
         throw new Error('Forbidden: You must be an admin.');
     }
 
-    const { data: attendanceLogs, error: fetchError } = await supabase
+    const { data: eodReports, error: fetchError } = await supabase
         .from('eod_reports')
         .select(`
             *,
-            records!inner()
+            records!inner(
+                admin_id,
+                admin_feedback,
+                reviewed_at
+            )
         `)
         .eq('records.intern_id', user_id)
         .order('date_written', { ascending: false });
@@ -244,11 +248,14 @@ export async function fetchAllEodReportByIdAPI(user_id: string): Promise<EODRepo
         throw new Error(`Error fetching attendance: ${fetchError.message}`);
     }
 
-    return (attendanceLogs || []).map((item: any) => ({
+    return (eodReports || []).map((item: any) => ({
         record_id: item.record_id,
         date_written: item.date_written,
         project_name: item.project_name,
         task_accomplished: item.task_accomplished,
-        hours_spent: item.hours_spent
-    })) as EODReport[];
+        hours_spent: item.hours_spent,
+        admin_id: item.records.admin_id,
+        admin_feedback: item.records.admin_feedback,
+        reviewed_at: item.records.reviewed_at
+    })) as EODReportAdminReviewed[];
 }
