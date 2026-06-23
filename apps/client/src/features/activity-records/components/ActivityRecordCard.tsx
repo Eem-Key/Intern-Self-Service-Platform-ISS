@@ -1,15 +1,16 @@
-{/*import { useQuery } from '@tanstack/react-query';*/}
 
 import StatusBadge from '../components/StatusBadge';
-{/*import profilepic from '../../../assets/images/default_pic.png';*/}
-{/*import { supabase } from '../../../config/supabase';*/}
 import type { ApprovalRecord } from '../../../../../shared/types/approvals.types';
 import type { ReportStatus } from '../../../../../shared/types/enums.types';
+import profilepic from '../../../assets/images/default_pic.png';
+import { supabase } from '../../../config/supabase';
+import { useQuery } from '@tanstack/react-query';
 
 type ReviewedStatus = Extract<ReportStatus, 'approved' | 'denied'>;
 
 export type AdminActivityRecordItem = ApprovalRecord & {
     status: ReviewedStatus;
+    avatar_url?: string | null;
 };
 
 type ActivityRecordCardProps = {
@@ -52,8 +53,8 @@ function formatSubmissionDate(value?: string | null) {
 }
 
 function ActivityRecordCard({ record, onView }: ActivityRecordCardProps) {
-    {/*remove comment after fetch api for avatar*/}
-    {/*const hasAvatarPath = Boolean(record.avatar_url);
+
+    const hasAvatarPath = Boolean(record.avatar_url);
 
     const { data: signedAvatarUrl, isLoading: isAvatarLoading } = useQuery({
         queryKey: ['activity-record-avatar-signed-url', record.avatar_url],
@@ -75,14 +76,14 @@ function ActivityRecordCard({ record, onView }: ActivityRecordCardProps) {
         refetchInterval: 1000 * 60 * 50,
     });
 
-    const avatarImage = signedAvatarUrl || (!hasAvatarPath ? profilepic : null);*/}
+    const avatarImage = signedAvatarUrl || (!hasAvatarPath ? profilepic : null);
 
     return (
         <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm lg:grid lg:min-h-[86px] lg:grid-cols-[44px_1.5fr_0.9fr_1fr_1fr_0.7fr_0.45fr] lg:items-center lg:gap-4 lg:rounded-none lg:border-0 lg:border-b lg:border-gray-100 lg:px-6 lg:py-3 lg:shadow-none">
         <div className="flex min-w-0 items-center gap-4 lg:contents">
             <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full bg-[#d9d9d9]">
-            {/*remove comment after fetch api for avatar*/}
-            {/*{isAvatarLoading && hasAvatarPath ? (
+            
+            {isAvatarLoading && hasAvatarPath ? (
                 <div className="h-full w-full animate-pulse bg-gray-300" />
             ) : avatarImage ? (
                 <img
@@ -92,7 +93,7 @@ function ActivityRecordCard({ record, onView }: ActivityRecordCardProps) {
                 />
             ) : (
                 <div className="h-full w-full bg-[#d9d9d9]" />
-            )}*/}
+            )}
             </div>
 
             <div className="min-w-0">
