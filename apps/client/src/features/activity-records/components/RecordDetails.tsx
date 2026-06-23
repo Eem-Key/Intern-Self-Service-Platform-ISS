@@ -118,7 +118,7 @@ function RecordDetails({ record, onClose }: RecordDetailsProps) {
             onClick={onClose}
         />
 
-        <div className="relative flex max-h-[calc(100dvh-1.5rem)] w-full max-w-[560px] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl sm:max-h-[calc(100dvh-2rem)] md:max-w-[620px]">
+        <div className="relative flex max-h-[calc(100dvh-1.5rem)] w-full max-w-[620px] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl sm:max-h-[calc(100dvh-2rem)] md:max-w-[680px]">
             <div className="flex shrink-0 items-center justify-between bg-gradient-to-r from-[#005de8] to-[#003d8f] px-4 py-4 text-white sm:px-5">
             <h2 className="min-w-0 truncate pr-3 text-xl font-bold sm:text-2xl">
                 {getTitle(record.log_category)}
@@ -152,7 +152,7 @@ function RecordDetails({ record, onClose }: RecordDetailsProps) {
             <div className="space-y-5 px-4 py-4 sm:px-5 sm:py-5">
                 {record.log_category === 'eod_report' && (
                 <>
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                    <div className="grid grid-cols-3 gap-3 sm:gap-4">
                     <DetailItem
                         label="Time Submitted"
                         value={record.details?.time_submitted || '--'}
@@ -195,7 +195,7 @@ function RecordDetails({ record, onClose }: RecordDetailsProps) {
 
                 {record.log_category === 'leave_request' && (
                 <>
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div className="grid grid-cols-2 gap-3 sm:gap-4">
                     <DetailItem
                         label="Time Submitted"
                         value={record.details?.time_submitted || '--'}
@@ -227,7 +227,7 @@ function RecordDetails({ record, onClose }: RecordDetailsProps) {
 
                 {record.log_category === 'profile_update' && (
                 <>
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div className="grid grid-cols-2 gap-3 sm:gap-4">
                     <DetailItem
                         label="Time Submitted"
                         value={record.details?.time_submitted || '--'}
@@ -248,7 +248,7 @@ function RecordDetails({ record, onClose }: RecordDetailsProps) {
                     )}
 
                     {record.details?.update_type === 'avatar_update' && (
-                    <div className="grid grid-cols-1 gap-5 pt-2 sm:grid-cols-2">
+                    <div className="grid grid-cols-2 gap-3 pt-2 sm:gap-5">
                         <ProfilePhotoBox
                         label="Old Profile Photo"
                         imageUrl={
@@ -288,14 +288,14 @@ function StatusDetailItem({
 }: {
     label: string;
     status?: string | null;
-    }) {
+}) {
     return (
         <div className="min-w-0">
-        <p className="text-sm text-black">{label}</p>
+            <p className="text-[11px] text-black sm:text-sm">{label}</p>
 
-        <div className="mt-1">
-            <StatusBadge status={status} />
-        </div>
+            <div className="mt-1">
+                <StatusBadge status={status} />
+            </div>
         </div>
     );
 }
@@ -303,10 +303,11 @@ function StatusDetailItem({
 function DetailItem({ label, value }: { label: string; value: string }) {
     return (
         <div className="min-w-0">
-        <p className="text-sm text-black">{label}</p>
-        <p className="mt-1 whitespace-pre-line break-words text-sm font-bold text-black">
-            {value}
-        </p>
+            <p className="text-[11px] text-black sm:text-sm">{label}</p>
+
+            <p className="mt-1 whitespace-pre-line break-words text-xs font-bold text-black sm:text-sm">
+                {value}
+            </p>
         </div>
     );
 }

@@ -98,12 +98,12 @@ function AdminActivityRecords() {
         <main className="min-h-screen bg-[#eeeeee] text-black lg:flex">
         <AdminSidebar />
 
-        <section className="w-full px-4 pb-4 pt-20 sm:px-5 sm:pt-24 xl:ml-[270px] lxl:px-6 xl:py-5">
+        <section className="w-full px-4 pb-4 pt-20 sm:px-5 sm:pt-24 xl:ml-[270px] xl:px-6 xl:py-5">
             <div className="mx-auto flex min-h-full w-full max-w-[2560px] flex-col gap-5">
             <Banner />
 
             <div className="rounded-xl bg-white shadow-md">
-                <TopFilterBar
+            <TopFilterBar
                 department={department}
                 recordType={recordType}
                 status={status}
@@ -115,8 +115,9 @@ function AdminActivityRecords() {
                 onStartDateChange={handleStartDateChange}
                 onEndDateChange={handleEndDateChange}
                 onClearFilters={handleClearFilters}
-                />
+            />
 
+                {/* Desktop / Laptop Header */}
                 <div className="hidden bg-[#EAF0FA] px-6 py-4 font-bold text-black lg:grid lg:grid-cols-[44px_1.5fr_0.9fr_1fr_1fr_0.7fr_0.45fr] lg:items-center lg:gap-4">
                     <p></p>
                     <p>Name</p>
@@ -127,53 +128,53 @@ function AdminActivityRecords() {
                     <p className="text-center">Action</p>
                 </div>
 
-                <div className="flex h-[430px] min-h-0 flex-col">
-                <div className="relative min-h-0 flex-1 space-y-3 overflow-y-auto px-3 py-3 sm:px-4 lg:space-y-0 lg:px-0 lg:py-0">
-                    {isFetching && !isLoading && (
-                    <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/100">
-                        <div className="flex flex-col items-center gap-3 px-6 py-5">
-                        <div className="h-9 w-9 animate-spin rounded-full border-4 border-[#EAF0FA] border-t-[#0058DD]" />
-                        <p className="text-sm font-semibold text-[#002D6F]">
-                            Loading records...
-                        </p>
-                        </div>
+                <div className="flex h-[calc(100dvh-330px)] min-h-[430px] flex-col sm:h-[calc(100dvh-350px)] lg:h-[430px]">
+                    <div className="relative min-h-0 flex-1 space-y-3 overflow-y-auto px-3 py-3 sm:px-4 lg:space-y-0 lg:px-0 lg:py-0">
+                        {isFetching && !isLoading && (
+                            <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/90">
+                                <div className="flex flex-col items-center gap-3 px-6 py-5">
+                                    <div className="h-9 w-9 animate-spin rounded-full border-4 border-[#EAF0FA] border-t-[#0058DD]" />
+                                    <p className="text-sm font-semibold text-[#002D6F]">
+                                        Loading records...
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+
+                        {isLoading && (
+                            <div className="flex h-full flex-col items-center justify-center gap-3">
+                                <div className="h-9 w-9 animate-spin rounded-full border-4 border-[#EAF0FA] border-t-[#0058DD]" />
+                                <p className="text-sm font-semibold text-gray-500">
+                                    Loading activity records...
+                                </p>
+                            </div>
+                        )}
+
+                        {isError && (
+                            <p className="py-16 text-center text-sm text-red-600">
+                                {error instanceof Error
+                                    ? error.message
+                                    : 'Failed to load activity records.'}
+                            </p>
+                        )}
+
+                        {!isLoading &&
+                            !isError &&
+                            records.length > 0 &&
+                            records.map((record) => (
+                                <ActivityRecordCard
+                                    key={record.id}
+                                    record={record}
+                                    onView={() => setSelectedRecord(record)}
+                                />
+                            ))}
+
+                        {!isLoading && !isError && records.length === 0 && (
+                            <p className="py-16 text-center text-sm text-gray-500">
+                                No activity records found.
+                            </p>
+                        )}
                     </div>
-                    )}
-
-                    {isLoading && (
-                    <div className="flex h-full flex-col items-center justify-center gap-3">
-                        <div className="h-9 w-9 animate-spin rounded-full border-4 border-[#EAF0FA] border-t-[#0058DD]" />
-                        <p className="text-sm font-semibold text-gray-500">
-                        Loading activity records...
-                        </p>
-                    </div>
-                    )}
-
-                    {isError && (
-                    <p className="py-16 text-center text-sm text-red-600">
-                        {error instanceof Error
-                        ? error.message
-                        : 'Failed to load activity records.'}
-                    </p>
-                    )}
-
-                    {!isLoading &&
-                    !isError &&
-                    records.length > 0 &&
-                    records.map((record) => (
-                        <ActivityRecordCard
-                        key={record.id}
-                        record={record}
-                        onView={() => setSelectedRecord(record)}
-                        />
-                    ))}
-
-                    {!isLoading && !isError && records.length === 0 && (
-                    <p className="py-16 text-center text-sm text-gray-500">
-                        No activity records found.
-                    </p>
-                    )}
-                </div>
                 </div>
             </div>
 
