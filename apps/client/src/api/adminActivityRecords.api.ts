@@ -73,7 +73,7 @@ export async function fetchReviewedApprovalRecords(
             interns!inner (
                 intern_position,
                 profiles!inner (
-                    first_name, middle_name, last_name, suffix, position, department
+                    first_name, middle_name, last_name, suffix, position, department, avatar_url
                 )
             )
         `, { count: 'exact' });
@@ -159,6 +159,8 @@ export async function fetchReviewedApprovalRecords(
                 name: name || '--',
                 position: profile?.position || record.interns?.intern_position || '--',
                 department: profile?.department || '--',
+
+                avatar_url: record.interns?.profiles?.avatar_url,
 
                 details,
             };
