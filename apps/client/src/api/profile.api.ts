@@ -77,13 +77,15 @@ export async function fetchUserProfileAPI(user_id: string): Promise<UserProfile>
 export async function fetchFullNameAPI(
     user_id: string
 ): Promise<string> {
+    console.log(user_id);
     const { data: nameData, error: fetchError } = await supabase
-        .from('profiles')
+        .from('public_profiles')
         .select(`first_name, middle_name, last_name, suffix`)
         .eq('id', user_id)
         .single();
 
     if (fetchError) {
+        console.log(fetchError)
         throw new Error(`Error fetching profile: ${fetchError.message}`);
     }
 
@@ -100,6 +102,8 @@ export async function fetchFullNameAPI(
     .filter(Boolean)
     .join(' ');
 
+    
+    console.log(fullname)
     return fullname;
 }
 

@@ -75,12 +75,18 @@ export async function timeInAPI(
 
     const { data: existingLog, error: checkError } = await supabase
         .from('attendance_logs')
-        .select('record_id')
-        .eq('intern_id', intern_id)
+        .select(`
+            record_id,
+            records!inner()
+            `)
+        .eq('records.intern_id', intern_id)
         .is('clock_out', null)
         .maybeSingle();
 
-    if (checkError) throw checkError;
+    if (checkError) {
+        console.log(checkError)
+        throw checkError
+    };
 
     if (existingLog) {
         throw new Error('You have an active session. Please clock out of your current log before starting a new one.');
