@@ -294,11 +294,16 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
         );
 
         queryClient.invalidateQueries({ queryKey: ['log-details'] });
+        queryClient.invalidateQueries({ queryKey: ['records'] });
         queryClient.invalidateQueries({
             queryKey: ['eod-report', eodFormValues.date_written],
         });
-        },
 
+        setTimeout(() => {
+            onClose();
+        }, 1200);
+    },
+        
         onError: () => {
         showStatusMessage(
             'error',
@@ -427,7 +432,7 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
             <div className="max-h-[75vh] space-y-5 overflow-y-auto px-6 py-5">
             {record.log_category === 'attendance' && (
                 <>
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div className="grid grid-cols-2 gap-3 sm:gap-4">
                     <DetailItem
                         label="Date"
                         value={formatDate(details?.work_date || record?.date_created)}
@@ -460,7 +465,7 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
 
             {record.log_category === 'eod_report' && (isDraftEOD || isEditingDeniedEOD) &&  (
                 <>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="grid grid-cols-2 gap-3 sm:gap-4">
                     
                     <div>
                     <label className="text-sm font-medium">Date</label>
@@ -536,7 +541,7 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
                     )}
                 </div>
 
-                <div className="flex flex-col-reverse justify-end gap-3 pt-2 sm:flex-row">
+                <div className="flex flex-row justify-end gap-2 pt-2 sm:gap-3">
                     {isDraftEOD && (
                         <button
                             type="button"
@@ -545,7 +550,7 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
                                 saveEODDraftMutation.isPending ||
                                 submitEODDraftMutation.isPending
                             }
-                            className="rounded-full border border-gray-300 bg-white px-7 py-2 text-sm font-bold text-black disabled:cursor-not-allowed disabled:opacity-70"
+                            className="rounded-full border border-gray-300 bg-white px-5 py-2 text-xs font-bold text-black disabled:cursor-not-allowed disabled:opacity-70 sm:px-7 sm:text-sm"
                         >
                             {saveEODDraftMutation.isPending ? 'Saving...' : 'Save'}
                         </button>
@@ -558,7 +563,7 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
                             saveEODDraftMutation.isPending ||
                             submitEODDraftMutation.isPending
                         }
-                        className="rounded-full bg-[#FFBF10] px-7 py-2 text-sm font-bold text-black disabled:cursor-not-allowed disabled:bg-[#eeeeee] disabled:text-gray-500 disabled:opacity-70"
+                        className="rounded-full bg-[#FFBF10] px-5 py-2 text-xs font-bold text-black disabled:cursor-not-allowed disabled:bg-[#eeeeee] disabled:text-gray-500 disabled:opacity-70 sm:px-7 sm:text-sm"
                     >
                         {submitEODDraftMutation.isPending
                             ? isEditingDeniedEOD
@@ -574,7 +579,7 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
 
             {record.log_category === 'eod_report' && !isDraftEOD && !isEditingDeniedEOD && (
                 <>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <div className="grid grid-cols-3 gap-3 sm:gap-4">
                     <DetailItem label="Date" value={formatDate(details?.date_written)} />
                     <DetailItem
                     label="Hour Spent"
@@ -619,7 +624,7 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
 
             {record.log_category === 'leave_request' && (
                 <>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="grid grid-cols-2 gap-3 sm:gap-4">
                     <DetailItem
                     label="Date of Leave"
                     value={`${formatDate(details?.start_date)} - ${formatDate(
@@ -654,7 +659,7 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
 
             {record.log_category === 'profile_update' && record.status !== 'pending' && (
                 <>
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div className="grid grid-cols-2 gap-3 sm:gap-4">
                         <DetailItem
                             label="Update Type"
                             value={formatProfileUpdate(details?.update_type || record.activity_description)}
@@ -688,9 +693,14 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
 
 function DetailItem({ label, value }: { label: string; value: string }) {
     return (
-        <div>
-        <p className="text-xs font-medium text-gray-600">{label}</p>
-        <p className="mt-1 text-sm font-bold text-black">{value}</p>
+        <div className="min-w-0">
+            <p className="text-[11px] font-medium text-gray-600 sm:text-xs">
+                {label}
+            </p>
+
+            <p className="mt-1 break-words text-xs font-bold text-black sm:text-sm">
+                {value}
+            </p>
         </div>
     );
 }
