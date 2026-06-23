@@ -21,7 +21,7 @@ function StatusType({ value, onChange }: StatusTypeProps) {
         statusOptions.find((option) => option.value === value)?.label || 'Status';
 
     return (
-        <div className="ml-auto relative w-[110px] shrink-0 sm:w-[150px] lg:w-[150px]">
+        <div className="relative w-[110px] shrink-0 sm:w-[150px] lg:w-[150px]">
         <button
             type="button"
             onClick={() => setIsOpen((prev) => !prev)}

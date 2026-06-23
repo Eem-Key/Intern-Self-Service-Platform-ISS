@@ -23,7 +23,7 @@ function DepartmentType({ value, onChange }: DepartmentTypeProps) {
         departmentOptions[0];
 
     return (
-        <div className="ml-auto relative w-[120px] shrink-0 sm:w-[170px] lg:w-[180px]">
+        <div className="relative w-[120px] shrink-0 sm:w-[170px] lg:w-[180px]">
         <button
             type="button"
             onClick={() => setIsOpen((prev) => !prev)}

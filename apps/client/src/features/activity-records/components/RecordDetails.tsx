@@ -331,7 +331,7 @@ function AdminFeedback({ value }: { value?: string | null }) {
         </h3>
 
         <div className="mt-3 min-h-[100px] whitespace-pre-wrap rounded-lg border border-dashed border-gray-300 bg-white p-4 text-sm leading-relaxed text-gray-500 shadow-sm">
-            {value || 'No feedback provided yet...'}
+            {value || 'No feedback provided.'}
         </div>
         </div>
     );

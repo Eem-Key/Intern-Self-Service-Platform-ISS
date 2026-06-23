@@ -12,7 +12,7 @@ function DateRange({
     onEndDateChange,
 }: DateRangeProps) {
     return (
-        <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
         <input
             type="date"
             value={startDate}
