@@ -8,7 +8,7 @@ import { fetchRecordDetails } from '../api/record.api';
 
 export function usefetchPendingRequestsPerRecord() {
     return useQuery({
-        queryKey: ['pendingRequests'],
+        queryKey: ['admin-pending-requests'],
         queryFn: fetchPendingRequestsPerRecord,
         refetchOnWindowFocus: true, 
     });

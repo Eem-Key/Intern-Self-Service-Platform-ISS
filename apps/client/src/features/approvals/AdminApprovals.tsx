@@ -181,7 +181,7 @@ function AdminApprovals() {
     );
 
     await queryClient.invalidateQueries({
-        queryKey: ['pendingRequests'],
+        queryKey: ['admin-pending-requests'],
     });
 
     await queryClient.invalidateQueries({

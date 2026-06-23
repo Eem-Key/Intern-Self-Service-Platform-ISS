@@ -1,6 +1,7 @@
 import type { 
     InternshipStatus,
-    InternPosition
+    InternPosition,
+    CompanyDepartment
 } from './enums.types';
 
 export type Intern = {
@@ -31,6 +32,22 @@ export type InternInfo = Omit<
     'is_deleted' |
     'intern_position'
 >;
+
+export type InternListInfo = Omit<
+    Intern, 
+    // 'id' |
+    // 'university' |
+    'year_level' |
+    // 'program' |
+    'required_hours' |
+    'start_date' |
+    // 'status' |
+    'is_deleted' 
+    // 'intern_position'
+> & {
+    name: string;
+    department: CompanyDepartment;
+};
 
 export type ProgramProgress = {
     required_hours: number;
