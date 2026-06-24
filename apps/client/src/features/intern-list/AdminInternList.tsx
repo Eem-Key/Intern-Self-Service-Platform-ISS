@@ -20,6 +20,7 @@ import {
     useResendInviteInternAPIMutation,
     useDeactivateInternAPIMutation
 } from '../../api/adminInterns.api';
+import Banner from './banner/InternListBanner';
 
 function AdminInternList() {
     const page: number = 1;
@@ -121,9 +122,13 @@ function AdminInternList() {
     
             
     return (
-        <main className="flex min-h-screen items-center justify-center bg-[#eeeeee]">
+        <main className="min-h-screen bg-[#eeeeee] text-black lg:flex">
             <AdminSidebar />
         <h1 className="text-2xl font-bold text-black">Intern List</h1>
+        <section className="w-full px-4 pb-4 pt-20 sm:px-5 sm:pt-24 xl:ml-[270px] xl:px-6 xl:py-5">
+            <div className="mx-auto flex min-h-full w-full max-w-[2560px] flex-col gap-5">
+            <Banner />
+
             <button 
                 onClick={() => handleInvite(sampleIntern)} 
                 disabled={isPending}
@@ -147,6 +152,9 @@ function AdminInternList() {
             >
                 {isPending2 ? 'Resending...' : 'Deactivate Account'}
             </button>
+            
+            </div>
+            </section>
         </main>
     );
 }

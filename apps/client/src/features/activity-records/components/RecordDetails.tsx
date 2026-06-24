@@ -110,7 +110,7 @@ function formatRequestedData(data?: Record<string, unknown>) {
 
 function RecordDetails({ record, onClose }: RecordDetailsProps) {
     return (
-        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/60 p-3 backdrop-blur-sm sm:p-4 lg:left-[270px]">
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/60 p-3 backdrop-blur-sm sm:p-4 xl:left-[270px]">
         <button
             type="button"
             aria-label="Close modal overlay"
@@ -118,7 +118,7 @@ function RecordDetails({ record, onClose }: RecordDetailsProps) {
             onClick={onClose}
         />
 
-        <div className="relative flex max-h-[calc(100dvh-1.5rem)] w-full max-w-[620px] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl sm:max-h-[calc(100dvh-2rem)] md:max-w-[680px]">
+        <div className="relative flex max-h-[calc(100dvh-1.5rem)] w-full max-w-[560px] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl sm:max-h-[calc(100dvh-2rem)] md:max-w-[580px]">
             <div className="flex shrink-0 items-center justify-between bg-gradient-to-r from-[#005de8] to-[#003d8f] px-4 py-4 text-white sm:px-5">
             <h2 className="min-w-0 truncate pr-3 text-xl font-bold sm:text-2xl">
                 {getTitle(record.log_category)}
