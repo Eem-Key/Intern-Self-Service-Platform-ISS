@@ -79,7 +79,7 @@ function InternProfile() {
         <main className="min-h-screen bg-[#eeeeee] text-black lg:flex">
             <InternSidebar />
 
-            <section className="flex min-h-screen w-full items-center justify-center px-4 py-4 sm:px-5 lg:ml-[270px] lg:px-6 lg:py-5">
+            <section className="flex min-h-screen w-full items-center justify-center px-4 py-4 sm:px-5 xl:ml-[270px] xl:px-6 xl:py-5">
                 <div className="flex flex-col items-center gap-3 rounded-xl bg-white px-8 py-6 shadow-xl">
                     <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#EAF0FA] border-t-[#0058DD]" />
 
@@ -97,7 +97,7 @@ function InternProfile() {
         <main className="min-h-screen bg-[#eeeeee] text-black lg:flex">
             <InternSidebar />
 
-            <section className="w-full px-4 py-4 sm:px-5 lg:ml-[270px] lg:px-6 lg:py-5">
+            <section className="w-full px-4 py-4 sm:px-5 xl:ml-[270px] xl:px-6 xl:py-5">
             <p className="text-red-600">Unable to load profile.</p>
             </section>
         </main>
@@ -108,7 +108,7 @@ function InternProfile() {
         <main className="min-h-screen bg-[#eeeeee] text-black lg:flex">
         <InternSidebar />
 
-        <section className="w-full px-4 pb-4 pt-20 sm:px-5 sm:pt-24 lg:ml-[270px] lg:px-6 lg:py-5">
+        <section className="w-full px-4 pb-4 pt-20 sm:px-5 sm:pt-24 xl:ml-[270px] xl:px-6 xl:py-5">
         {/*<section className="w-full px-4 py-4 sm:px-5 lg:ml-[270px] lg:px-6 lg:py-5">*/}
             <div className="mx-auto max-w-[2560px]">
             <Banner />

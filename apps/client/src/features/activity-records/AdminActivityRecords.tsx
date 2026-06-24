@@ -23,7 +23,7 @@ function getPageNumbers(
         return Array.from({ length: totalPages }, (_, index) => index + 1);
     }
 
-    // Mobile / tablet: show only 2 page numbers minimum
+    // Mobile / tablet
     if (maxVisible === 2) {
         if (currentPage <= 1) {
             return [1, 2, '...', totalPages];

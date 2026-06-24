@@ -27,11 +27,30 @@ import type {
 import type { ProfileUpdate } from '../../../../shared/types/profile.types';
 import type { InternInfo } from '../../../../shared/types/intern.types';
 
-function getPageNumbers(currentPage: number, totalPages: number) {
-    if (totalPages <= 5) {
+
+function getPageNumbers(
+    currentPage: number,
+    totalPages: number,
+    maxVisible: number
+) {
+    if (totalPages <= maxVisible) {
         return Array.from({ length: totalPages }, (_, index) => index + 1);
     }
 
+    // Mobile / tablet
+    if (maxVisible === 2) {
+        if (currentPage <= 1) {
+            return [1, 2, '...', totalPages];
+        }
+
+        if (currentPage >= totalPages) {
+            return [1, '...', totalPages - 1, totalPages];
+        }
+
+        return [currentPage, '...', totalPages];
+    }
+
+    // Desktop / laptop
     if (currentPage <= 3) {
         return [1, 2, 3, '...', totalPages];
     }
@@ -122,7 +141,12 @@ function AdminApprovals() {
     const count = approvalData?.count ?? 0;
 
     const totalPages = count ? Math.ceil(count / rowsPerPage) : 0;
-    const pageNumbers = getPageNumbers(currentPage, totalPages);
+    const [isMobileOrTablet, setIsMobileOrTablet] = useState(false);
+        const pageNumbers = getPageNumbers(
+            currentPage,
+            totalPages,
+            isMobileOrTablet ? 2 : 5
+        );
 
     const startEntry = count === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1;
     const endEntry = Math.min(currentPage * rowsPerPage, count);
@@ -212,15 +236,28 @@ function AdminApprovals() {
     }
 };
 
-useEffect(() => {
-    if (!statusMessage) return;
+    useEffect(() => {
+        if (!statusMessage) return;
 
-    const timeout = window.setTimeout(() => {
-        setStatusMessage(null);
-    }, 4000);
+        const timeout = window.setTimeout(() => {
+            setStatusMessage(null);
+        }, 4000);
 
-    return () => window.clearTimeout(timeout);
-    }, [statusMessage]);
+        return () => window.clearTimeout(timeout);
+        }, [statusMessage]);
+
+    useEffect(() => {
+        const updateScreenSize = () => {
+            setIsMobileOrTablet(window.innerWidth < 768);
+        };
+
+        updateScreenSize();
+        window.addEventListener('resize', updateScreenSize);
+
+        return () => {
+            window.removeEventListener('resize', updateScreenSize);
+        };
+    }, []);
 
     return (
         <main className="min-h-screen bg-[#eeeeee] text-black lg:flex">
@@ -283,63 +320,64 @@ useEffect(() => {
                 </div>
             </div>
 
-            <div className="flex flex-col gap-3 px-3 text-xs text-gray-500 sm:px-5 md:flex-row md:items-center md:justify-between">
-                <p>
-                Showing {startEntry} to {endEntry} of {count} entries
+            <div className="flex w-full items-center justify-between gap-2 overflow-x-auto px-3 text-xs text-gray-500 sm:px-5">
+                <p className="shrink-0 whitespace-nowrap text-[11px] sm:text-xs">
+                    Showing {startEntry} to {endEntry} of {count} entries
                 </p>
 
                 {totalPages > 1 && (
-                <div className="flex flex-wrap items-center justify-center gap-2 md:justify-end">
-                    <button
-                    type="button"
-                    disabled={currentPage === 1}
-                    onClick={() =>
-                        setCurrentPage((prev) => Math.max(1, prev - 1))
-                    }
-                    className="rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs text-black disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 sm:text-sm"
-                    >
-                    Previous
-                    </button>
-
-                    {pageNumbers.map((page, index) => {
-                    if (typeof page === 'string') {
-                        return (
-                        <span
-                            key={`ellipsis-${index}`}
-                            className="flex h-8 w-8 items-center justify-center text-sm text-gray-400"
-                        >
-                            ...
-                        </span>
-                        );
-                    }
-
-                    return (
+                    <div className="flex shrink-0 items-center justify-end gap-1 whitespace-nowrap sm:gap-2">
                         <button
-                        key={page}
-                        type="button"
-                        onClick={() => setCurrentPage(page)}
-                        className={`flex h-8 w-8 items-center justify-center rounded-full border text-sm ${
-                            currentPage === page
-                            ? 'border-[#FFBF10] bg-[#FFBF10] text-black'
-                            : 'border-gray-300 bg-white text-black'
-                        }`}
+                            type="button"
+                            disabled={currentPage === 1}
+                            onClick={() =>
+                                setCurrentPage((prev) => Math.max(1, prev - 1))
+                            }
+                            className="shrink-0 rounded-full border border-gray-300 bg-white px-2 py-1.5 text-[10px] text-black disabled:cursor-not-allowed disabled:opacity-50 sm:px-3 sm:text-xs lg:px-4 lg:text-sm"
                         >
-                        {page}
+                            <span className="sm:hidden">Prev</span>
+                            <span className="hidden sm:inline">Previous</span>
                         </button>
-                    );
-                    })}
 
-                    <button
-                    type="button"
-                    disabled={currentPage === totalPages}
-                    onClick={() =>
-                        setCurrentPage((prev) => Math.min(totalPages, prev + 1))
-                    }
-                    className="rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs text-black disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 sm:text-sm"
-                    >
-                    Next
-                    </button>
-                </div>
+                        {pageNumbers.map((page, index) => {
+                            if (typeof page === 'string') {
+                                return (
+                                    <span
+                                        key={`ellipsis-${index}`}
+                                        className="flex h-7 w-4 shrink-0 items-center justify-center text-[10px] text-gray-400 sm:h-8 sm:w-6 sm:text-sm lg:w-8"
+                                    >
+                                        ...
+                                    </span>
+                                );
+                            }
+
+                            return (
+                                <button
+                                    key={page}
+                                    type="button"
+                                    onClick={() => setCurrentPage(page)}
+                                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-[11px] sm:h-8 sm:w-8 sm:text-sm ${
+                                        currentPage === page
+                                            ? 'border-[#FFBF10] bg-[#FFBF10] text-black'
+                                            : 'border-gray-300 bg-white text-black'
+                                    }`}
+                                >
+                                    {page}
+                                </button>
+                            );
+                        })}
+
+                        <button
+                            type="button"
+                            disabled={currentPage === totalPages}
+                            onClick={() =>
+                                setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+                            }
+                            className="shrink-0 rounded-full border border-gray-300 bg-white px-2 py-1.5 text-[10px] text-black disabled:cursor-not-allowed disabled:opacity-50 sm:px-3 sm:text-xs lg:px-4 lg:text-sm"
+                        >
+                            Next
+                        </button>
+                    </div>
                 )}
             </div>
             </div>

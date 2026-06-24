@@ -11,6 +11,11 @@ import type {
     ProfileIntern,
     ProfileUpdateRequestForm 
 } from '../../../../../shared/types/profile.types';
+import { ChevronDown } from 'lucide-react';
+import {
+    USER_GENDER_VALUES,
+    type UserGender,
+} from '../../../../../shared/types/enums.types';
 
 type PendingProfileUpdateEditorProps = {
     record: RecordLog;
@@ -49,6 +54,23 @@ function ProfileUpdate({
     onClose,
     onNotify,
 }: PendingProfileUpdateEditorProps) {
+
+    const formatGenderLabel = (gender: UserGender) => {
+        switch (gender) {
+            case 'male':
+            return 'Male';
+            case 'female':
+            return 'Female';
+            case 'non-binary':
+            return 'Non-binary';
+            case 'prefer_not_to_say':
+            return 'Prefer not to say';
+            default:
+            return gender;
+        }
+    };
+
+    const [isGenderDropdownOpen, setIsGenderDropdownOpen] = useState(false);
     const queryClient = useQueryClient();
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -340,7 +362,7 @@ function ProfileUpdate({
             </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
             <ProfileField
             label="First Name"
             value={formValues.first_name}
@@ -369,11 +391,21 @@ function ProfileUpdate({
             onChange={(value) => handleChange('birth_date', value)}
             />
 
-            <ProfileField
-            label="Gender"
-            value={formValues.gender}
-            required
-            onChange={(value) => handleChange('gender', value)}
+            <ProfileDropdownField
+                label="Gender"
+                value={formValues.gender}
+                required
+                isOpen={isGenderDropdownOpen}
+                options={USER_GENDER_VALUES.map((gender) => ({
+                    label: formatGenderLabel(gender),
+                    value: gender,
+                }))}
+                placeholder="Select gender"
+                onToggle={() => setIsGenderDropdownOpen((prev) => !prev)}
+                onSelect={(value) => {
+                    handleChange('gender', value);
+                    setIsGenderDropdownOpen(false);
+                }}
             />
 
             <ProfileField
@@ -382,7 +414,7 @@ function ProfileUpdate({
             onChange={(value) => handleChange('suffix', value)}
             />
 
-            <div className="md:col-span-2">
+            <div className="col-span-2">
             <ProfileField
                 label="Email"
                 value={formValues.email}
@@ -398,7 +430,7 @@ function ProfileUpdate({
             onChange={(value) => handleChange('contact_number', value)}
             />
 
-            <div className="md:col-span-3">
+            <div className="col-span-3">
             <ProfileField
                 label="Address"
                 value={formValues.address}
@@ -412,7 +444,7 @@ function ProfileUpdate({
             Academics
         </h3>
 
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-[0.45fr_1fr]">
+        <div className="grid grid-cols-[0.45fr_1fr] gap-2 sm:gap-3">
             <ProfileField
             label="Year Level"
             value={formValues.year_level}
@@ -427,7 +459,7 @@ function ProfileUpdate({
             onChange={(value) => handleChange('program', value)}
             />
 
-            <div className="md:col-span-2">
+            <div className="col-span-2">
             <ProfileField
                 label="University"
                 value={formValues.university}
@@ -441,7 +473,7 @@ function ProfileUpdate({
             Internship Information
         </h3>
 
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3">
             <ProfileField
             label="Position"
             value={formValues.position}
@@ -479,7 +511,7 @@ function ProfileUpdate({
             />
         </div>
 
-        <div className="flex flex-col-reverse justify-end gap-3 pt-2 sm:flex-row">
+        <div className="flex flex-row justify-end gap-2 pt-2 sm:gap-3">
             {/*<button
             type="button"
             onClick={onClose}
@@ -493,7 +525,7 @@ function ProfileUpdate({
             type="button"
             onClick={handleSaveInformationUpdate}
             disabled={updateMutation.isPending}
-            className="rounded-full bg-[#FFBF10] px-7 py-2 text-sm font-bold text-black disabled:cursor-not-allowed disabled:bg-[#eeeeee] disabled:text-gray-500 disabled:opacity-70"
+            className="rounded-full bg-[#FFBF10] px-5 py-2 text-xs font-bold text-black disabled:cursor-not-allowed disabled:bg-[#eeeeee] disabled:text-gray-500 disabled:opacity-70 sm:px-7 sm:text-sm"
             >
             {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
             </button>
@@ -518,8 +550,8 @@ function ProfileField({
     onChange,
     }: ProfileFieldProps) {
     return (
-        <div>
-        <label className="inline-flex items-center gap-1 text-xs font-medium">
+        <div className="min-w-0">
+        <label className="inline-flex items-center gap-1 text-[11px] font-medium sm:text-xs">
             {label}
             {required && <RequiredMark />}
         </label>
@@ -530,6 +562,77 @@ function ProfileField({
             onChange={(event) => onChange(event.target.value)}
             className="h-9 w-full rounded bg-[#eeeeee] px-3 text-sm outline-none"
         />
+        </div>
+    );
+}
+
+type ProfileDropdownFieldProps = {
+    label: string;
+    value: string;
+    disabled?: boolean;
+    placeholder?: string;
+    isOpen: boolean;
+    options: {
+        label: string;
+        value: string;
+    }[];
+    required?: boolean;
+    error?: string;
+    onToggle: () => void;
+    onSelect: (value: string) => void;
+};
+
+function ProfileDropdownField({
+    label,
+    value,
+    disabled = false,
+    required = false,
+    error,
+    placeholder = 'Select option',
+    isOpen,
+    options,
+    onToggle,
+    onSelect,
+}: ProfileDropdownFieldProps) {
+    const selectedLabel =
+        options.find((option) => option.value === value)?.label || placeholder;
+
+    return (
+        <div className="min-w-0">
+        <label className="inline-flex items-center gap-1 text-[11px] font-medium sm:text-xs">
+            {label}
+            {required && <RequiredMark />}
+        </label>
+
+        <div className="relative">
+            <button
+            type="button"
+            disabled={disabled}
+            onClick={onToggle}
+            className={`flex h-9 w-full min-w-0 items-center justify-between rounded bg-[#eeeeee] px-2 text-left text-xs outline-none disabled:cursor-not-allowed disabled:text-gray-600 sm:px-3 sm:text-sm ${
+                value ? 'text-black' : 'text-gray-400'
+            }`}
+            >
+            <span className="truncate">{selectedLabel}</span>
+            <ChevronDown size={16} className="shrink-0 text-gray-600" />
+            </button>
+
+            {isOpen && !disabled && (
+                <div className="absolute left-0 top-full z-[99999] mt-1 w-full overflow-hidden rounded bg-white shadow-lg">
+                    {options.map((option) => (
+                        <button
+                            key={option.value}
+                            type="button"
+                            onClick={() => onSelect(option.value)}
+                            className="w-full px-3 py-2.5 text-left text-xs hover:bg-[#eeeeee] sm:text-sm"
+                        >
+                            {option.label}
+                        </button>
+                    ))}
+                </div>
+            )}
+            {error && <p className="mt-1 text-xs font-medium text-red-600">{error}</p>}
+        </div>
         </div>
     );
 }
