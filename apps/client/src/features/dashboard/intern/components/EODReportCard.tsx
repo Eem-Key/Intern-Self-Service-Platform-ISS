@@ -1,3 +1,5 @@
+
+
 import { useEffect, useRef, useState } from 'react';
 import { Clock } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -38,6 +40,11 @@ function EODReportCard() {
   const existingReport = eodReport?.report;
   const hasTimedOut = !!attendanceData?.clock_out;
   const isSubmitted = eodReport?.status === 'pending';
+  const isApproved = eodReport?.status === 'approved';
+
+  const isYesterdayReport = formValues.date_written === yesterday;
+  const isApprovedYesterdayReport = isYesterdayReport && isApproved;
+  const isReportLocked = isSubmitted || isApprovedYesterdayReport;
 
   const openDatePicker = () => {
     if (dateInputRef.current?.showPicker) {
@@ -120,26 +127,54 @@ function EODReportCard() {
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    if (isSubmitted) {
-      showStatusMessage('error', 'Cannot Edit', 'This report has already been submitted and cannot be changed.');
+
+    if (isApprovedYesterdayReport) {
+      showStatusMessage(
+        'error',
+        'Cannot Edit',
+        'Yesterday’s EOD report has already been approved and cannot be changed.'
+      );
       return;
     }
-    
-    const validationErrors = validateEodReport(formValues, 'save');
-    if (Object.keys(validationErrors).length > 0) return setErrors(validationErrors);
-    saveMutation.mutate(formValues);
-  };
 
-  const handleSubmit = (e: React.FormEvent) => {
+    if (isSubmitted) {
+      showStatusMessage(
+        'error',
+        'Cannot Edit',
+        'This report has already been submitted and cannot be changed.'
+      );
+      return;
+    }
+
+    const validationErrors = validateEodReport(formValues, 'save');
+      if (Object.keys(validationErrors).length > 0) return setErrors(validationErrors);
+
+      saveMutation.mutate(formValues);
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (isApprovedYesterdayReport) {
+      showStatusMessage(
+        'error',
+        'Cannot Submit',
+        'Yesterday’s EOD report has already been approved.'
+      );
+      return;
+    }
+
     if (isSubmitted) {
       showStatusMessage('error', 'Cannot Submit', 'This report has already been submitted.');
       return;
     }
+
     const validationErrors = validateEodReport(formValues, 'submit');
     if (Object.keys(validationErrors).length > 0) return setErrors(validationErrors);
+
     submitMutation.mutate(formValues);
   };
+
 
   return (
     <section className="rounded-xl bg-white px-4 py-4 shadow-md sm:px-6 sm:py-5 xl:px-8 xl:py-6">
@@ -189,39 +224,39 @@ function EODReportCard() {
 
         <div>
           <label className="text-sm">Project Name</label> <RequiredMark/>
-          <input disabled={isSubmitted} type="text" value={formValues.project_name} onChange={(e) => handleChange('project_name', e.target.value)} className="h-10 w-full rounded bg-[#eeeeee] px-4 text-sm outline-none" />
+          <input disabled={isReportLocked} type="text" value={formValues.project_name} onChange={(e) => handleChange('project_name', e.target.value)} className="h-10 w-full rounded bg-[#eeeeee] px-4 text-sm outline-none disabled:cursor-not-allowed disabled:text-gray-500" />
         </div>
 
         <div>
           <label className="text-sm">Task Accomplished</label> <RequiredMark/>
-          <textarea disabled={isSubmitted} value={formValues.task_accomplished} onChange={(e) => handleChange('task_accomplished', e.target.value)} className="h-[200px] w-full resize-none rounded bg-[#eeeeee] p-3 text-sm outline-none" />
+          <textarea disabled={isReportLocked} value={formValues.task_accomplished} onChange={(e) => handleChange('task_accomplished', e.target.value)} className="h-[200px] w-full resize-none rounded bg-[#eeeeee] p-3 text-sm outline-none disabled:cursor-not-allowed disabled:text-gray-500"/>
         </div>
 
         <div className="flex flex-row gap-3 pt-2 justify-end">
         <button
-          type="button"
-          onClick={handleSave}
-          disabled={
-            saveMutation.isPending ||
-            submitMutation.isPending ||
-            isSubmitted
-          }
-          className="h-10 flex-1 rounded-full bg-[#eeeeee] px-4 text-sm font-bold text-gray-500 disabled:cursor-not-allowed disabled:opacity-70 sm:flex-none sm:min-w-[100px] sm:px-7"
-        >
-          {saveMutation.isPending ? 'Saving...' : 'Save'}
+            type="button"
+            onClick={handleSave}
+            disabled={
+              saveMutation.isPending ||
+              submitMutation.isPending ||
+              isReportLocked
+            }
+            className="h-10 flex-1 rounded-full bg-[#eeeeee] px-4 text-sm font-bold text-gray-500 disabled:cursor-not-allowed disabled:opacity-70 sm:flex-none sm:min-w-[100px] sm:px-7"
+          >
+            {saveMutation.isPending ? 'Saving...' : 'Save'}
         </button>
 
         <button
-          type="submit"
-          disabled={
-            !hasTimedOut ||
-            saveMutation.isPending ||
-            submitMutation.isPending ||
-            isSubmitted
-          }
-          className="h-10 flex-1 rounded-full bg-[#FFBF10] px-4 text-sm font-bold text-white disabled:cursor-not-allowed disabled:bg-[#eeeeee] disabled:text-gray-500 disabled:opacity-70 sm:flex-none sm:min-w-[110px] sm:px-7"
-        >
-          {submitMutation.isPending ? 'Submitting...' : 'Submit'}
+            type="submit"
+            disabled={
+              !hasTimedOut ||
+              saveMutation.isPending ||
+              submitMutation.isPending ||
+              isReportLocked
+            }
+            className="h-10 flex-1 rounded-full bg-[#FFBF10] px-4 text-sm font-bold text-white disabled:cursor-not-allowed disabled:bg-[#eeeeee] disabled:text-gray-500 disabled:opacity-70 sm:flex-none sm:min-w-[110px] sm:px-7"
+          >
+            {submitMutation.isPending ? 'Submitting...' : 'Submit'}
         </button>
       </div>
       </form>
