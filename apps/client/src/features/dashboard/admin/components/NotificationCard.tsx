@@ -301,7 +301,7 @@ function NotificationCard({ hidden = false, isFloatingOnly = false, isDesktopOnl
         )}
 
         {selectedNotification && (
-            <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm lg:left-[270px]">
+            <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm xl:left-[270px]">
             <div className="fixed inset-0" onClick={handleCloseModal} />
 
             <div className="relative w-full max-w-[540px] overflow-hidden rounded-2xl bg-white shadow-2xl">
