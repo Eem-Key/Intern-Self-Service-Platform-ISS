@@ -1,6 +1,6 @@
 import { supabase } from '../config/supabase';
 import { getAuthUserId, isAdmin } from '../utils/auth.util';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { 
     AttendanceRecord 
 } from '../../../shared/types/attendance.types';
@@ -97,6 +97,50 @@ export function useFetchAllEodReportByIdAPI(
             ),
             refetchOnWindowFocus: true, 
     });
+};
+
+export const useInviteInternAPIMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: ProfileInternInsert) => inviteInternAPI(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-intern-list'] });
+      alert("Intern invited successfully!");
+    },
+    onError: (error) => {
+      alert(`Error: ${error.message}`);
+    }
+  });
+};
+
+export const useResendInviteInternAPIMutation = () => {
+  return useMutation({
+    mutationFn: (email: string) => resendInviteInternAPI(email),
+    onSuccess: () => {
+      alert("Resent intern invitation successfully!");
+    },
+    onError: (error) => {
+      alert(`Error: ${error.message}`);
+    }
+  });
+};
+
+export const useDeactivateInternAPIMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (variables: { intern_id: string; deactivate_reason: string }) => 
+      deactivateInternAPI(variables.intern_id, variables.deactivate_reason),
+    
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-intern-list'] });
+      alert("Intern deactivated successfully!");
+    },
+    onError: (error: any) => {
+      alert(`Error: ${error.message}`);
+    }
+  });
 };
 
 export async function fetchAllInternListInformationAPI(
@@ -260,4 +304,107 @@ export async function fetchAllEodReportByIdAPI(user_id: string): Promise<EODRepo
         admin_feedback: item.records.admin_feedback,
         reviewed_at: item.records.reviewed_at
     })) as EODReportAdminReviewed[];
+}
+
+export async function inviteInternAPI(
+    profile_info: ProfileInternInsert
+){
+    const admin_id = await getAuthUserId();
+
+    if (!admin_id) {
+        throw new Error('You must be logged in as a user.');
+    }
+
+    if (!(await isAdmin())) {
+        throw new Error('Forbidden: You must be an admin.');
+    }
+    const { data, error } = await supabase.auth.signInWithOtp({
+        email: profile_info.email,
+        options: {
+            data: {
+                first_name: profile_info.first_name,
+                middle_name: profile_info.middle_name,
+                last_name: profile_info.last_name,
+                suffix: profile_info.suffix,
+                role: profile_info.role,
+                position: profile_info.position,
+                department: profile_info.department,
+                office: profile_info.office,
+                birth_date: profile_info.birth_date,
+                gender: profile_info.gender,
+                contact_number: profile_info.contact_number,
+                address: profile_info.address,
+
+                // Intern
+                university: profile_info.university,
+                year_level: profile_info.year_level,
+                program: profile_info.program,
+                required_hours: profile_info.required_hours,
+                start_date: profile_info.start_date,
+                intern_position: profile_info.intern_position
+            },
+            emailRedirectTo: 'http://localhost:5173/login',
+        },
+    });
+
+  if (error) {
+    throw error;
+  }
+
+  return data
+}
+
+export async function resendInviteInternAPI(email: string){
+    const admin_id = await getAuthUserId();
+
+    if (!admin_id) {
+        throw new Error('You must be logged in as a user.');
+    }
+
+    if (!(await isAdmin())) {
+        throw new Error('Forbidden: You must be an admin.');
+    }
+    const { error } = await supabase.auth.signInWithOtp({
+        email: email,
+        options: {
+        emailRedirectTo: 'http://localhost:5173/login',
+        },
+    });
+
+  if (error) {
+    throw error;
+  }
+}
+
+export async function deactivateInternAPI(
+    intern_id: string,
+    deactivate_reason: string
+){
+    const admin_id = await getAuthUserId();
+
+    if (!admin_id) {
+        throw new Error('You must be logged in as a user.');
+    }
+
+    if (!(await isAdmin())) {
+        throw new Error('Forbidden: You must be an admin.');
+    }
+
+    const { data, error } = await supabase
+        .from('interns')
+        .update({ 
+        status: 'deactivated' as InternshipStatus,
+        deactivate_reason: deactivate_reason 
+        })
+        .eq('id', intern_id);
+
+    if (error) throw error;
+
+    const { error: signoutError } = await supabase.auth.admin.signOut(intern_id);
+
+    if (signoutError) {
+        console.error("Failed to sign out user:", signoutError);
+    }
+
+    return data;
 }

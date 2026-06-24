@@ -14,7 +14,7 @@ export type JobPosition =
 export type CompanyDepartment = 'SDS' | 'ISS';
 
 // Intern
-export type InternshipStatus = 'active' | 'completed' | 'extended' | 'terminated';
+export type InternshipStatus = 'active' | 'deactivated';
 
 export type InternPosition = 	'quality_assurance' | 'frontend_developer' | 'backend_developer' | 'business_analyst';
 

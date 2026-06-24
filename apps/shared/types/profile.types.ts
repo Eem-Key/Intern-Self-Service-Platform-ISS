@@ -6,7 +6,10 @@ import type {
     UserGender, 
     UserRole 
 } from './enums.types';
-import type { InternInfo } from './intern.types'
+import type { 
+  InternInfo,
+  InternInsert
+} from './intern.types'
 
 export type Profile = {
   id: string;
@@ -35,6 +38,14 @@ export type Profile = {
 export type ProfileIntern = Profile & {
     intern_info: InternInfo;
 }
+
+export type ProfileInternInsert = Omit<
+  Profile,
+  'id' |
+  'created_at' |
+  'updated_at' |
+  'requires_password_change'
+  > & InternInsert
 
 export type ProfileInsert = Omit<ProfileIntern, 'id' | 'created_at' | 'updated_at'>;
 

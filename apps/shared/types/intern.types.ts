@@ -46,6 +46,19 @@ export type InternListInfo = Omit<
     avatar_url: string;
 };
 
+export type InternInsert = Omit<
+    Intern, 
+    'id' |
+    // 'university' |
+    // 'year_level' |
+    // 'program' |
+    // 'required_hours' |
+    // 'start_date' |
+    'status' |
+    'is_deleted' 
+    // 'intern_position'
+>
+
 export type ProgramProgress = {
     required_hours: number;
     rendered_hours: number;
