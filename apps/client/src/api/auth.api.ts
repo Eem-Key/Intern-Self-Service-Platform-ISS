@@ -90,3 +90,6 @@ export async function updatePasswordAPI(
         return { error: 'An unexpected error occurred while updating your password.' };
     }
 }
+
+// add setupPasswordAPI
+

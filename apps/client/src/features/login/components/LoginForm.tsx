@@ -1,18 +1,23 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
+
 import FormInput from '../../../components/ui/formInput';
 import PrimaryButton from '../../../components/ui/primaryButton';
-import FirstLoginPrompt from './FirstLogin';
 import ChangePasswordModal from './ChangePassword';
+
+import { supabase } from '../../../config/supabase';
 import { loginUserAPI } from '../../../api/auth.api';
+import { fetchUserProfileAPI } from '../../../api/profile.api';
 import validateForm from '../../../utils/ValidateForm';
-import type { 
-    LoginFormValues, 
+
+import type {
+    LoginFormValues,
     LoginErrors,
-    LoginResponse 
 } from '../../../../../shared/types/login.types';
-import { Eye, EyeOff } from 'lucide-react';
+import type { UserProfile } from '../../../../../shared/types/profile.types';
+import type { UserRole } from '../../../../../shared/types/enums.types';
 
 function LoginForm() {
     const navigate = useNavigate();
@@ -21,65 +26,164 @@ function LoginForm() {
         email: '',
         password: '',
     });
-    
-    const [showPassword, setShowPassword] = useState(false);
 
+    const [showPassword, setShowPassword] = useState(false);
     const [errors, setErrors] = useState<LoginErrors>({});
     const [serverError, setServerError] = useState('');
-    const [firstLoginData, setFirstLoginData] = useState<LoginResponse | null>(null);
+
+    const [setupPasswordUser, setSetupPasswordUser] =
+        useState<UserProfile | null>(null);
     const [showChangePassword, setShowChangePassword] = useState(false);
+    const [checkingInviteSession, setCheckingInviteSession] = useState(true);
 
-    const getDashboardRoute = (role?: string) => {
-        const normalizedRole = role?.toLowerCase();
+    const getDashboardRoute = (role?: UserRole) => {
+    const normalizedRole = role?.toLowerCase();
 
-        if (normalizedRole === 'admin' || normalizedRole === 'supervisor') {
+    if (normalizedRole === 'admin') {
         return '/admin/dashboard';
+    }
+
+    return '/intern/dashboard';
+};
+
+    const saveAuthSession = ({
+        accessToken,
+        refreshToken,
+        user,
+    }: {
+        accessToken: string;
+        refreshToken?: string;
+        user: UserProfile;
+    }) => {
+        sessionStorage.setItem('accessToken', accessToken);
+        sessionStorage.setItem('authUser', JSON.stringify(user));
+
+        if (refreshToken) {
+            sessionStorage.setItem('refreshToken', refreshToken);
         }
 
-        return '/intern/dashboard';
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('authUser', JSON.stringify(user));
+
+        if (refreshToken) {
+            localStorage.setItem('refreshToken', refreshToken);
+        }
     };
+
+    const clearStoredAuth = () => {
+        sessionStorage.removeItem('accessToken');
+        sessionStorage.removeItem('refreshToken');
+        sessionStorage.removeItem('authUser');
+
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('authUser');
+    };
+
+    useEffect(() => {
+    let isMounted = true;
+
+    const checkInviteSession = async () => {
+        const {
+            data: { session },
+        } = await supabase.auth.getSession();
+
+        if (!session?.user?.id) {
+            return;
+        }
+
+        try {
+            const userProfile = await fetchUserProfileAPI(session.user.id);
+
+            saveAuthSession({
+                accessToken: session.access_token,
+                refreshToken: session.refresh_token,
+                user: userProfile,
+            });
+
+            const role = userProfile.role?.toLowerCase();
+            const isIntern = role === 'intern';
+
+            if (isIntern && userProfile.requires_password_change) {
+                if (isMounted) {
+                    setSetupPasswordUser(userProfile);
+                    setShowChangePassword(true);
+                }
+
+                return;
+            }
+
+            if (isMounted) {
+                navigate(getDashboardRoute(role), { replace: true });
+            }
+        } catch (error) {
+            console.error('Error checking invite session:', error);
+
+            clearStoredAuth();
+            await supabase.auth.signOut();
+        }
+    };
+
+    checkInviteSession();
+
+    const {
+        data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+        if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') {
+            if (session?.user?.id) {
+                checkInviteSession();
+            }
+        }
+    });
+
+    return () => {
+        isMounted = false;
+        subscription.unsubscribe();
+    };
+}, [navigate]);
 
     const clearError = (field: keyof LoginFormValues) => {
         setErrors((prev) => ({
-        ...prev,
-        [field]: undefined,
+            ...prev,
+            [field]: undefined,
         }));
     };
 
     const loginMutation = useMutation({
-    mutationFn: loginUserAPI,
+        mutationFn: loginUserAPI,
 
         onSuccess: (response) => {
-            const { accessToken, refreshToken, user } =
-                response.data;
+            const { accessToken, refreshToken, user } = response.data;
 
-            localStorage.setItem('accessToken', accessToken);
-            localStorage.setItem('authUser', JSON.stringify(user));
-
-            if (refreshToken) {
-                localStorage.setItem('refreshToken', refreshToken);
-            }
+            saveAuthSession({
+                accessToken,
+                refreshToken,
+                user,
+            });
 
             const role = user.role?.toLowerCase();
             const isIntern = role === 'intern';
 
             if (isIntern && user.requires_password_change) {
-                setFirstLoginData(response);
+                setSetupPasswordUser(user);
+                setShowChangePassword(true);
                 return;
             }
 
-            navigate(getDashboardRoute(role));
+            navigate(getDashboardRoute(role), { replace: true });
         },
 
         onError: (error) => {
-            setServerError(error.message || 'Incorrect email address or password.');
+            setServerError(
+                error.message || 'Incorrect email address or password.'
+            );
         },
     });
 
     const handleChange = (field: keyof LoginFormValues, value: string) => {
         setFormValues((prev) => ({
-        ...prev,
-        [field]: value,
+            ...prev,
+            [field]: value,
         }));
 
         clearError(field);
@@ -92,100 +196,96 @@ function LoginForm() {
         const validationErrors = validateForm(formValues);
 
         if (Object.keys(validationErrors).length > 0) {
-        setErrors(validationErrors);
-        return;
+            setErrors(validationErrors);
+            return;
         }
 
         setErrors({});
         loginMutation.mutate(formValues);
     };
 
-    const handleChangePassword = () => {
-        setShowChangePassword(true);
-    };
+    const handlePasswordUpdated = async () => {
+        if (!setupPasswordUser) return;
 
-    const handleChangeLater = () => {
-        if (!firstLoginData) return;
+        const {
+            data: { session },
+        } = await supabase.auth.getSession();
 
-        const dashboardRoute = getDashboardRoute(firstLoginData.data.user.role);
+        if (session?.access_token) {
+            const updatedUser = {
+                ...setupPasswordUser,
+                requires_password_change: false,
+            };
 
-        setFirstLoginData(null);
+            saveAuthSession({
+                accessToken: session.access_token,
+                refreshToken: session.refresh_token,
+                user: updatedUser,
+            });
+        }
+
+        const dashboardRoute = getDashboardRoute(setupPasswordUser.role);
+
         setShowChangePassword(false);
-        navigate(dashboardRoute);
+        setSetupPasswordUser(null);
+
+        navigate(dashboardRoute, { replace: true });
     };
 
-    const handlePasswordUpdated = () => {
-        if (!firstLoginData) return;
-
-        const dashboardRoute = getDashboardRoute(firstLoginData.data.user.role);
-
-        setShowChangePassword(false);
-        setFirstLoginData(null);
-        navigate(dashboardRoute);
-    };
-
-    return (
-        <>
-        {firstLoginData && !showChangePassword && (
-            <FirstLoginPrompt
-            internName={firstLoginData.data.user.first_name || 'Intern'}
-            onChangePassword={handleChangePassword}
-            onChangeLater={handleChangeLater}
-            />
-        )}
-
-        {showChangePassword && firstLoginData?.data.user.email && (
+return (
+    <>
+         {showChangePassword && setupPasswordUser?.email && (
             <ChangePasswordModal
-            onSuccess={handlePasswordUpdated}
-            id={firstLoginData.data.user.id}
-            email={firstLoginData.data.user.email}
+                onSuccess={handlePasswordUpdated}
+                id={setupPasswordUser.id}
+                email={setupPasswordUser.email}
             />
         )}
 
         {serverError && (
             <div className="mb-4 flex items-center justify-between gap-3 rounded-md bg-red-200 px-4 py-3 text-sm text-red-600">
-            <span>{serverError}</span>
+                <span>{serverError}</span>
 
-            <button
-                type="button"
-                onClick={() => setServerError('')}
-                className="font-bold text-red-600"
-                aria-label="Dismiss error"
-            >
-                ×
-            </button>
+                <button
+                    type="button"
+                    onClick={() => setServerError('')}
+                    className="font-bold text-red-600"
+                    aria-label="Dismiss error"
+                >
+                    ×
+                </button>
             </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4 text-left">
             <FormInput
-            id="email"
-            label="Email Address"
-            type="email"
-            value={formValues.email}
-            error={errors.email}
-            onChange={(value) => handleChange('email', value)}
+                id="email"
+                label="Email Address"
+                type="email"
+                value={formValues.email}
+                error={errors.email}
+                onChange={(value) => handleChange('email', value)}
             />
 
             <PasswordField
-            id="password"
-            label="Password"
-            value={formValues.password}
-            error={errors.password}
-            showPassword={showPassword}
-            onToggle={() => {
-                if (!formValues.password) return;
-                setShowPassword((prev) => !prev);
-            }}
-            onChange={(value) => handleChange('password', value)}
+                id="password"
+                label="Password"
+                value={formValues.password}
+                error={errors.password}
+                showPassword={showPassword}
+                onToggle={() => {
+                    if (!formValues.password) return;
+                    setShowPassword((prev) => !prev);
+                }}
+                onChange={(value) => handleChange('password', value)}
             />
 
             <PrimaryButton type="submit" isLoading={loginMutation.isPending}>
-            Log In
+                Log In
             </PrimaryButton>
         </form>
-        </>
-    );
+    </>
+);
 }
 
 type PasswordFieldProps = {
@@ -211,33 +311,36 @@ function PasswordField({
 
     return (
         <div>
-        <label htmlFor={id} className="mb-1 block text-sm font-medium text-black">
-            {label}
-        </label>
-
-        <div className="relative">
-            <input
-            id={id}
-            type={showPassword ? 'text' : 'password'}
-            value={value}
-            onChange={(event) => onChange(event.target.value)}
-            className={`h-11 w-full rounded-md bg-[#eeeeee] px-3 pr-10 text-sm outline-none ${
-                error ? 'ring-1 ring-red-500' : ''
-            }`}
-            />
-
-            <button
-            type="button"
-            onClick={onToggle}
-            disabled={!canToggle}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-black disabled:cursor-not-allowed disabled:opacity-40"
-            aria-label={showPassword ? 'Hide password' : 'Show password'}
+            <label
+                htmlFor={id}
+                className="mb-1 block text-sm font-medium text-black"
             >
-            {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
-            </button>
-        </div>
+                {label}
+            </label>
 
-        {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+            <div className="relative">
+                <input
+                    id={id}
+                    type={showPassword ? 'text' : 'password'}
+                    value={value}
+                    onChange={(event) => onChange(event.target.value)}
+                    className={`h-11 w-full rounded-md bg-[#eeeeee] px-3 pr-10 text-sm outline-none ${
+                        error ? 'ring-1 ring-red-500' : ''
+                    }`}
+                />
+
+                <button
+                    type="button"
+                    onClick={onToggle}
+                    disabled={!canToggle}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-black disabled:cursor-not-allowed disabled:opacity-40"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                    {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+                </button>
+            </div>
+
+            {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
         </div>
     );
 }
