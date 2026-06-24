@@ -1,4 +1,5 @@
 import { supabase } from '../config/supabase';
+import { getAuthUserId } from '../utils/auth.util';
 import type { 
     LoginFormValues, 
     LoginResponse, 
@@ -91,5 +92,36 @@ export async function updatePasswordAPI(
     }
 }
 
-// add setupPasswordAPI
+export async function setupFirstPasswordAPI(
+    new_password: string,
+    confirm_new_password: string,
+): Promise<{ error: string | null }> {
+    const user_id = await getAuthUserId();
 
+    if (!user_id) {
+        throw new Error('You must be authorized to set up a new password.');
+    }
+
+    if (new_password !== confirm_new_password) {
+        return { error: "Passwords do not match." };
+    }
+
+    const { error: authError } = await supabase.auth.updateUser({
+        password: new_password
+    });
+
+    if (authError) {
+        return { error: `Failed to set password: ${authError.message}` };
+    }
+
+    const { error: profileError } = await supabase
+        .from('profiles')
+        .update({ requires_password_change: false })
+        .eq('id', user_id);
+
+    if (profileError) {
+        return { error: `Password set, but failed to update status: ${profileError.message}` };
+    }
+
+    return { error: null };
+}

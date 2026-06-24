@@ -17,34 +17,60 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const validateUser = async (currentSession: Session | null) => {
+    if (!currentSession) {
+      setSession(null);
+      setLoading(false);
+      return;
+    }
+
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', currentSession.user.id)
+      .single();
+
+    if (profileError || !profile) {
+      await supabase.auth.signOut();
+      setSession(null);
+      setLoading(false);
+      return;
+    }
+
+    if (profile.role?.toLowerCase() === 'intern') {
+      const { data: intern, error: internError } = await supabase
+        .from('interns')
+        .select('status')
+        .eq('id', currentSession.user.id)
+        .single();
+
+      if (internError || intern?.status === 'deactivated') {
+        await supabase.auth.signOut();
+        setSession(null);
+      } else {
+        setSession(currentSession);
+      }
+    } else {
+      setSession(currentSession);
+    }
+    
+    setLoading(false);
+  };
+
   useEffect(() => {
-    const checkSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      validateUser(session);
+    });
 
-      setSession(session);
-      setLoading(false);
-    };
-
-    checkSession();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setLoading(false);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      validateUser(session);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-white">
-        <p className="text-gray-500">Loading authorization...</p>
-      </div>
-    );
+    return <div className="flex min-h-screen items-center justify-center bg-white"><p>Loading...</p></div>;
   }
 
   if (!session) {

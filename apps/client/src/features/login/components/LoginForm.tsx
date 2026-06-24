@@ -1,13 +1,14 @@
-import { useEffect, useState } from 'react';
+import { supabase } from '../../../config/supabase';
+import { useState, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
+import { isFirstLogin } from '../../../utils/auth.util';
 import { Eye, EyeOff } from 'lucide-react';
 
 import FormInput from '../../../components/ui/formInput';
 import PrimaryButton from '../../../components/ui/primaryButton';
 import ChangePasswordModal from './ChangePassword';
 
-import { supabase } from '../../../config/supabase';
 import { loginUserAPI } from '../../../api/auth.api';
 import { fetchUserProfileAPI } from '../../../api/profile.api';
 import validateForm from '../../../utils/ValidateForm';
@@ -37,14 +38,14 @@ function LoginForm() {
     const [checkingInviteSession, setCheckingInviteSession] = useState(true);
 
     const getDashboardRoute = (role?: UserRole) => {
-    const normalizedRole = role?.toLowerCase();
+        const normalizedRole = role?.toLowerCase();
 
-    if (normalizedRole === 'admin') {
-        return '/admin/dashboard';
-    }
+        if (normalizedRole === 'admin') {
+            return '/admin/dashboard';
+        }
 
-    return '/intern/dashboard';
-};
+        return '/intern/dashboard';
+    };
 
     const saveAuthSession = ({
         accessToken,
@@ -81,66 +82,70 @@ function LoginForm() {
     };
 
     useEffect(() => {
-    let isMounted = true;
+        let isMounted = true;
 
-    const checkInviteSession = async () => {
-        const {
-            data: { session },
-        } = await supabase.auth.getSession();
+        const checkInviteSession = async () => {
+            const {
+                data: { session },
+            } = await supabase.auth.getSession();
 
-        if (!session?.user?.id) {
-            return;
-        }
-
-        try {
-            const userProfile = await fetchUserProfileAPI(session.user.id);
-
-            saveAuthSession({
-                accessToken: session.access_token,
-                refreshToken: session.refresh_token,
-                user: userProfile,
-            });
-
-            const role = userProfile.role?.toLowerCase();
-            const isIntern = role === 'intern';
-
-            if (isIntern && userProfile.requires_password_change) {
-                if (isMounted) {
-                    setSetupPasswordUser(userProfile);
-                    setShowChangePassword(true);
-                }
-
+            if (!session?.user?.id){
+                console.log("No active session found on load.");
                 return;
             }
 
-            if (isMounted) {
-                navigate(getDashboardRoute(role), { replace: true });
+            try {
+                console.log(session.user.id)
+                const userProfile = await fetchUserProfileAPI(session.user.id);
+
+                console.log(userProfile)
+                saveAuthSession({
+                    accessToken: session.access_token,
+                    refreshToken: session.refresh_token,
+                    user: userProfile,
+                });
+
+                const role = userProfile.role?.toLowerCase();
+                const isIntern = role === 'intern';
+
+                if (isIntern && userProfile.requires_password_change) {
+                    if (isMounted) {
+                        setSetupPasswordUser(userProfile);
+                        setShowChangePassword(true);
+                    }
+
+                    return;
+                }
+
+                if (isMounted) {
+                    navigate(getDashboardRoute(role), { replace: true });
+                }
+            } catch (error) {
+                console.error('Error checking invite session:', error);
+
+                clearStoredAuth();
+                await supabase.auth.signOut();
+                navigate('/login', { replace: true });
             }
-        } catch (error) {
-            console.error('Error checking invite session:', error);
+        };
 
-            clearStoredAuth();
-            await supabase.auth.signOut();
-        }
-    };
+        checkInviteSession();
 
-    checkInviteSession();
-
-    const {
-        data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-        if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') {
-            if (session?.user?.id) {
-                checkInviteSession();
+        const {
+            data: { subscription },
+        } = supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') {
+                if (session?.user?.id) {
+                    checkInviteSession();
+                }
             }
-        }
-    });
+        });
 
-    return () => {
-        isMounted = false;
-        subscription.unsubscribe();
-    };
-}, [navigate]);
+        return () => {
+            isMounted = false;
+            subscription.unsubscribe();
+        };
+    }, [navigate]);
 
     const clearError = (field: keyof LoginFormValues) => {
         setErrors((prev) => ({

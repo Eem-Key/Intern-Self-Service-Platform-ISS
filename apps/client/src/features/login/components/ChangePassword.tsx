@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { supabase } from '../../../config/supabase';
+import { useState, useEffect } from 'react';
 import React from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 
 import PasswordStrength from '../../../components/ui/passwordStrength';
 import ChangePassButton from '../../../components/ui/changePassButton';
 
-import { setupPasswordAPI } from '../../../api/auth.api';
+import { setupFirstPasswordAPI } from '../../../api/auth.api';
 
 type SetupPasswordValues = {
     new_password: string;
@@ -38,6 +39,15 @@ function ChangePasswordModal({ onSuccess, id }: ChangePasswordModalProps) {
     const [serverError, setServerError] = useState('');
     const [isNewPasswordFocused, setIsNewPasswordFocused] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isAuth, setIsAuth] = useState(false);
+
+    useEffect(() => {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setIsAuth(!!session);
+        });
+    }, []);
+
+    if (!isAuth) return null;
 
     const togglePasswordVisibility = (field: keyof SetupPasswordValues) => {
         if (!formValues[field]) return;
@@ -107,7 +117,7 @@ function ChangePasswordModal({ onSuccess, id }: ChangePasswordModalProps) {
         setIsSubmitting(true);
 
         try {
-            const { error: updateError } = await setupPasswordAPI(formValues, id);
+            const { error: updateError } = await setupFirstPasswordAPI(formValues.new_password, formValues.confirm_new_password);
 
             if (updateError) {
                 setServerError(updateError);

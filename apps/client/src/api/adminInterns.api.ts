@@ -1,4 +1,5 @@
 import { supabase } from '../config/supabase';
+import { supabaseAdmin } from '../config/supabaseAdmin';
 import { getAuthUserId, isAdmin } from '../utils/auth.util';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { 
@@ -379,32 +380,20 @@ export async function resendInviteInternAPI(email: string){
 export async function deactivateInternAPI(
     intern_id: string,
     deactivate_reason: string
-){
-    const admin_id = await getAuthUserId();
-
-    if (!admin_id) {
-        throw new Error('You must be logged in as a user.');
-    }
-
-    if (!(await isAdmin())) {
-        throw new Error('Forbidden: You must be an admin.');
-    }
-
-    const { data, error } = await supabase
+) {
+    const { error: dbError } = await supabase
         .from('interns')
-        .update({ 
-        status: 'deactivated' as InternshipStatus,
-        deactivate_reason: deactivate_reason 
-        })
+        .update({ status: 'deactivated', deactivate_reason })
         .eq('id', intern_id);
 
-    if (error) throw error;
+    if (dbError) throw dbError;
 
-    const { error: signoutError } = await supabase.auth.admin.signOut(intern_id);
+    const { error: adminError } = await supabaseAdmin.auth.admin.updateUserById(intern_id, {
+        ban_duration: '876000h' 
+    });
 
-    if (signoutError) {
-        console.error("Failed to sign out user:", signoutError);
+    if (adminError) {
+        console.error("Ban failed:", adminError);
+        throw new Error("Intern profile updated, but could not ban user.");
     }
-
-    return data;
 }
