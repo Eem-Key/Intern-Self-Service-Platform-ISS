@@ -95,7 +95,7 @@ function AdminInternList() {
         invite(intern_data);
     };
 
-    const email = 'ianmatthewyanga@gmail.com'
+    const email = 'ianmatthewyangam@gmail.com'
 
     const { mutate: resendInvite, isPending: isPending2 } = useResendInviteInternAPIMutation();
 

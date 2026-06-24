@@ -239,7 +239,7 @@ function LoginForm() {
 
 return (
     <>
-         {showChangePassword && setupPasswordUser?.email && (
+        {showChangePassword && setupPasswordUser?.email && (
             <ChangePasswordModal
                 onSuccess={handlePasswordUpdated}
                 id={setupPasswordUser.id}
