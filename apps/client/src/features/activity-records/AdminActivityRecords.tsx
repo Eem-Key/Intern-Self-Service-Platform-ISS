@@ -208,7 +208,7 @@ function AdminActivityRecords() {
                             ))}
 
                         {!isLoading && !isError && records.length === 0 && (
-                            <p className="py-16 text-center text-sm text-gray-500">
+                            <p className="py-40 text-center items-center text-sm text-gray-500">
                                 No activity records found.
                             </p>
                         )}
