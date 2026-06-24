@@ -9,6 +9,7 @@ import type {
 } from '../../../shared/types/eodReport.types';
 import type { 
     ProfileIntern,
+    ProfileInternInsert
 } from '../../../shared/types/profile.types';
 import type { 
     InternPosition,
@@ -150,7 +151,8 @@ export async function fetchAllInternListInformationAPI(
         status: item.status,
         intern_position: item.intern_position,
         department: item.department,
-        name: item.full_name
+        name: item.full_name,
+        avatar_url: item.avatar_url,
     } as InternListInfo));
 
     return {data: mappedInterns, count: count || 0 }
@@ -205,7 +207,7 @@ export async function fetchAllAttendanceByIdAPI(user_id: string): Promise<Attend
     
     if (fetchError) {
         console.log(fetchError)
-        throw new Error(`Error fetching attendance: ${fetchError.message}`);
+        throw new Error(`Error fetching attendances: ${fetchError.message}`);
     }
 
     return (attendanceLogs || []).map((item: any) => ({
@@ -245,7 +247,7 @@ export async function fetchAllEodReportByIdAPI(user_id: string): Promise<EODRepo
     
     if (fetchError) {
         console.log(fetchError)
-        throw new Error(`Error fetching attendance: ${fetchError.message}`);
+        throw new Error(`Error fetching eod reports: ${fetchError.message}`);
     }
 
     return (eodReports || []).map((item: any) => ({

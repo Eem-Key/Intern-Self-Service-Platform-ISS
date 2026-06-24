@@ -16,10 +16,6 @@ export type Intern = {
     intern_position: InternPosition;
 };
 
-export type InternInsert = Omit<Intern, 'id'>;
-
-export type InternUpdate = Partial<InternInsert>;
-
 export type InternInfo = Omit<
     Intern, 
     'id' |
@@ -47,6 +43,7 @@ export type InternListInfo = Omit<
 > & {
     name: string;
     department: CompanyDepartment;
+    avatar_url: string;
 };
 
 export type ProgramProgress = {
