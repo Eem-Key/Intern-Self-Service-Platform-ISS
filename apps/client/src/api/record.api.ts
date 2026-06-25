@@ -20,8 +20,10 @@ import {
 } from './profile.api';
 import { 
     insertInternNotificationAPI,
+ } from './intern.dashboard.api'
+import { 
     insertAdminNotificationAPI
- } from './notification.api'
+ } from './admin.dashboard.api'
 import {
     fetchRecordsPaginatedAPI,
     fetchAttendanceByIdAPI,

@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Clock3 } from 'lucide-react';
 
-import { fetchActiveAttendanceAPI } from '../../../../api/adminDashboard.api';
+import { fetchActiveAttendanceAPI } from '../../../../api/admin.dashboard.api';
 
 function CurrentlyClockedInCard() {
     const {

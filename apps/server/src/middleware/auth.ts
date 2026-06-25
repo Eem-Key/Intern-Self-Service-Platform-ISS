@@ -1,4 +1,5 @@
 import type { Request, Response, NextFunction } from 'express';
+import { prisma } from '../db.js';
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseAdmin = createClient(
@@ -27,5 +28,28 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
         next();
     } catch (err) {
         return res.status(500).json({ error: 'Internal server error during authentication' });
+    }
+};
+
+export const isAdmin = async (req: Request, res: Response, next: NextFunction) => {
+    const user = (req as any).user;
+
+    if (!user) {
+        return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    try {
+        const profile = await prisma.profiles.findUnique({
+            where: { id: user.id },
+            select: { role: true }
+        });
+
+        if (profile?.role !== 'admin') {
+            return res.status(403).json({ error: 'Access denied: Admins only' });
+        }
+
+        next();
+    } catch (err) {
+        return res.status(500).json({ error: 'Internal server error checking role' });
     }
 };
