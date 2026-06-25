@@ -141,11 +141,11 @@ function ProtectedRoute({
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-white">
-        <p>Loading...</p>
-      </div>
+        <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-white">
+            <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#EAF0FA] border-t-[#0058DD]" />
+        </div>
     );
-  }
+}
 
   if (!session) {
     return <Navigate to="/login" replace />;

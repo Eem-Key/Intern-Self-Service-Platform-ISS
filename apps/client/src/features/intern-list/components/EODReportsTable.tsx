@@ -160,7 +160,7 @@ function EODReportsTable({
                     </div>
                 </div>
 
-                {nonDraftReports.length < 5 && (
+                {nonDraftReports.length > 5 && (
                     <button
                         type="button"
                         onClick={() => setIsModalOpen(true)}

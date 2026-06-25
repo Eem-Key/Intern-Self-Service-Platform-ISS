@@ -13,7 +13,7 @@ import {
 import type { InternPosition, InternshipStatus, } from '../../../../shared/types/enums.types';
 
 import InternProfileBanner from './banner/InternProfileBanner';
-import InfoSection, { InfoItem } from './components/InfoSection';
+import InfoSection, { InfoItem, StatusPill } from './components/InfoSection';
 import HoursSummary from './components/HoursSummary';
 import AttendanceLogTable from './components/AttendanceLogTable';
 import EODReportsTable from './components/EODReportsTable';
@@ -249,12 +249,7 @@ function AdminInternProfile() {
                                     />
                                     <InfoItem
                                         label="Status"
-                                        value={
-                                            internInfo?.status ===
-                                            'deactivated'
-                                                ? 'Deactivated'
-                                                : 'Active'
-                                        }
+                                        value={<StatusPill status={internInfo?.status} />}
                                     />
                                 </InfoSection>
 

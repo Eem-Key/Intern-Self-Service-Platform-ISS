@@ -163,26 +163,25 @@ function AdminInternList() {
                             <p>Status</p>
                         </div>
 
-                        <div className="flex h-[calc(100dvh-330px)] min-h-[430px] flex-col sm:h-[calc(100dvh-350px)] lg:h-[430px]">
-                            <div className="relative min-h-0 flex-1 space-y-3 overflow-y-auto px-3 py-3 sm:px-4 lg:space-y-0 lg:px-0 lg:py-0">
-                                {isFetching && !isLoading && (
-                                    <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/90">
-                                        <div className="flex flex-col items-center gap-3 px-6 py-5">
-                                            <div className="h-9 w-9 animate-spin rounded-full border-4 border-[#EAF0FA] border-t-[#0058DD]" />
-                                            <p className="text-sm font-semibold text-[#002D6F]">
-                                                Loading interns...
-                                            </p>
-                                        </div>
-                                    </div>
-                                )}
+                        <div className="relative flex h-[calc(100dvh-330px)] min-h-[430px] flex-col overflow-hidden sm:h-[calc(100dvh-350px)] lg:h-[430px]">
+                            {isFetching && !isLoading && (
+                                <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 bg-white">
+                                    <div className="h-9 w-9 animate-spin rounded-full border-4 border-[#EAF0FA] border-t-[#0058DD]" />
+                                    <p className="text-sm font-semibold text-[#002D6F]">
+                                        Loading interns...
+                                    </p>
+                                </div>
+                            )}
+
+                            <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-3 py-3 sm:px-4 lg:space-y-0 lg:px-0 lg:py-0">
 
                                 {isLoading && (
-                                    <div className="flex h-full flex-col items-center justify-center gap-3">
-                                        <div className="h-9 w-9 animate-spin rounded-full border-4 border-[#EAF0FA] border-t-[#0058DD]" />
-                                        <p className="text-sm font-semibold text-gray-500">
-                                            Loading intern list...
-                                        </p>
-                                    </div>
+                                    <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 bg-white">
+                                    <div className="h-9 w-9 animate-spin rounded-full border-4 border-[#EAF0FA] border-t-[#0058DD]" />
+                                    <p className="text-sm font-semibold text-[#002D6F]">
+                                        Loading interns...
+                                    </p>
+                                </div>
                                 )}
 
                                 {isError && (

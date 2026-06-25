@@ -39,14 +39,14 @@ function AttendanceTracker() {
         <section className="flex max-h-[620px] min-h-[430px] min-w-0 flex-col rounded-xl bg-white shadow-md lg:h-[calc(100vh-360px)] xl:h-[calc(100vh-280px)] xl:max-h-[520px]">
         {/*<section className="flex h-[360px] min-h-0 min-w-0 flex-col rounded-xl bg-white shadow-md sm:h-[420px] lg:h-[calc(100vh-360px)] xl:h-[calc(100vh-280px)] xl:max-h-[520px]">*/}
         {/*</section><section className="flex min-w-0 flex-col rounded-xl bg-white shadow-md">*/}
-        <div className="flex shrink-0 flex-row items-center justify-between gap-3 px-3 py-4 sm:px-5 md:px-6">
-        <h2 className="shrink-0 border-l-4 border-[#FFBF10] pl-2 text-sm font-bold sm:pl-3 sm:text-2xl">
-            Attendance Tracker
-        </h2>
+        <div className="flex shrink-0 flex-col gap-3 px-3 py-4 sm:px-5 md:px-6 lg:flex-row lg:items-center lg:justify-between">
+            <h2 className="shrink-0 border-l-4 border-[#FFBF10] pl-2 text-xl font-bold sm:pl-3 sm:text-2xl">
+                Attendance Tracker
+            </h2>
 
-        <div className="min-w-0 rounded-xl bg-[#FFF3C4] px-2 py-1.5 text-[#9A6B00] ring-1 ring-[#FFE28A] sm:px-3 sm:py-2">
-            <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-1.5 sm:gap-2">
-                <div className="flex min-w-0 items-center gap-1.5">
+            <div className="w-full rounded-xl bg-[#FFF3C4] px-3 py-2 text-[#9A6B00] ring-1 ring-[#FFE28A] lg:w-auto">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-center">
+                <div className="grid min-w-0 grid-cols-[42px_minmax(0,1fr)] items-center gap-2 sm:flex sm:items-center sm:gap-1.5">
                 <span className="shrink-0 text-[10px] font-semibold text-[#9A6B00]/70 sm:text-xs xl:text-sm">
                     From
                 </span>
@@ -70,9 +70,9 @@ function AttendanceTracker() {
                 />
                 </div>
 
-                <span className="block h-6 w-px bg-[#D8A600]/35" />
+                <span className="hidden h-6 w-px bg-[#D8A600]/35 sm:block" />
 
-                <div className="flex min-w-0 items-center gap-1.5">
+                <div className="grid min-w-0 grid-cols-[42px_minmax(0,1fr)] items-center gap-2 sm:flex sm:items-center sm:gap-1.5">
                 <span className="shrink-0 text-[10px] font-semibold text-[#9A6B00]/70 sm:text-xs xl:text-sm">
                     To
                 </span>
