@@ -209,6 +209,11 @@ export type records = $Result.DefaultSelection<Prisma.$recordsPayload>
  * 
  */
 export type intern_hours_summary = $Result.DefaultSelection<Prisma.$intern_hours_summaryPayload>
+/**
+ * Model records_with_display_date
+ * 
+ */
+export type records_with_display_date = $Result.DefaultSelection<Prisma.$records_with_display_datePayload>
 
 /**
  * Enums
@@ -978,6 +983,16 @@ export class PrismaClient<
     * ```
     */
   get intern_hours_summary(): Prisma.intern_hours_summaryDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.records_with_display_date`: Exposes CRUD operations for the **records_with_display_date** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Records_with_display_dates
+    * const records_with_display_dates = await prisma.records_with_display_date.findMany()
+    * ```
+    */
+  get records_with_display_date(): Prisma.records_with_display_dateDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -1445,7 +1460,8 @@ export namespace Prisma {
     profile_update_requests: 'profile_update_requests',
     profiles: 'profiles',
     records: 'records',
-    intern_hours_summary: 'intern_hours_summary'
+    intern_hours_summary: 'intern_hours_summary',
+    records_with_display_date: 'records_with_display_date'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1461,7 +1477,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "audit_log_entries" | "custom_oauth_providers" | "flow_state" | "identities" | "instances" | "mfa_amr_claims" | "mfa_challenges" | "mfa_factors" | "oauth_authorizations" | "oauth_client_states" | "oauth_clients" | "oauth_consents" | "one_time_tokens" | "refresh_tokens" | "saml_providers" | "saml_relay_states" | "schema_migrations" | "sessions" | "sso_domains" | "sso_providers" | "users" | "webauthn_challenges" | "webauthn_credentials" | "activity_logs" | "admins" | "attendance_logs" | "eod_reports" | "interns" | "leave_requests" | "notifications" | "profile_update_requests" | "profiles" | "records" | "intern_hours_summary"
+      modelProps: "audit_log_entries" | "custom_oauth_providers" | "flow_state" | "identities" | "instances" | "mfa_amr_claims" | "mfa_challenges" | "mfa_factors" | "oauth_authorizations" | "oauth_client_states" | "oauth_clients" | "oauth_consents" | "one_time_tokens" | "refresh_tokens" | "saml_providers" | "saml_relay_states" | "schema_migrations" | "sessions" | "sso_domains" | "sso_providers" | "users" | "webauthn_challenges" | "webauthn_credentials" | "activity_logs" | "admins" | "attendance_logs" | "eod_reports" | "interns" | "leave_requests" | "notifications" | "profile_update_requests" | "profiles" | "records" | "intern_hours_summary" | "records_with_display_date"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -3981,6 +3997,80 @@ export namespace Prisma {
           }
         }
       }
+      records_with_display_date: {
+        payload: Prisma.$records_with_display_datePayload<ExtArgs>
+        fields: Prisma.records_with_display_dateFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.records_with_display_dateFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$records_with_display_datePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.records_with_display_dateFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$records_with_display_datePayload>
+          }
+          findFirst: {
+            args: Prisma.records_with_display_dateFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$records_with_display_datePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.records_with_display_dateFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$records_with_display_datePayload>
+          }
+          findMany: {
+            args: Prisma.records_with_display_dateFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$records_with_display_datePayload>[]
+          }
+          create: {
+            args: Prisma.records_with_display_dateCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$records_with_display_datePayload>
+          }
+          createMany: {
+            args: Prisma.records_with_display_dateCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.records_with_display_dateCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$records_with_display_datePayload>[]
+          }
+          delete: {
+            args: Prisma.records_with_display_dateDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$records_with_display_datePayload>
+          }
+          update: {
+            args: Prisma.records_with_display_dateUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$records_with_display_datePayload>
+          }
+          deleteMany: {
+            args: Prisma.records_with_display_dateDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.records_with_display_dateUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.records_with_display_dateUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$records_with_display_datePayload>[]
+          }
+          upsert: {
+            args: Prisma.records_with_display_dateUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$records_with_display_datePayload>
+          }
+          aggregate: {
+            args: Prisma.Records_with_display_dateAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateRecords_with_display_date>
+          }
+          groupBy: {
+            args: Prisma.records_with_display_dateGroupByArgs<ExtArgs>
+            result: $Utils.Optional<Records_with_display_dateGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.records_with_display_dateCountArgs<ExtArgs>
+            result: $Utils.Optional<Records_with_display_dateCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -4123,6 +4213,7 @@ export namespace Prisma {
     profiles?: profilesOmit
     records?: recordsOmit
     intern_hours_summary?: intern_hours_summaryOmit
+    records_with_display_date?: records_with_display_dateOmit
   }
 
   /* Types for Logging */
@@ -43599,6 +43690,1097 @@ export namespace Prisma {
 
 
   /**
+   * Model records_with_display_date
+   */
+
+  export type AggregateRecords_with_display_date = {
+    _count: Records_with_display_dateCountAggregateOutputType | null
+    _min: Records_with_display_dateMinAggregateOutputType | null
+    _max: Records_with_display_dateMaxAggregateOutputType | null
+  }
+
+  export type Records_with_display_dateMinAggregateOutputType = {
+    id: string | null
+    intern_id: string | null
+    log_category: string | null
+    created_at: Date | null
+    status: string | null
+    admin_id: string | null
+    admin_feedback: string | null
+    reviewed_at: Date | null
+    date_created: Date | null
+    activity_description: string | null
+    updated_at: Date | null
+    display_date: Date | null
+  }
+
+  export type Records_with_display_dateMaxAggregateOutputType = {
+    id: string | null
+    intern_id: string | null
+    log_category: string | null
+    created_at: Date | null
+    status: string | null
+    admin_id: string | null
+    admin_feedback: string | null
+    reviewed_at: Date | null
+    date_created: Date | null
+    activity_description: string | null
+    updated_at: Date | null
+    display_date: Date | null
+  }
+
+  export type Records_with_display_dateCountAggregateOutputType = {
+    id: number
+    intern_id: number
+    log_category: number
+    created_at: number
+    status: number
+    admin_id: number
+    admin_feedback: number
+    reviewed_at: number
+    date_created: number
+    activity_description: number
+    updated_at: number
+    display_date: number
+    _all: number
+  }
+
+
+  export type Records_with_display_dateMinAggregateInputType = {
+    id?: true
+    intern_id?: true
+    log_category?: true
+    created_at?: true
+    status?: true
+    admin_id?: true
+    admin_feedback?: true
+    reviewed_at?: true
+    date_created?: true
+    activity_description?: true
+    updated_at?: true
+    display_date?: true
+  }
+
+  export type Records_with_display_dateMaxAggregateInputType = {
+    id?: true
+    intern_id?: true
+    log_category?: true
+    created_at?: true
+    status?: true
+    admin_id?: true
+    admin_feedback?: true
+    reviewed_at?: true
+    date_created?: true
+    activity_description?: true
+    updated_at?: true
+    display_date?: true
+  }
+
+  export type Records_with_display_dateCountAggregateInputType = {
+    id?: true
+    intern_id?: true
+    log_category?: true
+    created_at?: true
+    status?: true
+    admin_id?: true
+    admin_feedback?: true
+    reviewed_at?: true
+    date_created?: true
+    activity_description?: true
+    updated_at?: true
+    display_date?: true
+    _all?: true
+  }
+
+  export type Records_with_display_dateAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which records_with_display_date to aggregate.
+     */
+    where?: records_with_display_dateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of records_with_display_dates to fetch.
+     */
+    orderBy?: records_with_display_dateOrderByWithRelationInput | records_with_display_dateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: records_with_display_dateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` records_with_display_dates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` records_with_display_dates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned records_with_display_dates
+    **/
+    _count?: true | Records_with_display_dateCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: Records_with_display_dateMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: Records_with_display_dateMaxAggregateInputType
+  }
+
+  export type GetRecords_with_display_dateAggregateType<T extends Records_with_display_dateAggregateArgs> = {
+        [P in keyof T & keyof AggregateRecords_with_display_date]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateRecords_with_display_date[P]>
+      : GetScalarType<T[P], AggregateRecords_with_display_date[P]>
+  }
+
+
+
+
+  export type records_with_display_dateGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: records_with_display_dateWhereInput
+    orderBy?: records_with_display_dateOrderByWithAggregationInput | records_with_display_dateOrderByWithAggregationInput[]
+    by: Records_with_display_dateScalarFieldEnum[] | Records_with_display_dateScalarFieldEnum
+    having?: records_with_display_dateScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: Records_with_display_dateCountAggregateInputType | true
+    _min?: Records_with_display_dateMinAggregateInputType
+    _max?: Records_with_display_dateMaxAggregateInputType
+  }
+
+  export type Records_with_display_dateGroupByOutputType = {
+    id: string
+    intern_id: string
+    log_category: string
+    created_at: Date
+    status: string
+    admin_id: string | null
+    admin_feedback: string | null
+    reviewed_at: Date | null
+    date_created: Date | null
+    activity_description: string | null
+    updated_at: Date | null
+    display_date: Date
+    _count: Records_with_display_dateCountAggregateOutputType | null
+    _min: Records_with_display_dateMinAggregateOutputType | null
+    _max: Records_with_display_dateMaxAggregateOutputType | null
+  }
+
+  type GetRecords_with_display_dateGroupByPayload<T extends records_with_display_dateGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<Records_with_display_dateGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof Records_with_display_dateGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], Records_with_display_dateGroupByOutputType[P]>
+            : GetScalarType<T[P], Records_with_display_dateGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type records_with_display_dateSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    intern_id?: boolean
+    log_category?: boolean
+    created_at?: boolean
+    status?: boolean
+    admin_id?: boolean
+    admin_feedback?: boolean
+    reviewed_at?: boolean
+    date_created?: boolean
+    activity_description?: boolean
+    updated_at?: boolean
+    display_date?: boolean
+  }, ExtArgs["result"]["records_with_display_date"]>
+
+  export type records_with_display_dateSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    intern_id?: boolean
+    log_category?: boolean
+    created_at?: boolean
+    status?: boolean
+    admin_id?: boolean
+    admin_feedback?: boolean
+    reviewed_at?: boolean
+    date_created?: boolean
+    activity_description?: boolean
+    updated_at?: boolean
+    display_date?: boolean
+  }, ExtArgs["result"]["records_with_display_date"]>
+
+  export type records_with_display_dateSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    intern_id?: boolean
+    log_category?: boolean
+    created_at?: boolean
+    status?: boolean
+    admin_id?: boolean
+    admin_feedback?: boolean
+    reviewed_at?: boolean
+    date_created?: boolean
+    activity_description?: boolean
+    updated_at?: boolean
+    display_date?: boolean
+  }, ExtArgs["result"]["records_with_display_date"]>
+
+  export type records_with_display_dateSelectScalar = {
+    id?: boolean
+    intern_id?: boolean
+    log_category?: boolean
+    created_at?: boolean
+    status?: boolean
+    admin_id?: boolean
+    admin_feedback?: boolean
+    reviewed_at?: boolean
+    date_created?: boolean
+    activity_description?: boolean
+    updated_at?: boolean
+    display_date?: boolean
+  }
+
+  export type records_with_display_dateOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "intern_id" | "log_category" | "created_at" | "status" | "admin_id" | "admin_feedback" | "reviewed_at" | "date_created" | "activity_description" | "updated_at" | "display_date", ExtArgs["result"]["records_with_display_date"]>
+
+  export type $records_with_display_datePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "records_with_display_date"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      intern_id: string
+      log_category: string
+      created_at: Date
+      status: string
+      admin_id: string | null
+      admin_feedback: string | null
+      reviewed_at: Date | null
+      date_created: Date | null
+      activity_description: string | null
+      updated_at: Date | null
+      display_date: Date
+    }, ExtArgs["result"]["records_with_display_date"]>
+    composites: {}
+  }
+
+  type records_with_display_dateGetPayload<S extends boolean | null | undefined | records_with_display_dateDefaultArgs> = $Result.GetResult<Prisma.$records_with_display_datePayload, S>
+
+  type records_with_display_dateCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<records_with_display_dateFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: Records_with_display_dateCountAggregateInputType | true
+    }
+
+  export interface records_with_display_dateDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['records_with_display_date'], meta: { name: 'records_with_display_date' } }
+    /**
+     * Find zero or one Records_with_display_date that matches the filter.
+     * @param {records_with_display_dateFindUniqueArgs} args - Arguments to find a Records_with_display_date
+     * @example
+     * // Get one Records_with_display_date
+     * const records_with_display_date = await prisma.records_with_display_date.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends records_with_display_dateFindUniqueArgs>(args: SelectSubset<T, records_with_display_dateFindUniqueArgs<ExtArgs>>): Prisma__records_with_display_dateClient<$Result.GetResult<Prisma.$records_with_display_datePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Records_with_display_date that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {records_with_display_dateFindUniqueOrThrowArgs} args - Arguments to find a Records_with_display_date
+     * @example
+     * // Get one Records_with_display_date
+     * const records_with_display_date = await prisma.records_with_display_date.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends records_with_display_dateFindUniqueOrThrowArgs>(args: SelectSubset<T, records_with_display_dateFindUniqueOrThrowArgs<ExtArgs>>): Prisma__records_with_display_dateClient<$Result.GetResult<Prisma.$records_with_display_datePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Records_with_display_date that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {records_with_display_dateFindFirstArgs} args - Arguments to find a Records_with_display_date
+     * @example
+     * // Get one Records_with_display_date
+     * const records_with_display_date = await prisma.records_with_display_date.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends records_with_display_dateFindFirstArgs>(args?: SelectSubset<T, records_with_display_dateFindFirstArgs<ExtArgs>>): Prisma__records_with_display_dateClient<$Result.GetResult<Prisma.$records_with_display_datePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Records_with_display_date that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {records_with_display_dateFindFirstOrThrowArgs} args - Arguments to find a Records_with_display_date
+     * @example
+     * // Get one Records_with_display_date
+     * const records_with_display_date = await prisma.records_with_display_date.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends records_with_display_dateFindFirstOrThrowArgs>(args?: SelectSubset<T, records_with_display_dateFindFirstOrThrowArgs<ExtArgs>>): Prisma__records_with_display_dateClient<$Result.GetResult<Prisma.$records_with_display_datePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Records_with_display_dates that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {records_with_display_dateFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Records_with_display_dates
+     * const records_with_display_dates = await prisma.records_with_display_date.findMany()
+     * 
+     * // Get first 10 Records_with_display_dates
+     * const records_with_display_dates = await prisma.records_with_display_date.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const records_with_display_dateWithIdOnly = await prisma.records_with_display_date.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends records_with_display_dateFindManyArgs>(args?: SelectSubset<T, records_with_display_dateFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$records_with_display_datePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Records_with_display_date.
+     * @param {records_with_display_dateCreateArgs} args - Arguments to create a Records_with_display_date.
+     * @example
+     * // Create one Records_with_display_date
+     * const Records_with_display_date = await prisma.records_with_display_date.create({
+     *   data: {
+     *     // ... data to create a Records_with_display_date
+     *   }
+     * })
+     * 
+     */
+    create<T extends records_with_display_dateCreateArgs>(args: SelectSubset<T, records_with_display_dateCreateArgs<ExtArgs>>): Prisma__records_with_display_dateClient<$Result.GetResult<Prisma.$records_with_display_datePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Records_with_display_dates.
+     * @param {records_with_display_dateCreateManyArgs} args - Arguments to create many Records_with_display_dates.
+     * @example
+     * // Create many Records_with_display_dates
+     * const records_with_display_date = await prisma.records_with_display_date.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends records_with_display_dateCreateManyArgs>(args?: SelectSubset<T, records_with_display_dateCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Records_with_display_dates and returns the data saved in the database.
+     * @param {records_with_display_dateCreateManyAndReturnArgs} args - Arguments to create many Records_with_display_dates.
+     * @example
+     * // Create many Records_with_display_dates
+     * const records_with_display_date = await prisma.records_with_display_date.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Records_with_display_dates and only return the `id`
+     * const records_with_display_dateWithIdOnly = await prisma.records_with_display_date.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends records_with_display_dateCreateManyAndReturnArgs>(args?: SelectSubset<T, records_with_display_dateCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$records_with_display_datePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Records_with_display_date.
+     * @param {records_with_display_dateDeleteArgs} args - Arguments to delete one Records_with_display_date.
+     * @example
+     * // Delete one Records_with_display_date
+     * const Records_with_display_date = await prisma.records_with_display_date.delete({
+     *   where: {
+     *     // ... filter to delete one Records_with_display_date
+     *   }
+     * })
+     * 
+     */
+    delete<T extends records_with_display_dateDeleteArgs>(args: SelectSubset<T, records_with_display_dateDeleteArgs<ExtArgs>>): Prisma__records_with_display_dateClient<$Result.GetResult<Prisma.$records_with_display_datePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Records_with_display_date.
+     * @param {records_with_display_dateUpdateArgs} args - Arguments to update one Records_with_display_date.
+     * @example
+     * // Update one Records_with_display_date
+     * const records_with_display_date = await prisma.records_with_display_date.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends records_with_display_dateUpdateArgs>(args: SelectSubset<T, records_with_display_dateUpdateArgs<ExtArgs>>): Prisma__records_with_display_dateClient<$Result.GetResult<Prisma.$records_with_display_datePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Records_with_display_dates.
+     * @param {records_with_display_dateDeleteManyArgs} args - Arguments to filter Records_with_display_dates to delete.
+     * @example
+     * // Delete a few Records_with_display_dates
+     * const { count } = await prisma.records_with_display_date.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends records_with_display_dateDeleteManyArgs>(args?: SelectSubset<T, records_with_display_dateDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Records_with_display_dates.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {records_with_display_dateUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Records_with_display_dates
+     * const records_with_display_date = await prisma.records_with_display_date.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends records_with_display_dateUpdateManyArgs>(args: SelectSubset<T, records_with_display_dateUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Records_with_display_dates and returns the data updated in the database.
+     * @param {records_with_display_dateUpdateManyAndReturnArgs} args - Arguments to update many Records_with_display_dates.
+     * @example
+     * // Update many Records_with_display_dates
+     * const records_with_display_date = await prisma.records_with_display_date.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Records_with_display_dates and only return the `id`
+     * const records_with_display_dateWithIdOnly = await prisma.records_with_display_date.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends records_with_display_dateUpdateManyAndReturnArgs>(args: SelectSubset<T, records_with_display_dateUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$records_with_display_datePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Records_with_display_date.
+     * @param {records_with_display_dateUpsertArgs} args - Arguments to update or create a Records_with_display_date.
+     * @example
+     * // Update or create a Records_with_display_date
+     * const records_with_display_date = await prisma.records_with_display_date.upsert({
+     *   create: {
+     *     // ... data to create a Records_with_display_date
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Records_with_display_date we want to update
+     *   }
+     * })
+     */
+    upsert<T extends records_with_display_dateUpsertArgs>(args: SelectSubset<T, records_with_display_dateUpsertArgs<ExtArgs>>): Prisma__records_with_display_dateClient<$Result.GetResult<Prisma.$records_with_display_datePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Records_with_display_dates.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {records_with_display_dateCountArgs} args - Arguments to filter Records_with_display_dates to count.
+     * @example
+     * // Count the number of Records_with_display_dates
+     * const count = await prisma.records_with_display_date.count({
+     *   where: {
+     *     // ... the filter for the Records_with_display_dates we want to count
+     *   }
+     * })
+    **/
+    count<T extends records_with_display_dateCountArgs>(
+      args?: Subset<T, records_with_display_dateCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], Records_with_display_dateCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Records_with_display_date.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {Records_with_display_dateAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends Records_with_display_dateAggregateArgs>(args: Subset<T, Records_with_display_dateAggregateArgs>): Prisma.PrismaPromise<GetRecords_with_display_dateAggregateType<T>>
+
+    /**
+     * Group by Records_with_display_date.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {records_with_display_dateGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends records_with_display_dateGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: records_with_display_dateGroupByArgs['orderBy'] }
+        : { orderBy?: records_with_display_dateGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, records_with_display_dateGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetRecords_with_display_dateGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the records_with_display_date model
+   */
+  readonly fields: records_with_display_dateFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for records_with_display_date.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__records_with_display_dateClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the records_with_display_date model
+   */
+  interface records_with_display_dateFieldRefs {
+    readonly id: FieldRef<"records_with_display_date", 'String'>
+    readonly intern_id: FieldRef<"records_with_display_date", 'String'>
+    readonly log_category: FieldRef<"records_with_display_date", 'String'>
+    readonly created_at: FieldRef<"records_with_display_date", 'DateTime'>
+    readonly status: FieldRef<"records_with_display_date", 'String'>
+    readonly admin_id: FieldRef<"records_with_display_date", 'String'>
+    readonly admin_feedback: FieldRef<"records_with_display_date", 'String'>
+    readonly reviewed_at: FieldRef<"records_with_display_date", 'DateTime'>
+    readonly date_created: FieldRef<"records_with_display_date", 'DateTime'>
+    readonly activity_description: FieldRef<"records_with_display_date", 'String'>
+    readonly updated_at: FieldRef<"records_with_display_date", 'DateTime'>
+    readonly display_date: FieldRef<"records_with_display_date", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * records_with_display_date findUnique
+   */
+  export type records_with_display_dateFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the records_with_display_date
+     */
+    select?: records_with_display_dateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the records_with_display_date
+     */
+    omit?: records_with_display_dateOmit<ExtArgs> | null
+    /**
+     * Filter, which records_with_display_date to fetch.
+     */
+    where: records_with_display_dateWhereUniqueInput
+  }
+
+  /**
+   * records_with_display_date findUniqueOrThrow
+   */
+  export type records_with_display_dateFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the records_with_display_date
+     */
+    select?: records_with_display_dateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the records_with_display_date
+     */
+    omit?: records_with_display_dateOmit<ExtArgs> | null
+    /**
+     * Filter, which records_with_display_date to fetch.
+     */
+    where: records_with_display_dateWhereUniqueInput
+  }
+
+  /**
+   * records_with_display_date findFirst
+   */
+  export type records_with_display_dateFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the records_with_display_date
+     */
+    select?: records_with_display_dateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the records_with_display_date
+     */
+    omit?: records_with_display_dateOmit<ExtArgs> | null
+    /**
+     * Filter, which records_with_display_date to fetch.
+     */
+    where?: records_with_display_dateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of records_with_display_dates to fetch.
+     */
+    orderBy?: records_with_display_dateOrderByWithRelationInput | records_with_display_dateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for records_with_display_dates.
+     */
+    cursor?: records_with_display_dateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` records_with_display_dates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` records_with_display_dates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of records_with_display_dates.
+     */
+    distinct?: Records_with_display_dateScalarFieldEnum | Records_with_display_dateScalarFieldEnum[]
+  }
+
+  /**
+   * records_with_display_date findFirstOrThrow
+   */
+  export type records_with_display_dateFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the records_with_display_date
+     */
+    select?: records_with_display_dateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the records_with_display_date
+     */
+    omit?: records_with_display_dateOmit<ExtArgs> | null
+    /**
+     * Filter, which records_with_display_date to fetch.
+     */
+    where?: records_with_display_dateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of records_with_display_dates to fetch.
+     */
+    orderBy?: records_with_display_dateOrderByWithRelationInput | records_with_display_dateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for records_with_display_dates.
+     */
+    cursor?: records_with_display_dateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` records_with_display_dates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` records_with_display_dates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of records_with_display_dates.
+     */
+    distinct?: Records_with_display_dateScalarFieldEnum | Records_with_display_dateScalarFieldEnum[]
+  }
+
+  /**
+   * records_with_display_date findMany
+   */
+  export type records_with_display_dateFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the records_with_display_date
+     */
+    select?: records_with_display_dateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the records_with_display_date
+     */
+    omit?: records_with_display_dateOmit<ExtArgs> | null
+    /**
+     * Filter, which records_with_display_dates to fetch.
+     */
+    where?: records_with_display_dateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of records_with_display_dates to fetch.
+     */
+    orderBy?: records_with_display_dateOrderByWithRelationInput | records_with_display_dateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing records_with_display_dates.
+     */
+    cursor?: records_with_display_dateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` records_with_display_dates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` records_with_display_dates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of records_with_display_dates.
+     */
+    distinct?: Records_with_display_dateScalarFieldEnum | Records_with_display_dateScalarFieldEnum[]
+  }
+
+  /**
+   * records_with_display_date create
+   */
+  export type records_with_display_dateCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the records_with_display_date
+     */
+    select?: records_with_display_dateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the records_with_display_date
+     */
+    omit?: records_with_display_dateOmit<ExtArgs> | null
+    /**
+     * The data needed to create a records_with_display_date.
+     */
+    data: XOR<records_with_display_dateCreateInput, records_with_display_dateUncheckedCreateInput>
+  }
+
+  /**
+   * records_with_display_date createMany
+   */
+  export type records_with_display_dateCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many records_with_display_dates.
+     */
+    data: records_with_display_dateCreateManyInput | records_with_display_dateCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * records_with_display_date createManyAndReturn
+   */
+  export type records_with_display_dateCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the records_with_display_date
+     */
+    select?: records_with_display_dateSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the records_with_display_date
+     */
+    omit?: records_with_display_dateOmit<ExtArgs> | null
+    /**
+     * The data used to create many records_with_display_dates.
+     */
+    data: records_with_display_dateCreateManyInput | records_with_display_dateCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * records_with_display_date update
+   */
+  export type records_with_display_dateUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the records_with_display_date
+     */
+    select?: records_with_display_dateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the records_with_display_date
+     */
+    omit?: records_with_display_dateOmit<ExtArgs> | null
+    /**
+     * The data needed to update a records_with_display_date.
+     */
+    data: XOR<records_with_display_dateUpdateInput, records_with_display_dateUncheckedUpdateInput>
+    /**
+     * Choose, which records_with_display_date to update.
+     */
+    where: records_with_display_dateWhereUniqueInput
+  }
+
+  /**
+   * records_with_display_date updateMany
+   */
+  export type records_with_display_dateUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update records_with_display_dates.
+     */
+    data: XOR<records_with_display_dateUpdateManyMutationInput, records_with_display_dateUncheckedUpdateManyInput>
+    /**
+     * Filter which records_with_display_dates to update
+     */
+    where?: records_with_display_dateWhereInput
+    /**
+     * Limit how many records_with_display_dates to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * records_with_display_date updateManyAndReturn
+   */
+  export type records_with_display_dateUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the records_with_display_date
+     */
+    select?: records_with_display_dateSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the records_with_display_date
+     */
+    omit?: records_with_display_dateOmit<ExtArgs> | null
+    /**
+     * The data used to update records_with_display_dates.
+     */
+    data: XOR<records_with_display_dateUpdateManyMutationInput, records_with_display_dateUncheckedUpdateManyInput>
+    /**
+     * Filter which records_with_display_dates to update
+     */
+    where?: records_with_display_dateWhereInput
+    /**
+     * Limit how many records_with_display_dates to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * records_with_display_date upsert
+   */
+  export type records_with_display_dateUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the records_with_display_date
+     */
+    select?: records_with_display_dateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the records_with_display_date
+     */
+    omit?: records_with_display_dateOmit<ExtArgs> | null
+    /**
+     * The filter to search for the records_with_display_date to update in case it exists.
+     */
+    where: records_with_display_dateWhereUniqueInput
+    /**
+     * In case the records_with_display_date found by the `where` argument doesn't exist, create a new records_with_display_date with this data.
+     */
+    create: XOR<records_with_display_dateCreateInput, records_with_display_dateUncheckedCreateInput>
+    /**
+     * In case the records_with_display_date was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<records_with_display_dateUpdateInput, records_with_display_dateUncheckedUpdateInput>
+  }
+
+  /**
+   * records_with_display_date delete
+   */
+  export type records_with_display_dateDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the records_with_display_date
+     */
+    select?: records_with_display_dateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the records_with_display_date
+     */
+    omit?: records_with_display_dateOmit<ExtArgs> | null
+    /**
+     * Filter which records_with_display_date to delete.
+     */
+    where: records_with_display_dateWhereUniqueInput
+  }
+
+  /**
+   * records_with_display_date deleteMany
+   */
+  export type records_with_display_dateDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which records_with_display_dates to delete
+     */
+    where?: records_with_display_dateWhereInput
+    /**
+     * Limit how many records_with_display_dates to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * records_with_display_date without action
+   */
+  export type records_with_display_dateDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the records_with_display_date
+     */
+    select?: records_with_display_dateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the records_with_display_date
+     */
+    omit?: records_with_display_dateOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -44138,6 +45320,24 @@ export namespace Prisma {
   };
 
   export type Intern_hours_summaryScalarFieldEnum = (typeof Intern_hours_summaryScalarFieldEnum)[keyof typeof Intern_hours_summaryScalarFieldEnum]
+
+
+  export const Records_with_display_dateScalarFieldEnum: {
+    id: 'id',
+    intern_id: 'intern_id',
+    log_category: 'log_category',
+    created_at: 'created_at',
+    status: 'status',
+    admin_id: 'admin_id',
+    admin_feedback: 'admin_feedback',
+    reviewed_at: 'reviewed_at',
+    date_created: 'date_created',
+    activity_description: 'activity_description',
+    updated_at: 'updated_at',
+    display_date: 'display_date'
+  };
+
+  export type Records_with_display_dateScalarFieldEnum = (typeof Records_with_display_dateScalarFieldEnum)[keyof typeof Records_with_display_dateScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -47382,6 +48582,93 @@ export namespace Prisma {
     rendered_hours?: IntNullableWithAggregatesFilter<"intern_hours_summary"> | number | null
   }
 
+  export type records_with_display_dateWhereInput = {
+    AND?: records_with_display_dateWhereInput | records_with_display_dateWhereInput[]
+    OR?: records_with_display_dateWhereInput[]
+    NOT?: records_with_display_dateWhereInput | records_with_display_dateWhereInput[]
+    id?: StringFilter<"records_with_display_date"> | string
+    intern_id?: StringFilter<"records_with_display_date"> | string
+    log_category?: StringFilter<"records_with_display_date"> | string
+    created_at?: DateTimeFilter<"records_with_display_date"> | Date | string
+    status?: StringFilter<"records_with_display_date"> | string
+    admin_id?: StringNullableFilter<"records_with_display_date"> | string | null
+    admin_feedback?: StringNullableFilter<"records_with_display_date"> | string | null
+    reviewed_at?: DateTimeNullableFilter<"records_with_display_date"> | Date | string | null
+    date_created?: DateTimeNullableFilter<"records_with_display_date"> | Date | string | null
+    activity_description?: StringNullableFilter<"records_with_display_date"> | string | null
+    updated_at?: DateTimeNullableFilter<"records_with_display_date"> | Date | string | null
+    display_date?: DateTimeFilter<"records_with_display_date"> | Date | string
+  }
+
+  export type records_with_display_dateOrderByWithRelationInput = {
+    id?: SortOrder
+    intern_id?: SortOrder
+    log_category?: SortOrder
+    created_at?: SortOrder
+    status?: SortOrder
+    admin_id?: SortOrderInput | SortOrder
+    admin_feedback?: SortOrderInput | SortOrder
+    reviewed_at?: SortOrderInput | SortOrder
+    date_created?: SortOrderInput | SortOrder
+    activity_description?: SortOrderInput | SortOrder
+    updated_at?: SortOrderInput | SortOrder
+    display_date?: SortOrder
+  }
+
+  export type records_with_display_dateWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: records_with_display_dateWhereInput | records_with_display_dateWhereInput[]
+    OR?: records_with_display_dateWhereInput[]
+    NOT?: records_with_display_dateWhereInput | records_with_display_dateWhereInput[]
+    intern_id?: StringFilter<"records_with_display_date"> | string
+    log_category?: StringFilter<"records_with_display_date"> | string
+    created_at?: DateTimeFilter<"records_with_display_date"> | Date | string
+    status?: StringFilter<"records_with_display_date"> | string
+    admin_id?: StringNullableFilter<"records_with_display_date"> | string | null
+    admin_feedback?: StringNullableFilter<"records_with_display_date"> | string | null
+    reviewed_at?: DateTimeNullableFilter<"records_with_display_date"> | Date | string | null
+    date_created?: DateTimeNullableFilter<"records_with_display_date"> | Date | string | null
+    activity_description?: StringNullableFilter<"records_with_display_date"> | string | null
+    updated_at?: DateTimeNullableFilter<"records_with_display_date"> | Date | string | null
+    display_date?: DateTimeFilter<"records_with_display_date"> | Date | string
+  }, "id">
+
+  export type records_with_display_dateOrderByWithAggregationInput = {
+    id?: SortOrder
+    intern_id?: SortOrder
+    log_category?: SortOrder
+    created_at?: SortOrder
+    status?: SortOrder
+    admin_id?: SortOrderInput | SortOrder
+    admin_feedback?: SortOrderInput | SortOrder
+    reviewed_at?: SortOrderInput | SortOrder
+    date_created?: SortOrderInput | SortOrder
+    activity_description?: SortOrderInput | SortOrder
+    updated_at?: SortOrderInput | SortOrder
+    display_date?: SortOrder
+    _count?: records_with_display_dateCountOrderByAggregateInput
+    _max?: records_with_display_dateMaxOrderByAggregateInput
+    _min?: records_with_display_dateMinOrderByAggregateInput
+  }
+
+  export type records_with_display_dateScalarWhereWithAggregatesInput = {
+    AND?: records_with_display_dateScalarWhereWithAggregatesInput | records_with_display_dateScalarWhereWithAggregatesInput[]
+    OR?: records_with_display_dateScalarWhereWithAggregatesInput[]
+    NOT?: records_with_display_dateScalarWhereWithAggregatesInput | records_with_display_dateScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"records_with_display_date"> | string
+    intern_id?: StringWithAggregatesFilter<"records_with_display_date"> | string
+    log_category?: StringWithAggregatesFilter<"records_with_display_date"> | string
+    created_at?: DateTimeWithAggregatesFilter<"records_with_display_date"> | Date | string
+    status?: StringWithAggregatesFilter<"records_with_display_date"> | string
+    admin_id?: StringNullableWithAggregatesFilter<"records_with_display_date"> | string | null
+    admin_feedback?: StringNullableWithAggregatesFilter<"records_with_display_date"> | string | null
+    reviewed_at?: DateTimeNullableWithAggregatesFilter<"records_with_display_date"> | Date | string | null
+    date_created?: DateTimeNullableWithAggregatesFilter<"records_with_display_date"> | Date | string | null
+    activity_description?: StringNullableWithAggregatesFilter<"records_with_display_date"> | string | null
+    updated_at?: DateTimeNullableWithAggregatesFilter<"records_with_display_date"> | Date | string | null
+    display_date?: DateTimeWithAggregatesFilter<"records_with_display_date"> | Date | string
+  }
+
   export type audit_log_entriesCreateInput = {
     instance_id?: string | null
     id: string
@@ -50457,6 +51744,111 @@ export namespace Prisma {
     rendered_hours?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
+  export type records_with_display_dateCreateInput = {
+    id: string
+    intern_id: string
+    log_category: string
+    created_at: Date | string
+    status: string
+    admin_id?: string | null
+    admin_feedback?: string | null
+    reviewed_at?: Date | string | null
+    date_created?: Date | string | null
+    activity_description?: string | null
+    updated_at?: Date | string | null
+    display_date: Date | string
+  }
+
+  export type records_with_display_dateUncheckedCreateInput = {
+    id: string
+    intern_id: string
+    log_category: string
+    created_at: Date | string
+    status: string
+    admin_id?: string | null
+    admin_feedback?: string | null
+    reviewed_at?: Date | string | null
+    date_created?: Date | string | null
+    activity_description?: string | null
+    updated_at?: Date | string | null
+    display_date: Date | string
+  }
+
+  export type records_with_display_dateUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    intern_id?: StringFieldUpdateOperationsInput | string
+    log_category?: StringFieldUpdateOperationsInput | string
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: StringFieldUpdateOperationsInput | string
+    admin_id?: NullableStringFieldUpdateOperationsInput | string | null
+    admin_feedback?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    date_created?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    activity_description?: NullableStringFieldUpdateOperationsInput | string | null
+    updated_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    display_date?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type records_with_display_dateUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    intern_id?: StringFieldUpdateOperationsInput | string
+    log_category?: StringFieldUpdateOperationsInput | string
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: StringFieldUpdateOperationsInput | string
+    admin_id?: NullableStringFieldUpdateOperationsInput | string | null
+    admin_feedback?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    date_created?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    activity_description?: NullableStringFieldUpdateOperationsInput | string | null
+    updated_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    display_date?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type records_with_display_dateCreateManyInput = {
+    id: string
+    intern_id: string
+    log_category: string
+    created_at: Date | string
+    status: string
+    admin_id?: string | null
+    admin_feedback?: string | null
+    reviewed_at?: Date | string | null
+    date_created?: Date | string | null
+    activity_description?: string | null
+    updated_at?: Date | string | null
+    display_date: Date | string
+  }
+
+  export type records_with_display_dateUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    intern_id?: StringFieldUpdateOperationsInput | string
+    log_category?: StringFieldUpdateOperationsInput | string
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: StringFieldUpdateOperationsInput | string
+    admin_id?: NullableStringFieldUpdateOperationsInput | string | null
+    admin_feedback?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    date_created?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    activity_description?: NullableStringFieldUpdateOperationsInput | string | null
+    updated_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    display_date?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type records_with_display_dateUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    intern_id?: StringFieldUpdateOperationsInput | string
+    log_category?: StringFieldUpdateOperationsInput | string
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: StringFieldUpdateOperationsInput | string
+    admin_id?: NullableStringFieldUpdateOperationsInput | string | null
+    admin_feedback?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    date_created?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    activity_description?: NullableStringFieldUpdateOperationsInput | string | null
+    updated_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    display_date?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type UuidNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -52957,6 +54349,51 @@ export namespace Prisma {
     total_onsite_hours?: SortOrder
     total_online_hours?: SortOrder
     rendered_hours?: SortOrder
+  }
+
+  export type records_with_display_dateCountOrderByAggregateInput = {
+    id?: SortOrder
+    intern_id?: SortOrder
+    log_category?: SortOrder
+    created_at?: SortOrder
+    status?: SortOrder
+    admin_id?: SortOrder
+    admin_feedback?: SortOrder
+    reviewed_at?: SortOrder
+    date_created?: SortOrder
+    activity_description?: SortOrder
+    updated_at?: SortOrder
+    display_date?: SortOrder
+  }
+
+  export type records_with_display_dateMaxOrderByAggregateInput = {
+    id?: SortOrder
+    intern_id?: SortOrder
+    log_category?: SortOrder
+    created_at?: SortOrder
+    status?: SortOrder
+    admin_id?: SortOrder
+    admin_feedback?: SortOrder
+    reviewed_at?: SortOrder
+    date_created?: SortOrder
+    activity_description?: SortOrder
+    updated_at?: SortOrder
+    display_date?: SortOrder
+  }
+
+  export type records_with_display_dateMinOrderByAggregateInput = {
+    id?: SortOrder
+    intern_id?: SortOrder
+    log_category?: SortOrder
+    created_at?: SortOrder
+    status?: SortOrder
+    admin_id?: SortOrder
+    admin_feedback?: SortOrder
+    reviewed_at?: SortOrder
+    date_created?: SortOrder
+    activity_description?: SortOrder
+    updated_at?: SortOrder
+    display_date?: SortOrder
   }
 
   export type NullableStringFieldUpdateOperationsInput = {

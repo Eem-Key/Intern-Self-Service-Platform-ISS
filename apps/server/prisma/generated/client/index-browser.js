@@ -546,6 +546,21 @@ exports.Prisma.Intern_hours_summaryScalarFieldEnum = {
   rendered_hours: 'rendered_hours'
 };
 
+exports.Prisma.Records_with_display_dateScalarFieldEnum = {
+  id: 'id',
+  intern_id: 'intern_id',
+  log_category: 'log_category',
+  created_at: 'created_at',
+  status: 'status',
+  admin_id: 'admin_id',
+  admin_feedback: 'admin_feedback',
+  reviewed_at: 'reviewed_at',
+  date_created: 'date_created',
+  activity_description: 'activity_description',
+  updated_at: 'updated_at',
+  display_date: 'display_date'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -751,7 +766,8 @@ exports.Prisma.ModelName = {
   profile_update_requests: 'profile_update_requests',
   profiles: 'profiles',
   records: 'records',
-  intern_hours_summary: 'intern_hours_summary'
+  intern_hours_summary: 'intern_hours_summary',
+  records_with_display_date: 'records_with_display_date'
 };
 
 /**

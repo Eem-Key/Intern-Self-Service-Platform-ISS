@@ -197,51 +197,6 @@ export async function fetchProfileUpdateRequestWithProfileById(
     return mergedData;
 }
 
-export async function updateProfileUpdateRequestAPI(
-    record_id: string,
-    partialUpdate: Partial<ProfileUpdateRequestForm>
-): Promise<ProfileUpdateRequest> {
-    console.log('updateProfileUpdateRequestAPI: ', partialUpdate)
-    const userId = await getAuthUserId();
-
-    if (!userId) {
-        throw new Error('You must be logged in to update a profile update request.');
-    }
-
-    const { data: existing, error: fetchError } = await supabase
-        .from('profile_update_requests')
-        .select('*')
-        .eq('record_id', record_id)
-        .single();
-
-    if (fetchError) throw fetchError;
-
-    const newRequestedData = {
-        ...existing.requested_data,
-        ...partialUpdate.requested_data,
-        intern_info: {
-            ...existing.requested_data?.intern_info,
-            ...partialUpdate.requested_data?.intern_info
-        }
-    };
-
-    const { data: updatedRequest, error: updateError } = await supabase
-        .from('profile_update_requests')
-        .update({
-            requested_data: newRequestedData,
-            reason: partialUpdate.reason || existing.reason,
-        })
-        .eq('record_id', record_id)
-        .select()
-        .single();
-    
-    if (updateError) {
-        throw new Error(`Error updating profile update request: ${updateError.message}`);
-    }
-
-    return updatedRequest;
-}
-
 export async function fetchProgramProgressAPI(id: string): Promise<ProgramProgressResponse> {
     const userId = await getAuthUserId();
     if (!userId) {

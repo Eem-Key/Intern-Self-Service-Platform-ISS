@@ -1,17 +1,6 @@
 import { supabase } from '../config/supabase.ts';
 import { getAuthUserId, isAdmin } from '../utils/auth.util.ts';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { fetchAttendanceByIdAPI } from './attendance.api';
-import { fetchEodReportById } from './eodReport.api';
-import { fetchLeaveRequestById } from './leave.api';
-import { 
-    fetchProfileUpdateRequestById,
-    fetchProfileUpdateRequestWithProfileById 
-} from './profile.api';
-import { 
-    insertInternNotificationAPI,
-    insertAdminNotificationAPI
- } from './notification.api'
 import type { 
     ReportStatus, 
     RecordType,
@@ -24,6 +13,36 @@ import type {
     Record, 
     RecordInsert,
 } from '../../../shared/types/record.types.ts';
+import { fetchEodReportById } from './eodReport.api';
+import { fetchLeaveRequestById } from './leave.api';
+import { 
+    fetchProfileUpdateRequestById, 
+} from './profile.api';
+import { 
+    insertInternNotificationAPI,
+    insertAdminNotificationAPI
+ } from './notification.api'
+import {
+    fetchRecordsPaginatedAPI,
+    fetchAttendanceByIdAPI,
+    fetchEodReportByIdAPI,
+    fetchLeaveRequestByIdAPI,
+    fetchProfileUpdateRequestWithProfileByIdAPI,
+    fetchProfileUpdateRequestByIdAPI
+} from './intern.logs.api'
+
+export function useFetchRecordsPaginatedIntern(
+    page:number, 
+    pageSize: number,
+    log_category?: RecordType
+) {
+    return useQuery({
+        queryKey: ['records', page, log_category], 
+        queryFn: () => fetchRecordsPaginatedAPI(page, pageSize, log_category),
+        placeholderData: keepPreviousData,
+        staleTime: 30_000,
+    });
+}
 
 export function useFetchCompleteRecordDetails(
     record_id: string, 
@@ -33,71 +52,32 @@ export function useFetchCompleteRecordDetails(
     return useQuery({
         queryKey: ['log-details', record_id],
         queryFn: async () => {
+            let data: any;
+
             switch (record_category) {
-                case 'attendance': return await fetchAttendanceByIdAPI(record_id);
-                case 'eod_report': return await fetchEodReportById(record_id);
-                case 'leave_request': return await fetchLeaveRequestById(record_id);
+                case 'attendance': 
+                    data = await fetchAttendanceByIdAPI(record_id);
+                    break;
+                case 'eod_report': 
+                    data = await fetchEodReportByIdAPI(record_id);
+                    break;
+                case 'leave_request': 
+                    data = await fetchLeaveRequestByIdAPI(record_id);
+                    break;
                 case 'profile_update': 
-                    if (status === 'pending'){
-                        return await fetchProfileUpdateRequestWithProfileById(record_id);
-                    }
-                    else {
-                        return await fetchProfileUpdateRequestById(record_id);
-                    }
-                default: return null;
+                    data = status === 'pending' 
+                        ? await fetchProfileUpdateRequestWithProfileByIdAPI(record_id)
+                        : await fetchProfileUpdateRequestByIdAPI(record_id);
+                    break;
+                default: 
+                    return null;
             }
+            
+            return data ?? null;
         },
+        enabled: !!record_id
     });
 }
-
-export function useFetchRecordsPaginatedIntern(
-    page:number, 
-    pageSize: number,
-    log_category?: RecordType
-) {
-    return useQuery({
-        queryKey: ['records', page, log_category], 
-        queryFn: () => fetchRecordsPaginatedIntern(page, pageSize, log_category),
-        placeholderData: keepPreviousData,
-        staleTime: 30_000,
-    });
-}
-
-export const fetchRecordsPaginatedIntern = async (
-    page: number, 
-    pageSize: number = 5,
-    log_category?: string
-): Promise<{
-    data: (Record & { display_date: string })[];
-    count: number;
-}> => {
-    const intern_id = await getAuthUserId();
-    if (!intern_id) {
-        throw new Error('You must be logged in to fetch records');
-    }
-    const from = page * pageSize;
-    const to = from + pageSize - 1;
-
-    let query = supabase
-        .from('records_with_display_date') 
-        .select('*', { count: 'exact' })
-        .eq('intern_id', intern_id);
-
-    if (log_category) {
-        query = query.eq('log_category', log_category);
-    }
-
-    const { data, error, count } = await query
-        .order('display_date', { ascending: false })
-        .range(from, to);
-    
-    if (error){
-        console.log(error)
-        throw error;
-    } 
-    
-    return { data: data || [], count: count ?? 0 };
-};
 
 export async function fetchRecordDetails(record_id: string, record_category: RecordType) {
      try {

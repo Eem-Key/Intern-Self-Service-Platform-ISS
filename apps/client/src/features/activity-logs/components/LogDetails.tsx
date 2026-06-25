@@ -5,8 +5,7 @@ import { supabase } from '../../../config/supabase';
 import StatusBadge from './StatusBadge';
 import StatusMessage from '../../../components/feedback/StatusMessage';
 import RequiredMark from '../../../components/ui/RequiredMark';
-import { useFetchCompleteRecordDetails } from '../../../api/record.api';
-import { updateEODReportAPI } from '../../../api/intern.dashboard.api';
+import ProfileUpdate from './ProfileUpdate';
 import { validateEodReport } from '../../../utils/validateEodReport';
 import type { ReportStatus } from '../../../../../shared/types/enums.types';
 import type { RecordLog } from '../../../../../shared/types/record.types';
@@ -14,8 +13,9 @@ import type {
     EODReportForm,
     EODReportFormErrors,
 } from '../../../../../shared/types/eodReport.types';
-import ProfileUpdate from './ProfileUpdate';
-import { fetchFullNameAPI } from '../../../api/profile.api';
+import { useFetchCompleteRecordDetails } from '../../../api/record.api';
+import { updateEODReportAPI } from '../../../api/intern.dashboard.api';
+import { fetchFullNameAPI } from '../../../api/intern.logs.api';
 
 type LogDetailsModalProps = {
     record: RecordLog;

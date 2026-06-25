@@ -671,6 +671,25 @@ model intern_hours_summary {
   @@schema("public")
 }
 
+model records_with_display_date {
+  id                   String    @id
+  intern_id            String
+  log_category         String
+  created_at           DateTime  @db.Timestamptz(6)
+  status               String
+  admin_id             String?
+  admin_feedback       String?
+  reviewed_at          DateTime? @db.Timestamptz(6)
+  date_created         DateTime? @db.Date
+  activity_description String?
+  updated_at           DateTime? @db.Timestamptz(6)
+  display_date         DateTime  @db.Timestamptz(6)
+
+  
+  @@map("records_with_display_date")
+  @@schema("public")
+}
+
 enum aal_level {
   aal1
   aal2
