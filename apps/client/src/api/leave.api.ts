@@ -13,6 +13,28 @@ import {
     insertRecord 
 } from './record.api'
 
+export async function fetchLeaveRequestById(
+    record_id: string
+) {
+    const intern_id = await getAuthUserId();
+    if (!intern_id) {
+        throw new Error(`You must be logged in to fetch a record.`);
+    }
+
+    const { data: fetchData, error: fetchError } = await supabase
+        .from('leave_requests')
+        .select('*')
+        .eq('record_id', record_id)
+        .single();
+
+    if (fetchError) {
+        console.error('Error fetching record:', fetchError.message);
+        throw fetchError;
+    }
+
+    return fetchData
+}
+
 export const fetchAllLeaveRequestDatesOfIntern = async (): Promise<
     { start_date: string; end_date: string }[]
 > => {
@@ -42,28 +64,6 @@ export const fetchAllLeaveRequestDatesOfIntern = async (): Promise<
 
     return leaveDates || [];
 };
-
-export async function fetchLeaveRequestById(
-    record_id: string
-) {
-    const intern_id = await getAuthUserId();
-    if (!intern_id) {
-        throw new Error(`You must be logged in to fetch a record.`);
-    }
-
-    const { data: fetchData, error: fetchError } = await supabase
-        .from('leave_requests')
-        .select('*')
-        .eq('record_id', record_id)
-        .single();
-
-    if (fetchError) {
-        console.error('Error fetching record:', fetchError.message);
-        throw fetchError;
-    }
-
-    return fetchData
-}
 
 export const insertLeaveRequest = async (formData: LeaveRequestForm) => {
     const intern_id = await getAuthUserId();
