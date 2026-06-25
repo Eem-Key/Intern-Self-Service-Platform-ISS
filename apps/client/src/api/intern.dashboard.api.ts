@@ -64,11 +64,11 @@ export async function timeInAPI(setup: WorkSetup) {
     });
 }
 
-export async function timeOutAPI(attendanceId: string) {
+export async function timeOutAPI(attendance_id: string) {
     const { data } = await supabase.auth.getSession();
     const token = data.session?.access_token;
 
-    return await apiClient<TimeOutResponse>(`/intern/dashboard/time-out/${attendanceId}`, {
+    return await apiClient<TimeOutResponse>(`/intern/dashboard/time-out/${attendance_id}`, {
         method: 'PATCH',
         token: token ?? undefined,
     });
@@ -99,22 +99,22 @@ export async function fetchEODReportByDateAPI(
     });
 }
 
-export async function insertEODReportAPI(payload: EODReportForm, reportStatus: ReportStatus) {
+export async function insertEODReportAPI(payload: EODReportForm, report_status: ReportStatus) {
     const { data } = await supabase.auth.getSession();
     
     return await apiClient('/intern/dashboard/eod-report', {
         method: 'POST',
-        body: { payload, reportStatus },
+        body: { payload, report_status },
         token: data.session?.access_token,
     });
 }
 
-export async function updateEODReportAPI(report_id: string, payload: EODReportForm, reportStatus: ReportStatus) {
+export async function updateEODReportAPI(report_id: string, payload: EODReportForm, report_status: ReportStatus) {
     const { data } = await supabase.auth.getSession();
     
     return await apiClient(`/intern/dashboard/eod-report/${report_id}`, {
         method: 'PATCH',
-        body: { payload, reportStatus },
+        body: { payload, report_status },
         token: data.session?.access_token,
     });
 }

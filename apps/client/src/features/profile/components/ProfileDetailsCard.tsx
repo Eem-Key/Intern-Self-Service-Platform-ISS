@@ -1,7 +1,15 @@
+import RequiredMark from '../../../components/ui/RequiredMark.tsx';
+import StatusMessage from '../../../components/feedback/StatusMessage';
+import ConfirmationModal from '../../../components/feedback/confirmationModal';
+import { ChevronDown } from 'lucide-react';
 import { calculateProfileChanges } from '../../../utils/profile.util'
 import { validateProfileUpdateRequest } from '../../../utils/validateProfile.ts';
 import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
+import {
+    USER_GENDER_VALUES,
+    type UserGender,
+} from '../../../../../shared/types/enums.types';
 import type {
     ProfileIntern,
     ProfileUpdateRequestForm,
@@ -12,21 +20,16 @@ import type {
 import { 
     insertProfileUpdateRequestAPI, 
     hasPendingProfileUpdateRequestAPI,
-} from '../../../api/profile.api';
-import StatusMessage from '../../../components/feedback/StatusMessage';
-import ConfirmationModal from '../../../components/feedback/confirmationModal';
-import {
-    USER_GENDER_VALUES,
-    type UserGender,
-} from '../../../../../shared/types/enums.types';
-import { ChevronDown } from 'lucide-react';
-import RequiredMark from '../../../components/ui/RequiredMark.tsx';
-
+} from '../../../api/intern.profile.api';
 
 type ProfileDetailsCardProps = {
     profile: ProfileIntern;
 };
 
+export const formatDateForInput = (dateString: string | Date | null | undefined) => {
+  if (!dateString) return '';
+  return new Date(dateString).toISOString().split('T')[0];
+};
 
 function ProfileDetailsCard(
     { profile }: ProfileDetailsCardProps
@@ -69,7 +72,7 @@ function ProfileDetailsCard(
         middle_name: profile.middle_name || '',
         last_name: profile.last_name || '',
         suffix: profile.suffix || '',
-        birth_date: profile.birth_date || '',
+        birth_date: formatDateForInput(profile.birth_date || ''),
         gender: profile.gender || '',
         email: profile.email || '',
         contact_number: profile.contact_number || '',
@@ -85,7 +88,7 @@ function ProfileDetailsCard(
         required_hours: profile.intern_info?.required_hours ? String(profile.intern_info.required_hours) : '',
         // work_setup: profile.intern_info?.work_setup || '',
         office: profile.office || '',
-        start_date: profile.intern_info?.start_date || '',
+        start_date: formatDateForInput(profile.intern_info?.start_date) || '',
     });
 
     const [fieldErrors, setFieldErrors] = useState<
@@ -150,7 +153,7 @@ function ProfileDetailsCard(
         middle_name: profile.middle_name || '',
         last_name: profile.last_name || '',
         suffix: profile.suffix || '',
-        birth_date: profile.birth_date || '',
+        birth_date: formatDateForInput(profile.birth_date),
         gender: profile.gender || '',
         email: profile.email || '',
         contact_number: profile.contact_number || '',
@@ -166,7 +169,7 @@ function ProfileDetailsCard(
         required_hours: profile.intern_info?.required_hours ? String(profile.intern_info.required_hours) : '',
         // work_setup: profile.work_setup || '',
         office: profile.office || '',
-        start_date: profile.intern_info?.start_date || '',
+        start_date: formatDateForInput(profile.intern_info?.start_date),
     });
     };
 
