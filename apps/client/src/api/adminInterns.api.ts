@@ -107,11 +107,11 @@ export const useInviteInternAPIMutation = () => {
     mutationFn: (data: ProfileInternInsert) => inviteInternAPI(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-intern-list'] });
-      alert("Intern invited successfully!");
+      //alert("Intern invited successfully!");
     },
-    onError: (error) => {
+    /*onError: (error) => {
       alert(`Error: ${error.message}`);
-    }
+    }*/
   });
 };
 
@@ -119,11 +119,11 @@ export const useResendInviteInternAPIMutation = () => {
   return useMutation({
     mutationFn: (email: string) => resendInviteInternAPI(email),
     onSuccess: () => {
-      alert("Resent intern invitation successfully!");
+      //alert("Resent intern invitation successfully!");
     },
-    onError: (error) => {
+    /*onError: (error) => {
       alert(`Error: ${error.message}`);
-    }
+    }*/
   });
 };
 
@@ -301,6 +301,7 @@ export async function fetchAllEodReportByIdAPI(user_id: string): Promise<EODRepo
         .select(`
             *,
             records!inner(
+                status,
                 admin_id,
                 admin_feedback,
                 reviewed_at
@@ -320,6 +321,7 @@ export async function fetchAllEodReportByIdAPI(user_id: string): Promise<EODRepo
         project_name: item.project_name,
         task_accomplished: item.task_accomplished,
         hours_spent: item.hours_spent,
+        status: item.records.status,
         admin_id: item.records.admin_id,
         admin_feedback: item.records.admin_feedback,
         reviewed_at: item.records.reviewed_at
