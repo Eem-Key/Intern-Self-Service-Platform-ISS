@@ -167,7 +167,12 @@ export async function fetchAllInternListInformationAPI(
 
     let query = supabase
         .from('intern_list_view')
-        .select('*', { count: 'exact' });
+        .select(`
+            id, university, program, status, intern_position, 
+            department, avatar_url, first_name, middle_name, 
+            last_name, suffix`, 
+            { count: 'exact' }
+        );
 
     if (search_value) {
         const term = `%${search_value}%`;
@@ -189,17 +194,31 @@ export async function fetchAllInternListInformationAPI(
         throw new Error(`Error fetching Intern List: ${error.message}`);
     }
 
-    const mappedInterns = (data || []).map((item: any) => ({
+
+
+    const mappedInterns = (data || []).map((item: any): InternListInfo => {
+    const middleInitial = item?.middle_name
+        ? `${item.middle_name.charAt(0).toUpperCase()}.`
+        : null;
+
+    const fullName = [
+        item?.first_name,
+        middleInitial,
+        item?.last_name,
+        item?.suffix,
+    ].filter(Boolean).join(' ');
+
+    return {
         id: item.id,
         university: item.university,
         program: item.program,
         status: item.status,
         intern_position: item.intern_position,
         department: item.department,
-        name: item.full_name,
+        name: fullName || item.full_name,
         avatar_url: item.avatar_url,
-    } as InternListInfo));
-
+    };
+});
     return {data: mappedInterns, count: count || 0 }
 };
 
