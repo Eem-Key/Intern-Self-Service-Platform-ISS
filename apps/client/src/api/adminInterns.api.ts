@@ -136,11 +136,11 @@ export const useDeactivateInternAPIMutation = () => {
     
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-intern-list'] });
-      alert("Intern deactivated successfully!");
+      //alert("Intern deactivated successfully!");
     },
-    onError: (error: any) => {
+    /*onError: (error: any) => {
       alert(`Error: ${error.message}`);
-    }
+    }*/
   });
 };
 
