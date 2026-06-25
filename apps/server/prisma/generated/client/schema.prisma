@@ -661,11 +661,11 @@ model records {
 }
 
 model intern_hours_summary {
-  intern_id           String  @id 
-  required_hours      Int?
-  total_onsite_hours  Int?
-  total_online_hours  Int?
-  rendered_hours      Int?
+  intern_id          String @id
+  required_hours     Int?
+  total_onsite_hours Int?
+  total_online_hours Int?
+  rendered_hours     Int?
 
   @@map("intern_hours_summary")
   @@schema("public")

@@ -15,7 +15,7 @@ import {
     updateRecord
 } from './record.api'
 
-export async function fetchAttendanceById(
+export async function fetchAttendanceByIdAPI(
     record_id: string
 ) {
     const intern_id = await getAuthUserId();

@@ -6,7 +6,7 @@ import StatusBadge from './StatusBadge';
 import StatusMessage from '../../../components/feedback/StatusMessage';
 import RequiredMark from '../../../components/ui/RequiredMark';
 import { useFetchCompleteRecordDetails } from '../../../api/record.api';
-import { updateEODReportAPI } from '../../../api/eodReport.api';
+import { updateEODReportAPI } from '../../../api/intern.dashboard.api';
 import { validateEodReport } from '../../../utils/validateEodReport';
 import type { ReportStatus } from '../../../../../shared/types/enums.types';
 import type { RecordLog } from '../../../../../shared/types/record.types';

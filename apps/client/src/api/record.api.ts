@@ -1,7 +1,7 @@
 import { supabase } from '../config/supabase.ts';
 import { getAuthUserId, isAdmin } from '../utils/auth.util.ts';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { fetchAttendanceById } from './attendance.api';
+import { fetchAttendanceByIdAPI } from './attendance.api';
 import { fetchEodReportById } from './eodReport.api';
 import { fetchLeaveRequestById } from './leave.api';
 import { 
@@ -34,7 +34,7 @@ export function useFetchCompleteRecordDetails(
         queryKey: ['log-details', record_id],
         queryFn: async () => {
             switch (record_category) {
-                case 'attendance': return await fetchAttendanceById(record_id);
+                case 'attendance': return await fetchAttendanceByIdAPI(record_id);
                 case 'eod_report': return await fetchEodReportById(record_id);
                 case 'leave_request': return await fetchLeaveRequestById(record_id);
                 case 'profile_update': 
@@ -102,7 +102,7 @@ export const fetchRecordsPaginatedIntern = async (
 export async function fetchRecordDetails(record_id: string, record_category: RecordType) {
      try {
         switch (record_category) {
-            case 'attendance': return await fetchAttendanceById(record_id);
+            case 'attendance': return await fetchAttendanceByIdAPI(record_id);
             case 'eod_report': return await fetchEodReportById(record_id);
             case 'leave_request': return await fetchLeaveRequestById(record_id);
             case 'profile_update': return await fetchProfileUpdateRequestById(record_id);

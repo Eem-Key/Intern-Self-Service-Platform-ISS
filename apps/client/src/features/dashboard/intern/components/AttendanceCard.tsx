@@ -7,7 +7,7 @@ import {
   fetchAttendanceByDateAPI,
   timeInAPI,
   timeOutAPI,
-} from '../../../../api/attendance.api';
+} from '../../../../api/intern.dashboard.api';
 import { useAttendanceTimer } from './attendance/useAttendanceTimer';
 import type { WorkSetup } from '../../../../../../shared/types/enums.types';
 
@@ -126,13 +126,7 @@ function AttendanceCard() {
   });
 
   const timeOutMutation = useMutation({
-    mutationFn: () => {
-      if (!todayAttendance?.record_id) {
-        throw new Error('No attendance record found.');
-      }
-
-      return timeOutAPI(todayAttendance.record_id);
-    },
+    mutationFn: (attendanceId: string) => timeOutAPI(attendanceId),
 
     onSuccess: async () => {
       await Promise.all([
@@ -208,7 +202,9 @@ function AttendanceCard() {
   };
 
   const handleTimeOut = () => {
-    timeOutMutation.mutate();
+    if (todayAttendance?.record_id) {
+      timeOutMutation.mutate(todayAttendance.record_id);
+    }
   };
 
   const handleMainAction = () => {
