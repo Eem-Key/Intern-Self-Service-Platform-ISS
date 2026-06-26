@@ -7,28 +7,20 @@ const supabaseAdmin = createClient(
     process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
+export const authenticate = async (req: any, res: any, next: any) => {
     const authHeader = req.headers.authorization;
-    
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ error: 'Missing or invalid authorization header' });
+    const token = authHeader?.split(' ')[1];
+
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+
+    const { data, error } = await supabaseAdmin.auth.getUser(token);
+
+    if (error || !data.user) {
+        return res.status(401).json({ error: 'Invalid token' });
     }
 
-    const token = authHeader.split(' ')[1];
-
-    try {
-        const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
-
-        if (error || !user) {
-            return res.status(401).json({ error: 'Unauthorized: Invalid or expired token' });
-        }
-
-        (req as any).user = user;
-        
-        next();
-    } catch (err) {
-        return res.status(500).json({ error: 'Internal server error during authentication' });
-    }
+    req.user = data.user; 
+    next();
 };
 
 export const isAdmin = async (req: Request, res: Response, next: NextFunction) => {

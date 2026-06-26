@@ -8,7 +8,7 @@ import FormInput from '../../../components/ui/formInput';
 import PrimaryButton from '../../../components/ui/primaryButton';
 import ChangePasswordModal from './ChangePassword';
 
-import { loginUserAPI } from '../../../api/login.api';
+import { loginUserAPI } from '../../../api/auth.api';
 import { fetchUserProfileAPI } from '../../../api/profile.api';
 import validateForm from '../../../utils/ValidateForm';
 
