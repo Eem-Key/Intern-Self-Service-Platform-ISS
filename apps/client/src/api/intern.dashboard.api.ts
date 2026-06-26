@@ -23,20 +23,6 @@ import type {
     NotificationsResponse
 } from '../../../shared/types/notification.types';
 
-export async function fetchAttendanceByIdAPI(record_id: string) {
-    const { data } = await supabase.auth.getSession();
-    const token = data.session?.access_token;
-
-    if (!token) {
-        throw new Error('You must be logged in to fetch a record.');
-    }
-
-    return await apiClient<AttendanceRecord>(`/attendance/${record_id}`, {
-        method: 'GET',
-        token: token ?? undefined,
-    });
-}
-
 export async function fetchAttendanceByDateAPI(
     date: string
 ): Promise<AttendanceRecord | null> {

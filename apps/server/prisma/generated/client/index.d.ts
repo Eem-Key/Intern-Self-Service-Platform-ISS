@@ -214,6 +214,11 @@ export type intern_hours_summary = $Result.DefaultSelection<Prisma.$intern_hours
  * 
  */
 export type records_with_display_date = $Result.DefaultSelection<Prisma.$records_with_display_datePayload>
+/**
+ * Model intern_list_view
+ * 
+ */
+export type intern_list_view = $Result.DefaultSelection<Prisma.$intern_list_viewPayload>
 
 /**
  * Enums
@@ -993,6 +998,16 @@ export class PrismaClient<
     * ```
     */
   get records_with_display_date(): Prisma.records_with_display_dateDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.intern_list_view`: Exposes CRUD operations for the **intern_list_view** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Intern_list_views
+    * const intern_list_views = await prisma.intern_list_view.findMany()
+    * ```
+    */
+  get intern_list_view(): Prisma.intern_list_viewDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -1461,7 +1476,8 @@ export namespace Prisma {
     profiles: 'profiles',
     records: 'records',
     intern_hours_summary: 'intern_hours_summary',
-    records_with_display_date: 'records_with_display_date'
+    records_with_display_date: 'records_with_display_date',
+    intern_list_view: 'intern_list_view'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1477,7 +1493,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "audit_log_entries" | "custom_oauth_providers" | "flow_state" | "identities" | "instances" | "mfa_amr_claims" | "mfa_challenges" | "mfa_factors" | "oauth_authorizations" | "oauth_client_states" | "oauth_clients" | "oauth_consents" | "one_time_tokens" | "refresh_tokens" | "saml_providers" | "saml_relay_states" | "schema_migrations" | "sessions" | "sso_domains" | "sso_providers" | "users" | "webauthn_challenges" | "webauthn_credentials" | "activity_logs" | "admins" | "attendance_logs" | "eod_reports" | "interns" | "leave_requests" | "notifications" | "profile_update_requests" | "profiles" | "records" | "intern_hours_summary" | "records_with_display_date"
+      modelProps: "audit_log_entries" | "custom_oauth_providers" | "flow_state" | "identities" | "instances" | "mfa_amr_claims" | "mfa_challenges" | "mfa_factors" | "oauth_authorizations" | "oauth_client_states" | "oauth_clients" | "oauth_consents" | "one_time_tokens" | "refresh_tokens" | "saml_providers" | "saml_relay_states" | "schema_migrations" | "sessions" | "sso_domains" | "sso_providers" | "users" | "webauthn_challenges" | "webauthn_credentials" | "activity_logs" | "admins" | "attendance_logs" | "eod_reports" | "interns" | "leave_requests" | "notifications" | "profile_update_requests" | "profiles" | "records" | "intern_hours_summary" | "records_with_display_date" | "intern_list_view"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -4071,6 +4087,80 @@ export namespace Prisma {
           }
         }
       }
+      intern_list_view: {
+        payload: Prisma.$intern_list_viewPayload<ExtArgs>
+        fields: Prisma.intern_list_viewFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.intern_list_viewFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$intern_list_viewPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.intern_list_viewFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$intern_list_viewPayload>
+          }
+          findFirst: {
+            args: Prisma.intern_list_viewFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$intern_list_viewPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.intern_list_viewFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$intern_list_viewPayload>
+          }
+          findMany: {
+            args: Prisma.intern_list_viewFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$intern_list_viewPayload>[]
+          }
+          create: {
+            args: Prisma.intern_list_viewCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$intern_list_viewPayload>
+          }
+          createMany: {
+            args: Prisma.intern_list_viewCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.intern_list_viewCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$intern_list_viewPayload>[]
+          }
+          delete: {
+            args: Prisma.intern_list_viewDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$intern_list_viewPayload>
+          }
+          update: {
+            args: Prisma.intern_list_viewUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$intern_list_viewPayload>
+          }
+          deleteMany: {
+            args: Prisma.intern_list_viewDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.intern_list_viewUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.intern_list_viewUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$intern_list_viewPayload>[]
+          }
+          upsert: {
+            args: Prisma.intern_list_viewUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$intern_list_viewPayload>
+          }
+          aggregate: {
+            args: Prisma.Intern_list_viewAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateIntern_list_view>
+          }
+          groupBy: {
+            args: Prisma.intern_list_viewGroupByArgs<ExtArgs>
+            result: $Utils.Optional<Intern_list_viewGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.intern_list_viewCountArgs<ExtArgs>
+            result: $Utils.Optional<Intern_list_viewCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -4214,6 +4304,7 @@ export namespace Prisma {
     records?: recordsOmit
     intern_hours_summary?: intern_hours_summaryOmit
     records_with_display_date?: records_with_display_dateOmit
+    intern_list_view?: intern_list_viewOmit
   }
 
   /* Types for Logging */
@@ -44781,6 +44872,1110 @@ export namespace Prisma {
 
 
   /**
+   * Model intern_list_view
+   */
+
+  export type AggregateIntern_list_view = {
+    _count: Intern_list_viewCountAggregateOutputType | null
+    _min: Intern_list_viewMinAggregateOutputType | null
+    _max: Intern_list_viewMaxAggregateOutputType | null
+  }
+
+  export type Intern_list_viewMinAggregateOutputType = {
+    id: string | null
+    university: string | null
+    program: string | null
+    status: string | null
+    intern_position: string | null
+    department: string | null
+    full_name: string | null
+    first_name: string | null
+    middle_name: string | null
+    last_name: string | null
+    suffix: string | null
+    avatar_url: string | null
+    profile_created_at: Date | null
+  }
+
+  export type Intern_list_viewMaxAggregateOutputType = {
+    id: string | null
+    university: string | null
+    program: string | null
+    status: string | null
+    intern_position: string | null
+    department: string | null
+    full_name: string | null
+    first_name: string | null
+    middle_name: string | null
+    last_name: string | null
+    suffix: string | null
+    avatar_url: string | null
+    profile_created_at: Date | null
+  }
+
+  export type Intern_list_viewCountAggregateOutputType = {
+    id: number
+    university: number
+    program: number
+    status: number
+    intern_position: number
+    department: number
+    full_name: number
+    first_name: number
+    middle_name: number
+    last_name: number
+    suffix: number
+    avatar_url: number
+    profile_created_at: number
+    _all: number
+  }
+
+
+  export type Intern_list_viewMinAggregateInputType = {
+    id?: true
+    university?: true
+    program?: true
+    status?: true
+    intern_position?: true
+    department?: true
+    full_name?: true
+    first_name?: true
+    middle_name?: true
+    last_name?: true
+    suffix?: true
+    avatar_url?: true
+    profile_created_at?: true
+  }
+
+  export type Intern_list_viewMaxAggregateInputType = {
+    id?: true
+    university?: true
+    program?: true
+    status?: true
+    intern_position?: true
+    department?: true
+    full_name?: true
+    first_name?: true
+    middle_name?: true
+    last_name?: true
+    suffix?: true
+    avatar_url?: true
+    profile_created_at?: true
+  }
+
+  export type Intern_list_viewCountAggregateInputType = {
+    id?: true
+    university?: true
+    program?: true
+    status?: true
+    intern_position?: true
+    department?: true
+    full_name?: true
+    first_name?: true
+    middle_name?: true
+    last_name?: true
+    suffix?: true
+    avatar_url?: true
+    profile_created_at?: true
+    _all?: true
+  }
+
+  export type Intern_list_viewAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which intern_list_view to aggregate.
+     */
+    where?: intern_list_viewWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of intern_list_views to fetch.
+     */
+    orderBy?: intern_list_viewOrderByWithRelationInput | intern_list_viewOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: intern_list_viewWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` intern_list_views from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` intern_list_views.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned intern_list_views
+    **/
+    _count?: true | Intern_list_viewCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: Intern_list_viewMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: Intern_list_viewMaxAggregateInputType
+  }
+
+  export type GetIntern_list_viewAggregateType<T extends Intern_list_viewAggregateArgs> = {
+        [P in keyof T & keyof AggregateIntern_list_view]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateIntern_list_view[P]>
+      : GetScalarType<T[P], AggregateIntern_list_view[P]>
+  }
+
+
+
+
+  export type intern_list_viewGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: intern_list_viewWhereInput
+    orderBy?: intern_list_viewOrderByWithAggregationInput | intern_list_viewOrderByWithAggregationInput[]
+    by: Intern_list_viewScalarFieldEnum[] | Intern_list_viewScalarFieldEnum
+    having?: intern_list_viewScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: Intern_list_viewCountAggregateInputType | true
+    _min?: Intern_list_viewMinAggregateInputType
+    _max?: Intern_list_viewMaxAggregateInputType
+  }
+
+  export type Intern_list_viewGroupByOutputType = {
+    id: string
+    university: string | null
+    program: string | null
+    status: string | null
+    intern_position: string | null
+    department: string | null
+    full_name: string | null
+    first_name: string | null
+    middle_name: string | null
+    last_name: string | null
+    suffix: string | null
+    avatar_url: string | null
+    profile_created_at: Date | null
+    _count: Intern_list_viewCountAggregateOutputType | null
+    _min: Intern_list_viewMinAggregateOutputType | null
+    _max: Intern_list_viewMaxAggregateOutputType | null
+  }
+
+  type GetIntern_list_viewGroupByPayload<T extends intern_list_viewGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<Intern_list_viewGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof Intern_list_viewGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], Intern_list_viewGroupByOutputType[P]>
+            : GetScalarType<T[P], Intern_list_viewGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type intern_list_viewSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    university?: boolean
+    program?: boolean
+    status?: boolean
+    intern_position?: boolean
+    department?: boolean
+    full_name?: boolean
+    first_name?: boolean
+    middle_name?: boolean
+    last_name?: boolean
+    suffix?: boolean
+    avatar_url?: boolean
+    profile_created_at?: boolean
+  }, ExtArgs["result"]["intern_list_view"]>
+
+  export type intern_list_viewSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    university?: boolean
+    program?: boolean
+    status?: boolean
+    intern_position?: boolean
+    department?: boolean
+    full_name?: boolean
+    first_name?: boolean
+    middle_name?: boolean
+    last_name?: boolean
+    suffix?: boolean
+    avatar_url?: boolean
+    profile_created_at?: boolean
+  }, ExtArgs["result"]["intern_list_view"]>
+
+  export type intern_list_viewSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    university?: boolean
+    program?: boolean
+    status?: boolean
+    intern_position?: boolean
+    department?: boolean
+    full_name?: boolean
+    first_name?: boolean
+    middle_name?: boolean
+    last_name?: boolean
+    suffix?: boolean
+    avatar_url?: boolean
+    profile_created_at?: boolean
+  }, ExtArgs["result"]["intern_list_view"]>
+
+  export type intern_list_viewSelectScalar = {
+    id?: boolean
+    university?: boolean
+    program?: boolean
+    status?: boolean
+    intern_position?: boolean
+    department?: boolean
+    full_name?: boolean
+    first_name?: boolean
+    middle_name?: boolean
+    last_name?: boolean
+    suffix?: boolean
+    avatar_url?: boolean
+    profile_created_at?: boolean
+  }
+
+  export type intern_list_viewOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "university" | "program" | "status" | "intern_position" | "department" | "full_name" | "first_name" | "middle_name" | "last_name" | "suffix" | "avatar_url" | "profile_created_at", ExtArgs["result"]["intern_list_view"]>
+
+  export type $intern_list_viewPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "intern_list_view"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      university: string | null
+      program: string | null
+      status: string | null
+      intern_position: string | null
+      department: string | null
+      full_name: string | null
+      first_name: string | null
+      middle_name: string | null
+      last_name: string | null
+      suffix: string | null
+      avatar_url: string | null
+      profile_created_at: Date | null
+    }, ExtArgs["result"]["intern_list_view"]>
+    composites: {}
+  }
+
+  type intern_list_viewGetPayload<S extends boolean | null | undefined | intern_list_viewDefaultArgs> = $Result.GetResult<Prisma.$intern_list_viewPayload, S>
+
+  type intern_list_viewCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<intern_list_viewFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: Intern_list_viewCountAggregateInputType | true
+    }
+
+  export interface intern_list_viewDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['intern_list_view'], meta: { name: 'intern_list_view' } }
+    /**
+     * Find zero or one Intern_list_view that matches the filter.
+     * @param {intern_list_viewFindUniqueArgs} args - Arguments to find a Intern_list_view
+     * @example
+     * // Get one Intern_list_view
+     * const intern_list_view = await prisma.intern_list_view.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends intern_list_viewFindUniqueArgs>(args: SelectSubset<T, intern_list_viewFindUniqueArgs<ExtArgs>>): Prisma__intern_list_viewClient<$Result.GetResult<Prisma.$intern_list_viewPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Intern_list_view that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {intern_list_viewFindUniqueOrThrowArgs} args - Arguments to find a Intern_list_view
+     * @example
+     * // Get one Intern_list_view
+     * const intern_list_view = await prisma.intern_list_view.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends intern_list_viewFindUniqueOrThrowArgs>(args: SelectSubset<T, intern_list_viewFindUniqueOrThrowArgs<ExtArgs>>): Prisma__intern_list_viewClient<$Result.GetResult<Prisma.$intern_list_viewPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Intern_list_view that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {intern_list_viewFindFirstArgs} args - Arguments to find a Intern_list_view
+     * @example
+     * // Get one Intern_list_view
+     * const intern_list_view = await prisma.intern_list_view.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends intern_list_viewFindFirstArgs>(args?: SelectSubset<T, intern_list_viewFindFirstArgs<ExtArgs>>): Prisma__intern_list_viewClient<$Result.GetResult<Prisma.$intern_list_viewPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Intern_list_view that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {intern_list_viewFindFirstOrThrowArgs} args - Arguments to find a Intern_list_view
+     * @example
+     * // Get one Intern_list_view
+     * const intern_list_view = await prisma.intern_list_view.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends intern_list_viewFindFirstOrThrowArgs>(args?: SelectSubset<T, intern_list_viewFindFirstOrThrowArgs<ExtArgs>>): Prisma__intern_list_viewClient<$Result.GetResult<Prisma.$intern_list_viewPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Intern_list_views that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {intern_list_viewFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Intern_list_views
+     * const intern_list_views = await prisma.intern_list_view.findMany()
+     * 
+     * // Get first 10 Intern_list_views
+     * const intern_list_views = await prisma.intern_list_view.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const intern_list_viewWithIdOnly = await prisma.intern_list_view.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends intern_list_viewFindManyArgs>(args?: SelectSubset<T, intern_list_viewFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$intern_list_viewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Intern_list_view.
+     * @param {intern_list_viewCreateArgs} args - Arguments to create a Intern_list_view.
+     * @example
+     * // Create one Intern_list_view
+     * const Intern_list_view = await prisma.intern_list_view.create({
+     *   data: {
+     *     // ... data to create a Intern_list_view
+     *   }
+     * })
+     * 
+     */
+    create<T extends intern_list_viewCreateArgs>(args: SelectSubset<T, intern_list_viewCreateArgs<ExtArgs>>): Prisma__intern_list_viewClient<$Result.GetResult<Prisma.$intern_list_viewPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Intern_list_views.
+     * @param {intern_list_viewCreateManyArgs} args - Arguments to create many Intern_list_views.
+     * @example
+     * // Create many Intern_list_views
+     * const intern_list_view = await prisma.intern_list_view.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends intern_list_viewCreateManyArgs>(args?: SelectSubset<T, intern_list_viewCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Intern_list_views and returns the data saved in the database.
+     * @param {intern_list_viewCreateManyAndReturnArgs} args - Arguments to create many Intern_list_views.
+     * @example
+     * // Create many Intern_list_views
+     * const intern_list_view = await prisma.intern_list_view.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Intern_list_views and only return the `id`
+     * const intern_list_viewWithIdOnly = await prisma.intern_list_view.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends intern_list_viewCreateManyAndReturnArgs>(args?: SelectSubset<T, intern_list_viewCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$intern_list_viewPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Intern_list_view.
+     * @param {intern_list_viewDeleteArgs} args - Arguments to delete one Intern_list_view.
+     * @example
+     * // Delete one Intern_list_view
+     * const Intern_list_view = await prisma.intern_list_view.delete({
+     *   where: {
+     *     // ... filter to delete one Intern_list_view
+     *   }
+     * })
+     * 
+     */
+    delete<T extends intern_list_viewDeleteArgs>(args: SelectSubset<T, intern_list_viewDeleteArgs<ExtArgs>>): Prisma__intern_list_viewClient<$Result.GetResult<Prisma.$intern_list_viewPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Intern_list_view.
+     * @param {intern_list_viewUpdateArgs} args - Arguments to update one Intern_list_view.
+     * @example
+     * // Update one Intern_list_view
+     * const intern_list_view = await prisma.intern_list_view.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends intern_list_viewUpdateArgs>(args: SelectSubset<T, intern_list_viewUpdateArgs<ExtArgs>>): Prisma__intern_list_viewClient<$Result.GetResult<Prisma.$intern_list_viewPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Intern_list_views.
+     * @param {intern_list_viewDeleteManyArgs} args - Arguments to filter Intern_list_views to delete.
+     * @example
+     * // Delete a few Intern_list_views
+     * const { count } = await prisma.intern_list_view.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends intern_list_viewDeleteManyArgs>(args?: SelectSubset<T, intern_list_viewDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Intern_list_views.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {intern_list_viewUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Intern_list_views
+     * const intern_list_view = await prisma.intern_list_view.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends intern_list_viewUpdateManyArgs>(args: SelectSubset<T, intern_list_viewUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Intern_list_views and returns the data updated in the database.
+     * @param {intern_list_viewUpdateManyAndReturnArgs} args - Arguments to update many Intern_list_views.
+     * @example
+     * // Update many Intern_list_views
+     * const intern_list_view = await prisma.intern_list_view.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Intern_list_views and only return the `id`
+     * const intern_list_viewWithIdOnly = await prisma.intern_list_view.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends intern_list_viewUpdateManyAndReturnArgs>(args: SelectSubset<T, intern_list_viewUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$intern_list_viewPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Intern_list_view.
+     * @param {intern_list_viewUpsertArgs} args - Arguments to update or create a Intern_list_view.
+     * @example
+     * // Update or create a Intern_list_view
+     * const intern_list_view = await prisma.intern_list_view.upsert({
+     *   create: {
+     *     // ... data to create a Intern_list_view
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Intern_list_view we want to update
+     *   }
+     * })
+     */
+    upsert<T extends intern_list_viewUpsertArgs>(args: SelectSubset<T, intern_list_viewUpsertArgs<ExtArgs>>): Prisma__intern_list_viewClient<$Result.GetResult<Prisma.$intern_list_viewPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Intern_list_views.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {intern_list_viewCountArgs} args - Arguments to filter Intern_list_views to count.
+     * @example
+     * // Count the number of Intern_list_views
+     * const count = await prisma.intern_list_view.count({
+     *   where: {
+     *     // ... the filter for the Intern_list_views we want to count
+     *   }
+     * })
+    **/
+    count<T extends intern_list_viewCountArgs>(
+      args?: Subset<T, intern_list_viewCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], Intern_list_viewCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Intern_list_view.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {Intern_list_viewAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends Intern_list_viewAggregateArgs>(args: Subset<T, Intern_list_viewAggregateArgs>): Prisma.PrismaPromise<GetIntern_list_viewAggregateType<T>>
+
+    /**
+     * Group by Intern_list_view.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {intern_list_viewGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends intern_list_viewGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: intern_list_viewGroupByArgs['orderBy'] }
+        : { orderBy?: intern_list_viewGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, intern_list_viewGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetIntern_list_viewGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the intern_list_view model
+   */
+  readonly fields: intern_list_viewFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for intern_list_view.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__intern_list_viewClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the intern_list_view model
+   */
+  interface intern_list_viewFieldRefs {
+    readonly id: FieldRef<"intern_list_view", 'String'>
+    readonly university: FieldRef<"intern_list_view", 'String'>
+    readonly program: FieldRef<"intern_list_view", 'String'>
+    readonly status: FieldRef<"intern_list_view", 'String'>
+    readonly intern_position: FieldRef<"intern_list_view", 'String'>
+    readonly department: FieldRef<"intern_list_view", 'String'>
+    readonly full_name: FieldRef<"intern_list_view", 'String'>
+    readonly first_name: FieldRef<"intern_list_view", 'String'>
+    readonly middle_name: FieldRef<"intern_list_view", 'String'>
+    readonly last_name: FieldRef<"intern_list_view", 'String'>
+    readonly suffix: FieldRef<"intern_list_view", 'String'>
+    readonly avatar_url: FieldRef<"intern_list_view", 'String'>
+    readonly profile_created_at: FieldRef<"intern_list_view", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * intern_list_view findUnique
+   */
+  export type intern_list_viewFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the intern_list_view
+     */
+    select?: intern_list_viewSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the intern_list_view
+     */
+    omit?: intern_list_viewOmit<ExtArgs> | null
+    /**
+     * Filter, which intern_list_view to fetch.
+     */
+    where: intern_list_viewWhereUniqueInput
+  }
+
+  /**
+   * intern_list_view findUniqueOrThrow
+   */
+  export type intern_list_viewFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the intern_list_view
+     */
+    select?: intern_list_viewSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the intern_list_view
+     */
+    omit?: intern_list_viewOmit<ExtArgs> | null
+    /**
+     * Filter, which intern_list_view to fetch.
+     */
+    where: intern_list_viewWhereUniqueInput
+  }
+
+  /**
+   * intern_list_view findFirst
+   */
+  export type intern_list_viewFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the intern_list_view
+     */
+    select?: intern_list_viewSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the intern_list_view
+     */
+    omit?: intern_list_viewOmit<ExtArgs> | null
+    /**
+     * Filter, which intern_list_view to fetch.
+     */
+    where?: intern_list_viewWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of intern_list_views to fetch.
+     */
+    orderBy?: intern_list_viewOrderByWithRelationInput | intern_list_viewOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for intern_list_views.
+     */
+    cursor?: intern_list_viewWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` intern_list_views from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` intern_list_views.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of intern_list_views.
+     */
+    distinct?: Intern_list_viewScalarFieldEnum | Intern_list_viewScalarFieldEnum[]
+  }
+
+  /**
+   * intern_list_view findFirstOrThrow
+   */
+  export type intern_list_viewFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the intern_list_view
+     */
+    select?: intern_list_viewSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the intern_list_view
+     */
+    omit?: intern_list_viewOmit<ExtArgs> | null
+    /**
+     * Filter, which intern_list_view to fetch.
+     */
+    where?: intern_list_viewWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of intern_list_views to fetch.
+     */
+    orderBy?: intern_list_viewOrderByWithRelationInput | intern_list_viewOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for intern_list_views.
+     */
+    cursor?: intern_list_viewWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` intern_list_views from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` intern_list_views.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of intern_list_views.
+     */
+    distinct?: Intern_list_viewScalarFieldEnum | Intern_list_viewScalarFieldEnum[]
+  }
+
+  /**
+   * intern_list_view findMany
+   */
+  export type intern_list_viewFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the intern_list_view
+     */
+    select?: intern_list_viewSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the intern_list_view
+     */
+    omit?: intern_list_viewOmit<ExtArgs> | null
+    /**
+     * Filter, which intern_list_views to fetch.
+     */
+    where?: intern_list_viewWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of intern_list_views to fetch.
+     */
+    orderBy?: intern_list_viewOrderByWithRelationInput | intern_list_viewOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing intern_list_views.
+     */
+    cursor?: intern_list_viewWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` intern_list_views from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` intern_list_views.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of intern_list_views.
+     */
+    distinct?: Intern_list_viewScalarFieldEnum | Intern_list_viewScalarFieldEnum[]
+  }
+
+  /**
+   * intern_list_view create
+   */
+  export type intern_list_viewCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the intern_list_view
+     */
+    select?: intern_list_viewSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the intern_list_view
+     */
+    omit?: intern_list_viewOmit<ExtArgs> | null
+    /**
+     * The data needed to create a intern_list_view.
+     */
+    data: XOR<intern_list_viewCreateInput, intern_list_viewUncheckedCreateInput>
+  }
+
+  /**
+   * intern_list_view createMany
+   */
+  export type intern_list_viewCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many intern_list_views.
+     */
+    data: intern_list_viewCreateManyInput | intern_list_viewCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * intern_list_view createManyAndReturn
+   */
+  export type intern_list_viewCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the intern_list_view
+     */
+    select?: intern_list_viewSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the intern_list_view
+     */
+    omit?: intern_list_viewOmit<ExtArgs> | null
+    /**
+     * The data used to create many intern_list_views.
+     */
+    data: intern_list_viewCreateManyInput | intern_list_viewCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * intern_list_view update
+   */
+  export type intern_list_viewUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the intern_list_view
+     */
+    select?: intern_list_viewSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the intern_list_view
+     */
+    omit?: intern_list_viewOmit<ExtArgs> | null
+    /**
+     * The data needed to update a intern_list_view.
+     */
+    data: XOR<intern_list_viewUpdateInput, intern_list_viewUncheckedUpdateInput>
+    /**
+     * Choose, which intern_list_view to update.
+     */
+    where: intern_list_viewWhereUniqueInput
+  }
+
+  /**
+   * intern_list_view updateMany
+   */
+  export type intern_list_viewUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update intern_list_views.
+     */
+    data: XOR<intern_list_viewUpdateManyMutationInput, intern_list_viewUncheckedUpdateManyInput>
+    /**
+     * Filter which intern_list_views to update
+     */
+    where?: intern_list_viewWhereInput
+    /**
+     * Limit how many intern_list_views to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * intern_list_view updateManyAndReturn
+   */
+  export type intern_list_viewUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the intern_list_view
+     */
+    select?: intern_list_viewSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the intern_list_view
+     */
+    omit?: intern_list_viewOmit<ExtArgs> | null
+    /**
+     * The data used to update intern_list_views.
+     */
+    data: XOR<intern_list_viewUpdateManyMutationInput, intern_list_viewUncheckedUpdateManyInput>
+    /**
+     * Filter which intern_list_views to update
+     */
+    where?: intern_list_viewWhereInput
+    /**
+     * Limit how many intern_list_views to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * intern_list_view upsert
+   */
+  export type intern_list_viewUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the intern_list_view
+     */
+    select?: intern_list_viewSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the intern_list_view
+     */
+    omit?: intern_list_viewOmit<ExtArgs> | null
+    /**
+     * The filter to search for the intern_list_view to update in case it exists.
+     */
+    where: intern_list_viewWhereUniqueInput
+    /**
+     * In case the intern_list_view found by the `where` argument doesn't exist, create a new intern_list_view with this data.
+     */
+    create: XOR<intern_list_viewCreateInput, intern_list_viewUncheckedCreateInput>
+    /**
+     * In case the intern_list_view was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<intern_list_viewUpdateInput, intern_list_viewUncheckedUpdateInput>
+  }
+
+  /**
+   * intern_list_view delete
+   */
+  export type intern_list_viewDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the intern_list_view
+     */
+    select?: intern_list_viewSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the intern_list_view
+     */
+    omit?: intern_list_viewOmit<ExtArgs> | null
+    /**
+     * Filter which intern_list_view to delete.
+     */
+    where: intern_list_viewWhereUniqueInput
+  }
+
+  /**
+   * intern_list_view deleteMany
+   */
+  export type intern_list_viewDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which intern_list_views to delete
+     */
+    where?: intern_list_viewWhereInput
+    /**
+     * Limit how many intern_list_views to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * intern_list_view without action
+   */
+  export type intern_list_viewDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the intern_list_view
+     */
+    select?: intern_list_viewSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the intern_list_view
+     */
+    omit?: intern_list_viewOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -45338,6 +46533,25 @@ export namespace Prisma {
   };
 
   export type Records_with_display_dateScalarFieldEnum = (typeof Records_with_display_dateScalarFieldEnum)[keyof typeof Records_with_display_dateScalarFieldEnum]
+
+
+  export const Intern_list_viewScalarFieldEnum: {
+    id: 'id',
+    university: 'university',
+    program: 'program',
+    status: 'status',
+    intern_position: 'intern_position',
+    department: 'department',
+    full_name: 'full_name',
+    first_name: 'first_name',
+    middle_name: 'middle_name',
+    last_name: 'last_name',
+    suffix: 'suffix',
+    avatar_url: 'avatar_url',
+    profile_created_at: 'profile_created_at'
+  };
+
+  export type Intern_list_viewScalarFieldEnum = (typeof Intern_list_viewScalarFieldEnum)[keyof typeof Intern_list_viewScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -48669,6 +49883,98 @@ export namespace Prisma {
     display_date?: DateTimeWithAggregatesFilter<"records_with_display_date"> | Date | string
   }
 
+  export type intern_list_viewWhereInput = {
+    AND?: intern_list_viewWhereInput | intern_list_viewWhereInput[]
+    OR?: intern_list_viewWhereInput[]
+    NOT?: intern_list_viewWhereInput | intern_list_viewWhereInput[]
+    id?: StringFilter<"intern_list_view"> | string
+    university?: StringNullableFilter<"intern_list_view"> | string | null
+    program?: StringNullableFilter<"intern_list_view"> | string | null
+    status?: StringNullableFilter<"intern_list_view"> | string | null
+    intern_position?: StringNullableFilter<"intern_list_view"> | string | null
+    department?: StringNullableFilter<"intern_list_view"> | string | null
+    full_name?: StringNullableFilter<"intern_list_view"> | string | null
+    first_name?: StringNullableFilter<"intern_list_view"> | string | null
+    middle_name?: StringNullableFilter<"intern_list_view"> | string | null
+    last_name?: StringNullableFilter<"intern_list_view"> | string | null
+    suffix?: StringNullableFilter<"intern_list_view"> | string | null
+    avatar_url?: StringNullableFilter<"intern_list_view"> | string | null
+    profile_created_at?: DateTimeNullableFilter<"intern_list_view"> | Date | string | null
+  }
+
+  export type intern_list_viewOrderByWithRelationInput = {
+    id?: SortOrder
+    university?: SortOrderInput | SortOrder
+    program?: SortOrderInput | SortOrder
+    status?: SortOrderInput | SortOrder
+    intern_position?: SortOrderInput | SortOrder
+    department?: SortOrderInput | SortOrder
+    full_name?: SortOrderInput | SortOrder
+    first_name?: SortOrderInput | SortOrder
+    middle_name?: SortOrderInput | SortOrder
+    last_name?: SortOrderInput | SortOrder
+    suffix?: SortOrderInput | SortOrder
+    avatar_url?: SortOrderInput | SortOrder
+    profile_created_at?: SortOrderInput | SortOrder
+  }
+
+  export type intern_list_viewWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: intern_list_viewWhereInput | intern_list_viewWhereInput[]
+    OR?: intern_list_viewWhereInput[]
+    NOT?: intern_list_viewWhereInput | intern_list_viewWhereInput[]
+    university?: StringNullableFilter<"intern_list_view"> | string | null
+    program?: StringNullableFilter<"intern_list_view"> | string | null
+    status?: StringNullableFilter<"intern_list_view"> | string | null
+    intern_position?: StringNullableFilter<"intern_list_view"> | string | null
+    department?: StringNullableFilter<"intern_list_view"> | string | null
+    full_name?: StringNullableFilter<"intern_list_view"> | string | null
+    first_name?: StringNullableFilter<"intern_list_view"> | string | null
+    middle_name?: StringNullableFilter<"intern_list_view"> | string | null
+    last_name?: StringNullableFilter<"intern_list_view"> | string | null
+    suffix?: StringNullableFilter<"intern_list_view"> | string | null
+    avatar_url?: StringNullableFilter<"intern_list_view"> | string | null
+    profile_created_at?: DateTimeNullableFilter<"intern_list_view"> | Date | string | null
+  }, "id">
+
+  export type intern_list_viewOrderByWithAggregationInput = {
+    id?: SortOrder
+    university?: SortOrderInput | SortOrder
+    program?: SortOrderInput | SortOrder
+    status?: SortOrderInput | SortOrder
+    intern_position?: SortOrderInput | SortOrder
+    department?: SortOrderInput | SortOrder
+    full_name?: SortOrderInput | SortOrder
+    first_name?: SortOrderInput | SortOrder
+    middle_name?: SortOrderInput | SortOrder
+    last_name?: SortOrderInput | SortOrder
+    suffix?: SortOrderInput | SortOrder
+    avatar_url?: SortOrderInput | SortOrder
+    profile_created_at?: SortOrderInput | SortOrder
+    _count?: intern_list_viewCountOrderByAggregateInput
+    _max?: intern_list_viewMaxOrderByAggregateInput
+    _min?: intern_list_viewMinOrderByAggregateInput
+  }
+
+  export type intern_list_viewScalarWhereWithAggregatesInput = {
+    AND?: intern_list_viewScalarWhereWithAggregatesInput | intern_list_viewScalarWhereWithAggregatesInput[]
+    OR?: intern_list_viewScalarWhereWithAggregatesInput[]
+    NOT?: intern_list_viewScalarWhereWithAggregatesInput | intern_list_viewScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"intern_list_view"> | string
+    university?: StringNullableWithAggregatesFilter<"intern_list_view"> | string | null
+    program?: StringNullableWithAggregatesFilter<"intern_list_view"> | string | null
+    status?: StringNullableWithAggregatesFilter<"intern_list_view"> | string | null
+    intern_position?: StringNullableWithAggregatesFilter<"intern_list_view"> | string | null
+    department?: StringNullableWithAggregatesFilter<"intern_list_view"> | string | null
+    full_name?: StringNullableWithAggregatesFilter<"intern_list_view"> | string | null
+    first_name?: StringNullableWithAggregatesFilter<"intern_list_view"> | string | null
+    middle_name?: StringNullableWithAggregatesFilter<"intern_list_view"> | string | null
+    last_name?: StringNullableWithAggregatesFilter<"intern_list_view"> | string | null
+    suffix?: StringNullableWithAggregatesFilter<"intern_list_view"> | string | null
+    avatar_url?: StringNullableWithAggregatesFilter<"intern_list_view"> | string | null
+    profile_created_at?: DateTimeNullableWithAggregatesFilter<"intern_list_view"> | Date | string | null
+  }
+
   export type audit_log_entriesCreateInput = {
     instance_id?: string | null
     id: string
@@ -51849,6 +53155,118 @@ export namespace Prisma {
     display_date?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type intern_list_viewCreateInput = {
+    id: string
+    university?: string | null
+    program?: string | null
+    status?: string | null
+    intern_position?: string | null
+    department?: string | null
+    full_name?: string | null
+    first_name?: string | null
+    middle_name?: string | null
+    last_name?: string | null
+    suffix?: string | null
+    avatar_url?: string | null
+    profile_created_at?: Date | string | null
+  }
+
+  export type intern_list_viewUncheckedCreateInput = {
+    id: string
+    university?: string | null
+    program?: string | null
+    status?: string | null
+    intern_position?: string | null
+    department?: string | null
+    full_name?: string | null
+    first_name?: string | null
+    middle_name?: string | null
+    last_name?: string | null
+    suffix?: string | null
+    avatar_url?: string | null
+    profile_created_at?: Date | string | null
+  }
+
+  export type intern_list_viewUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    university?: NullableStringFieldUpdateOperationsInput | string | null
+    program?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: NullableStringFieldUpdateOperationsInput | string | null
+    intern_position?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
+    full_name?: NullableStringFieldUpdateOperationsInput | string | null
+    first_name?: NullableStringFieldUpdateOperationsInput | string | null
+    middle_name?: NullableStringFieldUpdateOperationsInput | string | null
+    last_name?: NullableStringFieldUpdateOperationsInput | string | null
+    suffix?: NullableStringFieldUpdateOperationsInput | string | null
+    avatar_url?: NullableStringFieldUpdateOperationsInput | string | null
+    profile_created_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type intern_list_viewUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    university?: NullableStringFieldUpdateOperationsInput | string | null
+    program?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: NullableStringFieldUpdateOperationsInput | string | null
+    intern_position?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
+    full_name?: NullableStringFieldUpdateOperationsInput | string | null
+    first_name?: NullableStringFieldUpdateOperationsInput | string | null
+    middle_name?: NullableStringFieldUpdateOperationsInput | string | null
+    last_name?: NullableStringFieldUpdateOperationsInput | string | null
+    suffix?: NullableStringFieldUpdateOperationsInput | string | null
+    avatar_url?: NullableStringFieldUpdateOperationsInput | string | null
+    profile_created_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type intern_list_viewCreateManyInput = {
+    id: string
+    university?: string | null
+    program?: string | null
+    status?: string | null
+    intern_position?: string | null
+    department?: string | null
+    full_name?: string | null
+    first_name?: string | null
+    middle_name?: string | null
+    last_name?: string | null
+    suffix?: string | null
+    avatar_url?: string | null
+    profile_created_at?: Date | string | null
+  }
+
+  export type intern_list_viewUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    university?: NullableStringFieldUpdateOperationsInput | string | null
+    program?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: NullableStringFieldUpdateOperationsInput | string | null
+    intern_position?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
+    full_name?: NullableStringFieldUpdateOperationsInput | string | null
+    first_name?: NullableStringFieldUpdateOperationsInput | string | null
+    middle_name?: NullableStringFieldUpdateOperationsInput | string | null
+    last_name?: NullableStringFieldUpdateOperationsInput | string | null
+    suffix?: NullableStringFieldUpdateOperationsInput | string | null
+    avatar_url?: NullableStringFieldUpdateOperationsInput | string | null
+    profile_created_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type intern_list_viewUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    university?: NullableStringFieldUpdateOperationsInput | string | null
+    program?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: NullableStringFieldUpdateOperationsInput | string | null
+    intern_position?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
+    full_name?: NullableStringFieldUpdateOperationsInput | string | null
+    first_name?: NullableStringFieldUpdateOperationsInput | string | null
+    middle_name?: NullableStringFieldUpdateOperationsInput | string | null
+    last_name?: NullableStringFieldUpdateOperationsInput | string | null
+    suffix?: NullableStringFieldUpdateOperationsInput | string | null
+    avatar_url?: NullableStringFieldUpdateOperationsInput | string | null
+    profile_created_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
   export type UuidNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -54394,6 +55812,54 @@ export namespace Prisma {
     activity_description?: SortOrder
     updated_at?: SortOrder
     display_date?: SortOrder
+  }
+
+  export type intern_list_viewCountOrderByAggregateInput = {
+    id?: SortOrder
+    university?: SortOrder
+    program?: SortOrder
+    status?: SortOrder
+    intern_position?: SortOrder
+    department?: SortOrder
+    full_name?: SortOrder
+    first_name?: SortOrder
+    middle_name?: SortOrder
+    last_name?: SortOrder
+    suffix?: SortOrder
+    avatar_url?: SortOrder
+    profile_created_at?: SortOrder
+  }
+
+  export type intern_list_viewMaxOrderByAggregateInput = {
+    id?: SortOrder
+    university?: SortOrder
+    program?: SortOrder
+    status?: SortOrder
+    intern_position?: SortOrder
+    department?: SortOrder
+    full_name?: SortOrder
+    first_name?: SortOrder
+    middle_name?: SortOrder
+    last_name?: SortOrder
+    suffix?: SortOrder
+    avatar_url?: SortOrder
+    profile_created_at?: SortOrder
+  }
+
+  export type intern_list_viewMinOrderByAggregateInput = {
+    id?: SortOrder
+    university?: SortOrder
+    program?: SortOrder
+    status?: SortOrder
+    intern_position?: SortOrder
+    department?: SortOrder
+    full_name?: SortOrder
+    first_name?: SortOrder
+    middle_name?: SortOrder
+    last_name?: SortOrder
+    suffix?: SortOrder
+    avatar_url?: SortOrder
+    profile_created_at?: SortOrder
   }
 
   export type NullableStringFieldUpdateOperationsInput = {

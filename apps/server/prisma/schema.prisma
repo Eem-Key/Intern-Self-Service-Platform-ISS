@@ -690,6 +690,25 @@ model records_with_display_date {
   @@schema("public")
 }
 
+model intern_list_view {
+  id                   String   @id
+  university           String?
+  program              String?
+  status               String?
+  intern_position      String?
+  department           String?
+  full_name            String?
+  first_name           String?
+  middle_name          String?
+  last_name            String?
+  suffix               String?
+  avatar_url           String?
+  profile_created_at   DateTime?
+
+  @@map("intern_list_view")
+  @@schema("public")
+}
+
 enum aal_level {
   aal1
   aal2

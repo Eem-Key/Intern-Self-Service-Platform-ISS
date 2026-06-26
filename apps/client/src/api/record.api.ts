@@ -1,19 +1,8 @@
-import { supabase } from '../config/supabase.ts';
-import { getAuthUserId, isAdmin } from '../utils/auth.util.ts';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import type { 
     ReportStatus, 
     RecordType,
-    ProfileUpdateType,
 } from '../../../shared/types/enums.types.ts';
-import type { ProfileUpdate } from '../../../shared/types/profile.types.ts';
-import type { InternInfo } from '../../../shared/types/intern.types.ts';
-import type { 
-    Record, 
-} from '../../../shared/types/record.types.ts';
-import { 
-    insertAdminNotificationAPI
- } from './admin.dashboard.api'
 import {
     fetchRecordsPaginatedAPI,
     fetchAttendanceByIdAPI,
@@ -69,60 +58,4 @@ export function useFetchCompleteRecordDetails(
         },
         enabled: !!record_id
     });
-}
-
-export async function fetchRecordDetails(record_id: string, record_category: RecordType) {
-     try {
-        switch (record_category) {
-            case 'attendance': return await fetchAttendanceByIdAPI(record_id);
-            case 'eod_report': return await fetchEodReportByIdAPI(record_id);
-            case 'leave_request': return await fetchLeaveRequestByIdAPI(record_id);
-            case 'profile_update': return await fetchProfileUpdateRequestByIdAPI(record_id);
-            default: 
-                console.warn(`No handler for category: ${record_category}`);
-                return null;
-        }
-    } catch (error) {
-        console.error(`Error fetching details for ${record_category}:`, error);
-        return null;
-    }
-}
-
-export async function updateAdminReviewRecord(
-    record_id: string, 
-    admin_feedback: string, 
-    status: ReportStatus,
-    update_type?: ProfileUpdateType,
-    profile_data?: ProfileUpdate,
-    intern_data?: InternInfo
-) {
-    const admin_id = await getAuthUserId();
-    if (!admin_id) {
-        throw new Error('You must be logged in as a user.');
-    }
-
-    if (!await isAdmin()) {
-        throw new Error('Forbidden: You must be an admin.');
-    }
-
-    const { data: recordData, error: updateError } = await supabase
-        .rpc('update_admin_review', {
-            p_record_id: record_id,
-            p_admin_id: admin_id,
-            p_admin_feedback: admin_feedback,
-            p_status: status,
-            p_update_type: update_type || null,
-            p_profile_data: profile_data || null,
-            p_intern_data: intern_data || null
-        })
-        .single();
-
-    if (updateError) {
-        console.error('RPC Error:', updateError);
-        throw updateError;
-    }
-    
-    await insertAdminNotificationAPI(recordData as Record);
-
-    console.log('Record, Profile, and Intern data updated successfully via RPC.');
 }

@@ -561,6 +561,22 @@ exports.Prisma.Records_with_display_dateScalarFieldEnum = {
   display_date: 'display_date'
 };
 
+exports.Prisma.Intern_list_viewScalarFieldEnum = {
+  id: 'id',
+  university: 'university',
+  program: 'program',
+  status: 'status',
+  intern_position: 'intern_position',
+  department: 'department',
+  full_name: 'full_name',
+  first_name: 'first_name',
+  middle_name: 'middle_name',
+  last_name: 'last_name',
+  suffix: 'suffix',
+  avatar_url: 'avatar_url',
+  profile_created_at: 'profile_created_at'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -767,7 +783,8 @@ exports.Prisma.ModelName = {
   profiles: 'profiles',
   records: 'records',
   intern_hours_summary: 'intern_hours_summary',
-  records_with_display_date: 'records_with_display_date'
+  records_with_display_date: 'records_with_display_date',
+  intern_list_view: 'intern_list_view'
 };
 
 /**
