@@ -6,7 +6,7 @@ import { Eye, EyeOff, CheckCircle } from 'lucide-react';
 import PasswordStrength from '../../../components/ui/passwordStrength';
 import ChangePassButton from '../../../components/ui/changePassButton';
 
-import { setupFirstPasswordAPI } from '../../../api/login.api';
+import { setupFirstPasswordAPI } from '../../../api/auth.api';
 
 type SetupPasswordValues = {
     new_password: string;
