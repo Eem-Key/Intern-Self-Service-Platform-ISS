@@ -14,6 +14,7 @@ type RecordDetailsProps = {
     onReview?: (status: ReportStatus, feedback: string) => void | Promise<void>;
 };
 
+
 function formatLabel(key: string) {
     return key
         .replaceAll('_', ' ')
@@ -196,7 +197,7 @@ function RecordDetails({ record, onClose, onReview }: RecordDetailsProps) {
 
             {record.log_category === 'profile_update' && (
             <>
-                <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <DetailItem
                     label="Time Submitted"
                     value={record.details?.time_submitted || '--'}
@@ -215,7 +216,7 @@ function RecordDetails({ record, onClose, onReview }: RecordDetailsProps) {
 
                 {record.details?.update_type === 'avatar_update' && (
                 <>
-                    <div className="grid grid-cols-2 gap-3 pt-2 sm:gap-5">
+                    <div className="grid grid-cols-1 gap-5 pt-2 sm:grid-cols-2">
                     <ProfilePhotoBox
                         label="Old Profile Photo"
                         imageUrl={
@@ -319,7 +320,6 @@ function DetailBox({ label, value }: { label: string; value: string }) {
         </div>
     );
 }
-
 function FeedbackBox({
     value,
     onChange,
