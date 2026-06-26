@@ -5,20 +5,16 @@ import type {
     ProfileIntern,
     ProfileInsert,
     UserProfile,
-    ProfileUpdateRequest,
-    ProfileUpdateRequestForm,
 } from '../../../shared/types/profile.types';
 import type{ 
     InternInfo, 
-    ProgramProgressResponse ,
-    ProgramProgressHours
 } from '../../../shared/types/intern.types';
-import type {
-    RecordInsert,
-} from '../../../shared/types/record.types';
 import { 
-    insertRecord 
-} from './record.api'
+    fetchProfileAPI 
+} from './intern.profile.api'
+import {
+    fetchProgramProgressHoursAPI
+}from '../api/admin.interns.api';
 
 export const useFetchProfileAPI = () => {
     return useQuery({
@@ -39,34 +35,6 @@ export const useProgramProgressHours = (id: string) => {
         refetchOnWindowFocus: true,
     });
 };
-
-export async function fetchProfileAPI(): Promise<ProfileIntern> {
-    const userId = await getAuthUserId();
-    if (!userId) {
-        throw new Error('You must be logged in to fetch your profile.');
-    }
-    
-    const isAdminCheck = await isAdmin();
-
-    const { data: profileData, error: fetchError } = await supabase
-        .from('profiles')
-        .select(`
-            *,
-            intern_info:interns(*)
-        `)
-        .eq('id', userId)
-        .single();
-
-    if (fetchError) {
-        throw new Error(`Error fetching profile: ${fetchError.message}`);
-    }
-
-    if (!isAdminCheck && profileData.id !== userId) {
-        throw new Error('Forbidden: You do not have permission to view this request.');
-    }
-
-    return profileData;
-}
 
 export async function fetchUserProfileAPI(user_id: string): Promise<UserProfile> {
     const { data: profileData, error: fetchError } = await supabase
@@ -152,261 +120,30 @@ export async function insertAdminProfileAPI(
 
     return insertedProfile;
 }
-
-export async function fetchProfileUpdateRequestById(
-    record_id: string
-) {
-    const userId = await getAuthUserId();
-    if (!userId) {
-        throw new Error('You must be logged in to fetch a profile update request.');
-    }
-
-    const { data: updateRequest, error: fetchError } = await supabase
-        .from('profile_update_requests')
-        .select('*')
-        .eq('record_id', record_id)
-        .single();
-
-    if (fetchError) {
-        console.log(fetchError)
-        throw new Error(`Error fetching profile update requests: ${fetchError.message}`);
-    }
-
-    return updateRequest;
-}
-
-export async function fetchProfileUpdateRequestWithProfileById(
-    record_id: string
-) {
-    const userId = await getAuthUserId();
-    if (!userId) {
-        throw new Error('You must be logged in to fetch a profile update request.');
-    }
-
-    const { data: updateRequest, error: fetchError } = await supabase
-        .from('profile_update_requests')
-        .select(`
-            *,
-            records!inner (
-                interns!records_intern_id_fkey (
-                    *,
-                    profiles (*)
-                )
-            )
-            `)
-        .eq('record_id', record_id)
-        .single();
-
-    if (fetchError) {
-        console.log(fetchError)
-        throw new Error(`Error fetching profile update requests: ${fetchError.message}`);
-    }
-
-    const profile = updateRequest.records?.interns?.profiles;
-    const internDetails = updateRequest.records?.interns;
-
-    const mergedData = {
-        record_id: updateRequest.record_id,
-        update_type: updateRequest.update_type,
-        reason: updateRequest.reason,
-        
-        requested_data: {
-            ...profile,
-            ...updateRequest.requested_data,
-            
-            intern_info: {
-                university: internDetails?.university,
-                year_level: internDetails?.year_level,
-                program: internDetails?.program,
-                required_hours: internDetails?.required_hours,
-                start_date: internDetails?.start_date,
-                ...(updateRequest.requested_data?.intern_info || {})
-            }
-        }
-    };
-
-    return mergedData;
-}
-
-export async function insertProfileUpdateRequestAPI(
-    updateRequest: ProfileUpdateRequestForm
-): Promise<ProfileUpdateRequest> {
-    const intern_id = await getAuthUserId();
-    if (!intern_id) {
-        throw new Error('You must be logged in to request a profile update.');
-    }
-
-    const record: RecordInsert = {
-        intern_id: intern_id,
-        log_category: 'profile_update',
-        activity_description: updateRequest.update_type === 'avatar_update'
-        ? 'Profile Picture'
-        : 'Profile Information',
-        status: 'pending'
-    }
-
-    const record_id = await insertRecord(record);
-
-    const requestProfileUpdateInsert: ProfileUpdateRequest = {
-        record_id: record_id,
-        update_type: updateRequest.update_type,
-        requested_data: updateRequest.requested_data,
-        reason: updateRequest.reason
-    }
-
-    const { data: insertedUpdateRequest, error: insertError } = await supabase
-        .from('profile_update_requests')
-        .insert([requestProfileUpdateInsert])
-        .select()
-        .single();
-
-    if (insertError) {
-        console.log(insertError)
-        throw new Error(`Error submitting profile update request: ${insertError.message}`);
-    }
-
-    return insertedUpdateRequest;
-}
-
-export async function updateProfileUpdateRequestAPI(
-    record_id: string,
-    partialUpdate: Partial<ProfileUpdateRequestForm>
-): Promise<ProfileUpdateRequest> {
-    console.log('updateProfileUpdateRequestAPI: ', partialUpdate)
-    const userId = await getAuthUserId();
-
-    if (!userId) {
-        throw new Error('You must be logged in to update a profile update request.');
-    }
-
-    const { data: existing, error: fetchError } = await supabase
-        .from('profile_update_requests')
-        .select('*')
-        .eq('record_id', record_id)
-        .single();
-
-    if (fetchError) throw fetchError;
-
-    const newRequestedData = {
-        ...existing.requested_data,
-        ...partialUpdate.requested_data,
-        intern_info: {
-            ...existing.requested_data?.intern_info,
-            ...partialUpdate.requested_data?.intern_info
-        }
-    };
-
-    const { data: updatedRequest, error: updateError } = await supabase
-        .from('profile_update_requests')
-        .update({
-            requested_data: newRequestedData,
-            reason: partialUpdate.reason || existing.reason,
-        })
-        .eq('record_id', record_id)
-        .select()
-        .single();
+//     const userId = await getAuthUserId();
+//     if (!userId) {
+//         throw new Error('You must be logged in to fetch your profile.');
+//     }
     
-    if (updateError) {
-        throw new Error(`Error updating profile update request: ${updateError.message}`);
-    }
+//     const isAdminCheck = await isAdmin();
 
-    return updatedRequest;
-}
+//     const { data: summary, error: summaryError } = await supabase
+//         .from('intern_hours_summary')
+//         .select('*')
+//         .eq('intern_id', id)
+//         .maybeSingle();
 
-export async function fetchProgramProgressAPI(id: string): Promise<ProgramProgressResponse> {
-    const userId = await getAuthUserId();
-    if (!userId) {
-        throw new Error('You must be logged in to fetch your profile.');
-    }
-    
-    const isAdminCheck = await isAdmin();
+//     if (!isAdminCheck && summary.intern_id !== userId) {
+//         throw new Error('Forbidden: You do not have permission to view this request.');
+//     }
 
-    const { data: summary, error: summaryError } = await supabase
-        .from('intern_hours_summary')
-        .select('*')
-        .eq('intern_id', id)
-        .maybeSingle();
+//     if (summaryError) {
+//         throw new Error(`Failed to fetch intern data: ${summaryError.message}`);
+//     }
 
-    if (!isAdminCheck && summary.intern_id !== userId) {
-        throw new Error('Forbidden: You do not have permission to view this request.');
-    }
-
-    if (summaryError) {
-        throw new Error(`Failed to fetch intern data: ${summaryError.message}`);
-    }
-
-    return {
-        message: 'Program progress fetched successfully',
-        data: {
-            required_hours: summary.required_hours,
-            rendered_hours: summary?.rendered_hours,
-            hours_left: Math.max(0, (summary.required_hours || 0) - (summary?.rendered_hours || 0)),
-            wfh_hours: summary?.total_online_hours,
-            onsite_hours: summary?.total_onsite_hours,
-        }
-    };
-}
-
-export async function fetchProgramProgressHoursAPI(id: string): Promise<ProgramProgressHours> {
-    const userId = await getAuthUserId();
-    if (!userId) {
-        throw new Error('You must be logged in to fetch your profile.');
-    }
-    
-    const isAdminCheck = await isAdmin();
-
-    const { data: summary, error: summaryError } = await supabase
-        .from('intern_hours_summary')
-        .select('*')
-        .eq('intern_id', id)
-        .maybeSingle();
-
-    if (!isAdminCheck && summary.intern_id !== userId) {
-        throw new Error('Forbidden: You do not have permission to view this request.');
-    }
-
-    if (summaryError) {
-        throw new Error(`Failed to fetch intern data: ${summaryError.message}`);
-    }
-
-    return {
-        required_hours: summary.required_hours,
-        rendered_hours: summary?.rendered_hours,
-        remaining_hours: Math.max(0, (summary.required_hours || 0) - (summary?.rendered_hours || 0)),
-    }
-};
-
-export async function hasPendingProfileUpdateRequestAPI(updateType: string) {
-    const {
-        data: { user },
-        error: userError,
-    } = await supabase.auth.getUser();
-
-    if (userError || !user) {
-        throw new Error('User not authenticated.');
-    }
-
-    const { data, error } = await supabase
-        .from('profile_update_requests')
-        .select(`
-            record_id,
-            update_type,
-            records!inner (
-                id,
-                intern_id,
-                status,
-                log_category
-            )
-        `)
-        .eq('update_type', updateType)
-        .eq('records.intern_id', user.id)
-        .eq('records.log_category', 'profile_update')
-        .eq('records.status', 'pending')
-        .maybeSingle();
-
-    if (error) {
-        throw new Error(error.message);
-    }
-
-    return !!data;
-}
+//     return {
+//         required_hours: summary.required_hours,
+//         rendered_hours: summary?.rendered_hours,
+//         remaining_hours: Math.max(0, (summary.required_hours || 0) - (summary?.rendered_hours || 0)),
+//     }
+// };

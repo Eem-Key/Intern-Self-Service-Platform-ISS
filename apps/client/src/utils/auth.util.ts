@@ -48,27 +48,6 @@ export async function isAccountActive(userId: String, role: UserRole): Promise<b
   return intern.status === 'active';
 }
 
-export async function isFirstLogin(): Promise<boolean> {
-  const user_id = await getAuthUserId()
-
-  if (!user_id) {
-        throw new Error('You must be authorized to set up a new password.');
-  }
-
-  const { data: profile, error } = await supabase
-    .from('profiles')
-    .select('requires_password_change')
-    .eq('id', user_id)
-    .single();
-
-  if (error || !profile) {
-    console.error('Error fetching requires change password:', error);
-    return false;
-  }
-
-  return profile.requires_password_change;
-}
-
 export function getAuthUser(): UserProfile | null {
     const storedUser = localStorage.getItem('authUser');
 

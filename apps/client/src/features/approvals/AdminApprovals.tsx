@@ -7,25 +7,25 @@ import SearchBar from '../approvals/components/SearchBar';
 import DepartmentType from '../approvals/components/DepartmentType';
 import ActivityRecordCard from '../approvals/components/ActivityRecordCard';
 import RecordDetails from '../approvals/components/RecordDetails';
-import {
-    usefetchPendingRequestsPerRecord,
-    useFetchPendingApprovalRecords,
-} from '../../api/adminApprovals.api';
-
-import type {
-    ApprovalTab,
-    ApprovalRecord,
-} from '../../../../shared/types/approvals.types';
-
 import StatusMessage from '../../components/feedback/AdminStatusMessage';
 import { useQueryClient } from '@tanstack/react-query';
-import { updateAdminReviewRecord } from '../../api/record.api';
 import type {
     ReportStatus,
     ProfileUpdateType,
 } from '../../../../shared/types/enums.types';
 import type { ProfileUpdate } from '../../../../shared/types/profile.types';
 import type { InternInfo } from '../../../../shared/types/intern.types';
+import type {
+    ApprovalTab,
+    ApprovalRecord,
+} from '../../../../shared/types/approvals.types';
+import {
+    usefetchPendingRequestsPerRecord,
+    useFetchPendingApprovalRecords,
+} from '../../api/adminApprovals.api';
+import {
+    updateAdminReviewRecordAPI
+} from '../../api/admin.approvals.api';
 
 
 function getPageNumbers(
@@ -195,13 +195,17 @@ function AdminApprovals() {
         }
     }
 
-    await updateAdminReviewRecord(
-        record.id,
-        feedback,
+    const  payload = {
+        admin_feedback: feedback,
         status,
-        updateType,
-        profileData,
-        internData
+        update_type: updateType,
+        profile_date: profileData,
+        intern_date: internData
+    }
+
+    await updateAdminReviewRecordAPI(
+        record.id,
+        payload
     );
 
     await queryClient.invalidateQueries({

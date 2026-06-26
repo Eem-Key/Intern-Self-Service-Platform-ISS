@@ -1,15 +1,7 @@
 import { supabase } from '../config/supabase';
-import { supabaseAdmin } from '../config/supabaseAdmin';
 import { getAuthUserId, isAdmin } from '../utils/auth.util';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { 
-    AttendanceRecord 
-} from '../../../shared/types/attendance.types';
-import type { 
-    EODReportAdminReviewed 
-} from '../../../shared/types/eodReport.types';
-import type { 
-    ProfileIntern,
     ProfileInternInsert
 } from '../../../shared/types/profile.types';
 import type { 
@@ -17,16 +9,20 @@ import type {
     InternshipStatus,
     CompanyDepartment
 } from '../../../shared/types/enums.types';
-import type{ 
-    InternListInfo, 
-} from '../../../shared/types/intern.types';
+import {
+    fetchAllInternListInformationAPI,
+    fetchProfileByIdAPI,
+    fetchAllAttendanceByIdAPI,
+    fetchAllEodReportByIdAPI,
+    deactivateInternAPI
+} from '../api/admin.interns.api';
 
 export function useFetchAllInternListInformationAPI(
     page: number,
     pageSize: number,
     search_value: string | null,
     department: CompanyDepartment | null,
-    posiion: InternPosition | null,
+    position: InternPosition | null,
     status: InternshipStatus | null,
 ) {
     return useQuery({
@@ -36,18 +32,18 @@ export function useFetchAllInternListInformationAPI(
             pageSize,
             search_value,
             department,
-            posiion,
+            position,
             status,
         ],
         queryFn: () =>
-            fetchAllInternListInformationAPI(
+            fetchAllInternListInformationAPI({
                 page,
                 pageSize,
                 search_value,
                 department,
-                posiion,
+                position,
                 status,
-            ),
+            }),
             refetchOnWindowFocus: true, 
     });
 };
@@ -107,11 +103,7 @@ export const useInviteInternAPIMutation = () => {
     mutationFn: (data: ProfileInternInsert) => inviteInternAPI(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-intern-list'] });
-      //alert("Intern invited successfully!");
     },
-    /*onError: (error) => {
-      alert(`Error: ${error.message}`);
-    }*/
   });
 };
 
@@ -119,11 +111,7 @@ export const useResendInviteInternAPIMutation = () => {
   return useMutation({
     mutationFn: (email: string) => resendInviteInternAPI(email),
     onSuccess: () => {
-      //alert("Resent intern invitation successfully!");
     },
-    /*onError: (error) => {
-      alert(`Error: ${error.message}`);
-    }*/
   });
 };
 
@@ -136,197 +124,9 @@ export const useDeactivateInternAPIMutation = () => {
     
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-intern-list'] });
-      //alert("Intern deactivated successfully!");
     },
-    /*onError: (error: any) => {
-      alert(`Error: ${error.message}`);
-    }*/
   });
 };
-
-export async function fetchAllInternListInformationAPI(
-    page: number,
-    pageSize: number,
-    search_value: string | null,
-    department: CompanyDepartment | null,
-    position: InternPosition | null,
-    status: InternshipStatus | null,
-): Promise<{
-    data: InternListInfo[];
-    count: number;
-}> {
-    const admin_id = await getAuthUserId();
-
-    if (!admin_id) {
-        throw new Error('You must be logged in as a user.');
-    }
-
-    if (!(await isAdmin())) {
-        throw new Error('Forbidden: You must be an admin.');
-    }
-
-    let query = supabase
-        .from('intern_list_view')
-        .select(`
-            id, university, program, status, intern_position, 
-            department, avatar_url, first_name, middle_name, 
-            last_name, suffix`, 
-            { count: 'exact' }
-        );
-
-    if (search_value) {
-        const term = `%${search_value}%`;
-        query = query.or(`program.ilike.${term},university.ilike.${term},full_name.ilike.${term}`);    
-    }
-    if (department) query = query.eq('department', department);
-    if (position) query = query.eq('intern_position', position);
-    if (status) query = query.eq('status', status);
-
-    const from = page * pageSize;
-    const to = from + pageSize - 1;
-
-    query = query.range(from, to).order('profile_created_at', { ascending: false });
-
-    const { data, error, count } = await query;
-
-    if (error) {
-        console.log(error)
-        throw new Error(`Error fetching Intern List: ${error.message}`);
-    }
-
-
-
-    const mappedInterns = (data || []).map((item: any): InternListInfo => {
-    const middleInitial = item?.middle_name
-        ? `${item.middle_name.charAt(0).toUpperCase()}.`
-        : null;
-
-    const fullName = [
-        item?.first_name,
-        middleInitial,
-        item?.last_name,
-        item?.suffix,
-    ].filter(Boolean).join(' ');
-
-    return {
-        id: item.id,
-        university: item.university,
-        program: item.program,
-        status: item.status,
-        intern_position: item.intern_position,
-        department: item.department,
-        name: fullName || item.full_name,
-        avatar_url: item.avatar_url,
-    };
-});
-    return {data: mappedInterns, count: count || 0 }
-};
-
-export async function fetchProfileByIdAPI(user_id: string): Promise<ProfileIntern> {
-    const admin_id = await getAuthUserId();
-
-    if (!admin_id) {
-        throw new Error('You must be logged in as a user.');
-    }
-
-    if (!(await isAdmin())) {
-        throw new Error('Forbidden: You must be an admin.');
-    }
-
-    const { data: profileData, error: fetchError } = await supabase
-        .from('profiles')
-        .select(`
-            *,
-            intern_info:interns(*)
-        `)
-        .eq('id', user_id)
-        .single();
-
-    if (fetchError) {
-        throw new Error(`Error fetching profile: ${fetchError.message}`);
-    }
-
-    return profileData;
-}
-
-export async function fetchAllAttendanceByIdAPI(user_id: string): Promise<AttendanceRecord[]>{
-    const admin_id = await getAuthUserId();
-
-    if (!admin_id) {
-        throw new Error('You must be logged in as a user.');
-    }
-
-    if (!(await isAdmin())) {
-        throw new Error('Forbidden: You must be an admin.');
-    }
-
-    const { data: attendanceLogs, error: fetchError } = await supabase
-        .from('attendance_logs')
-        .select(`
-            *,
-            records!inner()
-        `)
-        .eq('records.intern_id', user_id)
-        .order('work_date', { ascending: false });
-    
-    if (fetchError) {
-        console.log(fetchError)
-        throw new Error(`Error fetching attendances: ${fetchError.message}`);
-    }
-
-    return (attendanceLogs || []).map((item: any) => ({
-        record_id: item.record_id,
-        clock_in: item.clock_in,
-        clock_out: item.clock_out,
-        work_date: item.work_date,
-        hours_logged: item.hours_logged,
-        work_setup: item.work_setup,
-    })) as AttendanceRecord[];
-}
-
-
-export async function fetchAllEodReportByIdAPI(user_id: string): Promise<EODReportAdminReviewed[]>{
-    const admin_id = await getAuthUserId();
-
-    if (!admin_id) {
-        throw new Error('You must be logged in as a user.');
-    }
-
-    if (!(await isAdmin())) {
-        throw new Error('Forbidden: You must be an admin.');
-    }
-
-    const { data: eodReports, error: fetchError } = await supabase
-        .from('eod_reports')
-        .select(`
-            *,
-            records!inner(
-                status,
-                admin_id,
-                admin_feedback,
-                reviewed_at
-            )
-        `)
-        .eq('records.intern_id', user_id)
-        .order('date_written', { ascending: false });
-    
-    if (fetchError) {
-        console.log(fetchError)
-        throw new Error(`Error fetching eod reports: ${fetchError.message}`);
-    }
-
-    return (eodReports || []).map((item: any) => ({
-        record_id: item.record_id,
-        date_written: item.date_written,
-        project_name: item.project_name,
-        task_accomplished: item.task_accomplished,
-        hours_spent: item.hours_spent,
-        status: item.records.status,
-        admin_id: item.records.admin_id,
-        admin_feedback: item.records.admin_feedback,
-        reviewed_at: item.records.reviewed_at
-    })) as EODReportAdminReviewed[];
-}
 
 export async function inviteInternAPI(
     profile_info: ProfileInternInsert
@@ -396,25 +196,4 @@ export async function resendInviteInternAPI(email: string){
   if (error) {
     throw error;
   }
-}
-
-export async function deactivateInternAPI(
-    intern_id: string,
-    deactivate_reason: string
-) {
-    const { error: dbError } = await supabase
-        .from('interns')
-        .update({ status: 'deactivated', deactivate_reason })
-        .eq('id', intern_id);
-
-    if (dbError) throw dbError;
-
-    const { error: adminError } = await supabaseAdmin.auth.admin.updateUserById(intern_id, {
-        ban_duration: '876000h' 
-    });
-
-    if (adminError) {
-        console.error("Ban failed:", adminError);
-        throw new Error("Intern profile updated, but could not ban user.");
-    }
 }

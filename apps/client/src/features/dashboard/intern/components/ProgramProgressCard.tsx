@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { fetchProgramProgressAPI } from '../../../../api/profile.api';
+import { fetchProgramProgressAPI } from '../../../../api/intern.dashboard.api';
 import { getAuthUserId } from '../../../../utils/auth.util.ts';
 import { Home, Building2 } from 'lucide-react';
 
@@ -14,7 +14,7 @@ function ProgramProgressCard() {
     },
     
   });
-
+  console.log(data)
   const progress = data?.data;
   const renderedHours = progress?.rendered_hours ?? 0;
   const requiredHours = progress?.required_hours ?? 0;

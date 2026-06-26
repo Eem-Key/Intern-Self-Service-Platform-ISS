@@ -26,11 +26,15 @@
   },
   "homepage": "https://github.com/Eem-Key/Intern-Self-Service-Platform-ISS#readme",
   "devDependencies": {
+    "@prisma/client": "^7.8.0",
     "@types/node": "^25.9.1",
-    "concurrently": "^10.0.0"
+    "concurrently": "^10.0.0",
+    "prisma": "^7.8.0"
   },
   "dependencies": {
+    "@prisma/adapter-pg": "^7.8.0",
     "date-fns": "^4.4.0",
+    "pg": "^8.22.0",
     "react-day-picker": "^10.0.1"
   }
 }

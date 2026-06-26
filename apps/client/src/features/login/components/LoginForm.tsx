@@ -2,7 +2,6 @@ import { supabase } from '../../../config/supabase';
 import { useState, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { isFirstLogin } from '../../../utils/auth.util';
 import { Eye, EyeOff } from 'lucide-react';
 
 import FormInput from '../../../components/ui/formInput';
@@ -35,7 +34,6 @@ function LoginForm() {
     const [setupPasswordUser, setSetupPasswordUser] =
         useState<UserProfile | null>(null);
     const [showChangePassword, setShowChangePassword] = useState(false);
-    const [checkingInviteSession, setCheckingInviteSession] = useState(true);
 
     const getDashboardRoute = (role?: UserRole) => {
         const normalizedRole = role?.toLowerCase();
@@ -159,6 +157,10 @@ function LoginForm() {
 
         onSuccess: (response) => {
             const { accessToken, refreshToken, user } = response.data;
+
+            console.log(accessToken)
+            console.log(refreshToken)
+            console.log(user)
 
             saveAuthSession({
                 accessToken,

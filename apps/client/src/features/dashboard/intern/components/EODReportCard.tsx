@@ -5,11 +5,13 @@ import { Clock } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import StatusMessage from '../../../../components/feedback/StatusMessage';
 import {
-  insertEODReportAPI,
-  updateEODReportAPI,
   useEODAttendance,
   useFetchEODReport,
 } from '../../../../api/eodReport.api';
+import {
+  insertEODReportAPI,
+  updateEODReportAPI,
+} from '../../../../api/intern.dashboard.api';
 import type { EODReportForm, EODReportFormErrors } from '../../../../../../shared/types/eodReport.types';
 import { validateEodReport } from '../../../../utils/validateEodReport';
 import RequiredMark from '../../../../components/ui/RequiredMark';
@@ -56,27 +58,26 @@ function EODReportCard() {
   };
 
   useEffect(() => {
-    setReportId(null);
-    setFormValues(prev => ({
-      ...prev,
-      hours_spent: attendanceData?.hours_logged ? attendanceData.hours_logged : 0,
-      project_name: '',
-      task_accomplished: '',
-    }));
+  setReportId(null);
+  setFormValues({
+    date_written: formValues.date_written,
+    hours_spent: attendanceData?.hours_logged ?? 0,
+    project_name: '',
+    task_accomplished: '',
+  });
 
-    if (existingReport){
-      setReportId(existingReport.record_id);
-      setFormValues(prev => ({
-        ...prev,
-        hours_spent: hasTimedOut 
-          ? (attendanceData?.hours_logged ? attendanceData.hours_logged : 0) 
-          : existingReport.hours_spent,
-        project_name: existingReport.project_name,
-        task_accomplished: existingReport.task_accomplished,
-      }));
-    }
-    
-  }, [existingReport, attendanceData]);
+  if (existingReport) {
+    setReportId(existingReport.record_id);
+    setFormValues({
+      date_written: formValues.date_written,
+      hours_spent: hasTimedOut 
+        ? (attendanceData?.hours_logged ?? 0) 
+        : Number(existingReport.hours_spent),
+      project_name: existingReport.project_name,
+      task_accomplished: existingReport.task_accomplished,
+    });
+  }
+}, [existingReport, attendanceData, formValues.date_written, hasTimedOut]);
 
   const handleChange = (field: keyof EODReportForm, value: string) => {
     setFormValues((prev) => ({

@@ -1,13 +1,16 @@
-import { useRef, useState} from 'react';
-import { useMutation, useQueryClient, useQuery  } from '@tanstack/react-query';
-import { supabase } from '../../../config/supabase';
 import StatusMessage from '../../../components/feedback/StatusMessage';
 import ConfirmationModal from '../../../components/feedback/confirmationModal';
 import profilepic from '../../../assets/images/default_pic.png';
-import { insertProfileUpdateRequestAPI, hasPendingProfileUpdateRequestAPI, } from '../../../api/profile.api';
+import { supabase } from '../../../config/supabase';
+import { useRef, useState} from 'react';
+import { useMutation, useQueryClient, useQuery  } from '@tanstack/react-query';
 import type {
     ProfileIntern,
 } from '../../../../../shared/types/profile.types';
+import { 
+    insertProfileUpdateRequestAPI, 
+    hasPendingProfileUpdateRequestAPI, 
+} from '../../../api/intern.profile.api';
 
 
 type ProfilePictureCardProps = {

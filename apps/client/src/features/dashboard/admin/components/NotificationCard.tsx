@@ -3,8 +3,8 @@ import { Bell, X } from 'lucide-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import {
     fetchAdminNotificationsAPI,
-    updateAdminNotificationsAsRead,
-} from '../../../../api/notification.api';
+    updateAdminNotificationsAsReadAPI,
+} from '../../../../api/admin.dashboard.api';
 import type { Notification } from '../../../../../../shared/types/notification.types';
 
 function getElapsedTime(sentAt: string) {
@@ -64,7 +64,7 @@ function NotificationCard({ hidden = false, isFloatingOnly = false, isDesktopOnl
     const unreadCount = notifications.filter(isNotificationUnread).length;
 
     const markAsReadMutation = useMutation({
-        mutationFn: updateAdminNotificationsAsRead,
+        mutationFn: updateAdminNotificationsAsReadAPI,
         onSuccess: async () => {
         await refetch();
         },

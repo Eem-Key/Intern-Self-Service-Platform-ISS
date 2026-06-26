@@ -7,10 +7,10 @@ import type {
     LeaveRequestFormErrors,
 } from '../../../../../shared/types/leave.types';
 import {
-    checkLeaveRequestDates,
-    fetchAllLeaveRequestDatesOfIntern,
-    insertLeaveRequest,
-} from '../../../api/leave.api';
+    checkLeaveRequestDatesAPI,
+    fetchAllLeaveRequestDatesOfInternAPI,
+    insertLeaveRequestAPI,
+} from '../../../api/intern.leave.api';
 import StatusMessage from '../../../components/feedback/StatusMessage';
 import RequiredMark from '../../../components/ui/RequiredMark';
 import { validateLeaveForm } from '../../../utils/validateLeave.ts';
@@ -29,6 +29,11 @@ const leaveTypeOptions: { label: string; value: LeaveReason }[] = [
     },
 ];
 
+export const formatDateForInput = (dateString: string | Date | null | undefined) => {
+  if (!dateString) return '';
+  return new Date(dateString).toISOString().split('T')[0];
+};
+
 function LeaveFormCard() {
     const queryClient = useQueryClient();
     const [activeDatePicker, setActiveDatePicker] = useState<
@@ -38,7 +43,7 @@ function LeaveFormCard() {
 
     const { data: unavailableLeaveDates = [] } = useQuery({
         queryKey: ['intern-leave-dates'],
-        queryFn: fetchAllLeaveRequestDatesOfIntern,
+        queryFn: fetchAllLeaveRequestDatesOfInternAPI,
         staleTime: 0,
         refetchOnMount: 'always',
         refetchOnWindowFocus: true,
@@ -158,7 +163,7 @@ function LeaveFormCard() {
     };
 
     const submitMutation = useMutation({
-        mutationFn: insertLeaveRequest,
+        mutationFn: insertLeaveRequestAPI,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['intern-leave-dates'] });
 
@@ -228,7 +233,7 @@ function LeaveFormCard() {
             return;
         }
         try {
-            const hasOverlap = await checkLeaveRequestDates(formValues.start_date, formValues.end_date);
+            const hasOverlap = await checkLeaveRequestDatesAPI(formValues.start_date, formValues.end_date);
             
             if (hasOverlap) {
                 setErrors({ 
@@ -255,11 +260,11 @@ function LeaveFormCard() {
     };
 
     const isDisabledLeaveDate = (date: Date) => {
-    const dateKey = formatDateKey(date);
+        const dateKey = formatDateKey(date);
 
-    return unavailableLeaveDates.some((leave) => {
-        return dateKey >= leave.start_date && dateKey <= leave.end_date;
-    });
+        return unavailableLeaveDates.some((leave) => {
+            return dateKey >= formatDateForInput(leave.start_date) && dateKey <= formatDateForInput(leave.end_date);
+        });
     };
 
     useEffect(() => {

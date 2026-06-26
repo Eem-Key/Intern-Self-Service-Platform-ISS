@@ -1,11 +1,10 @@
 import { Bell, ChevronsDown, X } from 'lucide-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-
 import {
   fetchInternNotificationsAPI,
-  updateInternNotificationsAsRead
-} from '../../../../api/notification.api';
+  updateInternNotificationsAsReadAPI
+} from '../../../../api/intern.dashboard.api';
 import type { Notification } from '../../../../../../shared/types/notification.types';
 
 function getElapsedTime(sentAt: string) {
@@ -65,7 +64,7 @@ function NotificationCard({ hidden = false, isFloatingOnly = false, isDesktopOnl
   const unreadCount = notifications.filter(isNotificationUnread).length;
 
   const markAsReadMutation = useMutation({
-    mutationFn: updateInternNotificationsAsRead,
+    mutationFn: updateInternNotificationsAsReadAPI,
     onSuccess: async () => { await refetch(); },
   });
 
