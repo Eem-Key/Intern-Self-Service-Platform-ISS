@@ -9,6 +9,7 @@ import internLeaveRoutes from './routes/intern/intern.leave.routes.js';
 import internLogsRoutes from './routes/intern/intern.logs.routes.js';
 import adminDashboardRoutes from './routes/admin/admin.dashboard.routes.js';
 import adminApprovalsRoutes from './routes/admin/admin.approvals.routes.js';
+import adminActivityRoutes from './routes/admin/admin.activity.routes.js';
 
 const envSchema = z.object({
   PORT: z.string().default('5000'),
@@ -30,6 +31,7 @@ app.use('/api/intern/logs', internLogsRoutes);
 
 app.use('/api/admin/dashboard', adminDashboardRoutes);
 app.use('/api/admin/approvals', adminApprovalsRoutes);
+app.use('/api/admin/activity', adminActivityRoutes);
 
 app.get('/api/connection', (req, res) => {
   res.json({ status: 'healthy', message: 'Backend is connected!' });
