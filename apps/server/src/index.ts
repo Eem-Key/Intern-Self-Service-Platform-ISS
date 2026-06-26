@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import 'dotenv/config';
 import { z } from 'zod';
+import loginRoutes from './routes/login.routes.js';
 import internDashboardRoutes from './routes/intern/intern.dashboard.routes.js';
 import internProfileRoutes from './routes/intern/intern.profile.routes.js';
 import internLeaveRoutes from './routes/intern/intern.leave.routes.js';
@@ -24,6 +25,8 @@ const app = express();
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
+
+app.use('/api/auth', loginRoutes);
 
 app.use('/api/intern/dashboard', internDashboardRoutes);
 app.use('/api/intern/profile', internProfileRoutes);

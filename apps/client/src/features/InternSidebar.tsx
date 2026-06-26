@@ -11,7 +11,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useLocation, useNavigate } from 'react-router-dom';
 import profilepic from '../assets/images/default_pic.png';
-import { logoutUserAPI } from '../api/auth.api';
+import { logoutUserAPI } from '../api/login.api';
 import { getAuthUser, getFullName, getPosition } from '../utils/auth.util.ts';
 import { supabase } from '../config/supabase';
 

@@ -12,7 +12,7 @@ import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import profilepic from '../assets/images/default_pic.png';
-import { logoutUserAPI } from '../api/auth.api.ts';
+import { logoutUserAPI } from '../api/login.api.ts';
 
 import { supabase } from '../config/supabase';
 import { useQuery } from '@tanstack/react-query';
