@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 import { prisma } from '../../db.js';
+import { insertInternNotificationService } from '../../services/notification.service.js'
 
 export const fetchLeaveDates = async (req: Request, res: Response) => {
     const authUser = (req as any).user;
@@ -35,7 +36,7 @@ export const insertLeaveRequest = async (req: Request, res: Response) => {
                 }
             });
 
-            return await tx.leave_requests.create({
+            const leaveRequest = await tx.leave_requests.create({
                 data: {
                     record_id: record.id,
                     reason_category: formData.reason_category,
@@ -44,7 +45,16 @@ export const insertLeaveRequest = async (req: Request, res: Response) => {
                     end_date: new Date(formData.end_date)
                 }
             });
+
+            return { record, leaveRequest };
         });
+
+        try {
+            await insertInternNotificationService(result.record);
+        } catch (notifError) {
+            console.error('Failed to send notification:', notifError);
+        }
+
         res.status(201).json(result);
     } catch (error) {
         res.status(500).json({ error: 'Failed to submit leave request' });

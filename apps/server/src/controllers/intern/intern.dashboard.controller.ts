@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 import { prisma } from '../../db.js';
+import { insertInternNotificationService } from '../../services/notification.service.js'
 
 export const fetchAttendanceByDate = async (req: Request, res: Response) => {
     const raw_date = req.params.date;
@@ -231,6 +232,14 @@ export const insertEODReport = async (req: Request, res: Response) => {
             return report;
         });
 
+        if (reportStatus !== 'draft') {
+            try {
+                await insertInternNotificationService(result);
+            } catch (notifError) {
+                console.error('Failed to send notification:', notifError);
+            }
+        }
+
         res.status(201).json({ message: `EOD ${reportStatus} saved successfully`, data: result });
     } catch (error) {
         console.log(error)
@@ -270,6 +279,14 @@ export const updateEODReport = async (req: Request, res: Response) => {
             return report;
         });
 
+        if (reportStatus !== 'draft') {
+            try {
+                await insertInternNotificationService(result);
+            } catch (notifError) {
+                console.error('Failed to send notification:', notifError);
+            }
+        }
+
         res.json({ message: `EOD ${reportStatus} updated successfully`, data: result });
     } catch (error) {
         console.log(error)
@@ -300,43 +317,6 @@ export const fetchNotifications = async (req: Request, res: Response) => {
     } catch (error) {
         console.error('Error fetching notifications:', error);
         res.status(500).json({ error: 'Failed to fetch notifications' });
-    }
-};
-
-export const insertNotification = async (req: Request, res: Response) => {
-    const { record } = req.body;
-
-    try {
-        const profile = await prisma.profiles.findUnique({
-            where: { id: record.intern_id },
-            select: { first_name: true, last_name: true }
-        });
-
-        const fullName = profile 
-            ? `${profile.first_name} ${profile.last_name}`.trim() 
-            : 'Intern';
-
-        const recordStr = record.log_category?.toString().toUpperCase().replace(/_/g, ' ');
-        const conjunction = record.log_category === 'eod_report' ? 'an' : 'a';
-        const readableDate = formatDate(new Date(record.created_at));
-
-        const title = `${recordStr || 'REPORT or REQUEST'} is pending for review`;
-        const message = `${fullName} submitted ${conjunction} ${recordStr || 'Report or Request'} on ${readableDate}.`;
-
-        const newNotification = await prisma.notifications.create({
-            data: {
-                record_id: record.id,
-                intern_id: record.intern_id,
-                title,
-                message,
-                status: record.status
-            }
-        });
-
-        res.status(201).json({ message: 'Notification created', data: newNotification });
-    } catch (error) {
-        console.error('Insert notification error:', error);
-        res.status(500).json({ error: 'Failed to create notification' });
     }
 };
 
@@ -372,11 +352,3 @@ export const markNotificationAsRead = async (req: Request, res: Response) => {
         res.status(500).json({ error: 'Failed to update notification' });
     }
 };
-
-function formatDate(dateString: string | Date): string {
-    return new Date(dateString).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
-}

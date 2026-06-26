@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 import { prisma } from '../../db.js';
+import { insertAdminNotificationService } from '../../services/notification.service.js'
 
 export const fetchActiveInternsCount = async (req: Request, res: Response) => {
     try {
@@ -84,40 +85,6 @@ export const fetchAdminNotifications = async (req: Request, res: Response) => {
         res.json({ message: 'Notifications fetched successfully', data: notifications });
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch notifications' });
-    }
-};
-
-export const insertAdminNotification = async (req: Request, res: Response) => {
-    const { record } = req.body;
-
-    try {
-        const recordstr = record.log_category?.toString().toUpperCase().replace(/_/g, ' ');
-        const title = `${recordstr || 'Report or Request'} has been ${record.status?.toString().toUpperCase() || 'Reviewed'}`;
-        let message = 'Error No Admin';
-
-        if (record.reviewed_at){
-            const recordstr = record.log_category?.toString().toUpperCase().replace(/_/g, ' ');
-        
-            const readableDate = formatDate(record.created_at);
-
-            message = `Your ${recordstr || 'Report or Request'} has been ${record.status?.toString().toUpperCase() || 'Reviewed'}  ${readableDate} by your supervisor.`;
-        }
-
-        const newNotification = await prisma.notifications.create({
-            data: {
-                record_id: record.id,
-                intern_id: record.intern_id,
-                title: title,
-                message: message,
-                status: record.status,
-                is_read: false
-            },
-            select: { id: true }
-        });
-
-        res.status(201).json({ message: 'Admin Notification created', data: newNotification });
-    } catch (error) {
-        throw error;
     }
 };
 

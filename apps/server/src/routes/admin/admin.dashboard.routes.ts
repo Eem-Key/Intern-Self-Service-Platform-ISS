@@ -9,7 +9,6 @@ import {
     fetchPendingRequestsCount,
     fetchAttendanceByRange,
     fetchAdminNotifications,
-    insertAdminNotification,
     markAdminNotificationAsRead
 } from '../../controllers/admin/admin.dashboard.controller.js';
 
@@ -22,7 +21,6 @@ router.get('/pending-requests', authenticate, isAdmin, fetchPendingRequestsCount
 router.get('/attendance', authenticate, isAdmin, fetchAttendanceByRange);
 
 router.get('/notifications', authenticate, fetchAdminNotifications);
-router.post('/notifications', authenticate, insertAdminNotification);
 router.patch('/notifications/:id/read', authenticate, markAdminNotificationAsRead);
 
 export default router;

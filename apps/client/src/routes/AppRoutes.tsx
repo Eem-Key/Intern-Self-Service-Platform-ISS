@@ -214,7 +214,6 @@ function AccountStatusGuard({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    // Admins usually have no row in interns table, so ignore them.
     if (!intern) return;
 
     const status = String(intern.status || '').toLowerCase().trim();

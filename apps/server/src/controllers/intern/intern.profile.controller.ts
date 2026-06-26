@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import { prisma } from '../../db.js';
 import { supabaseAdmin } from '../../config/supabaseAdmin.js';
 import { createClient } from '@supabase/supabase-js';
+import { insertInternNotificationService } from '../../services/notification.service.js'
 
 export const fetchProfile = async (req: Request, res: Response) => {
     const authUser = (req as any).user;
@@ -85,8 +86,14 @@ export const insertProfileUpdateRequest = async (req: Request, res: Response) =>
                 }
             });
 
-            return request;
+            return { record, request };
         });
+
+        try {
+            await insertInternNotificationService(result.record);
+        } catch (notifError) {
+            console.error('Failed to send notification:', notifError);
+        }
 
         res.status(201).json(result);
     } catch (error) {

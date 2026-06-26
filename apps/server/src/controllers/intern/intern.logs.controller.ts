@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import { prisma } from '../../db.js';
 import { Prisma } from '../../../prisma/generated/client/client.js';
+import { insertInternNotificationService } from '../../services/notification.service.js'
 
 export const fetchRecordsPaginated = async (req: Request, res: Response) => {
     const authUser = (req as any).user;
@@ -41,10 +42,31 @@ export const fetchRecordById = async (
     res: Response, 
     table: 'attendance_logs' | 'eod_reports' | 'leave_requests' | 'profile_update_requests'
 ) => {
-    const { record_id } = req.params;
+    const raw_id = req.params.record_id;
+    const record_id = Array.isArray(raw_id) ? raw_id[0] : raw_id;
+
+    if (!record_id) {
+        return res.status(400).json({ error: 'Record ID is required' });
+    }
+    
     try {
-        // @ts-ignore: Dynamic access to Prisma model
-        const data = await prisma[table].findUnique({ where: { record_id } });
+        let data: any;
+
+        switch (table) {
+            case 'attendance_logs':
+                data = await prisma.attendance_logs.findUnique({ where: { record_id } });
+                break;
+            case 'eod_reports':
+                data = await prisma.eod_reports.findUnique({ where: { record_id } });
+                break;
+            case 'leave_requests':
+                data = await prisma.leave_requests.findUnique({ where: { record_id } });
+                break;
+            case 'profile_update_requests':
+                data = await prisma.profile_update_requests.findUnique({ where: { record_id } });
+                break;
+        }
+
         if (!data) return res.status(404).json({ error: 'Record not found' });
         
         res.json(data);
@@ -184,6 +206,12 @@ export const updateProfileUpdateRequest = async (req: Request, res: Response) =>
                 reason: partialUpdate.reason || existing.reason
             }
         });
+
+        try {
+            await insertInternNotificationService(existing);
+        } catch (notifError) {
+            console.error('Failed to send update notification:', notifError);
+        }
 
         res.json(updatedRequest);
     } catch (error) {

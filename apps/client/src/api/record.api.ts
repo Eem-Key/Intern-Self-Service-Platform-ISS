@@ -4,23 +4,13 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import type { 
     ReportStatus, 
     RecordType,
-    ActivityDescription,
     ProfileUpdateType,
 } from '../../../shared/types/enums.types.ts';
 import type { ProfileUpdate } from '../../../shared/types/profile.types.ts';
 import type { InternInfo } from '../../../shared/types/intern.types.ts';
 import type { 
     Record, 
-    RecordInsert,
 } from '../../../shared/types/record.types.ts';
-import { fetchEodReportById } from './eodReport.api';
-import { fetchLeaveRequestById } from './leave.api';
-import { 
-    fetchProfileUpdateRequestById, 
-} from './profile.api';
-import { 
-    insertInternNotificationAPI,
- } from './intern.dashboard.api'
 import { 
     insertAdminNotificationAPI
  } from './admin.dashboard.api'
@@ -85,9 +75,9 @@ export async function fetchRecordDetails(record_id: string, record_category: Rec
      try {
         switch (record_category) {
             case 'attendance': return await fetchAttendanceByIdAPI(record_id);
-            case 'eod_report': return await fetchEodReportById(record_id);
-            case 'leave_request': return await fetchLeaveRequestById(record_id);
-            case 'profile_update': return await fetchProfileUpdateRequestById(record_id);
+            case 'eod_report': return await fetchEodReportByIdAPI(record_id);
+            case 'leave_request': return await fetchLeaveRequestByIdAPI(record_id);
+            case 'profile_update': return await fetchProfileUpdateRequestByIdAPI(record_id);
             default: 
                 console.warn(`No handler for category: ${record_category}`);
                 return null;
@@ -97,46 +87,6 @@ export async function fetchRecordDetails(record_id: string, record_category: Rec
         return null;
     }
 }
-
-export const insertRecord = async (record: RecordInsert): Promise<string> => {
-    const { data: recordInsert, error: insertRecordError } = await supabase
-    .from('records')
-    .insert([record])
-    .select('*')
-    .single();
-
-    if (insertRecordError){
-        console.log(insertRecordError)
-        throw insertRecordError;
-    }
-
-    console.log('Insert Record: ', recordInsert.id);
-
-    if(record.log_category !== 'attendance'){
-        await insertInternNotificationAPI(recordInsert);
-    }
-
-    return recordInsert.id;
-};
-
-export const updateRecord = async (record_id: string, description: ActivityDescription, status?: ReportStatus) => {
-    const { data: recordUpdate, error: updateRecordError } = await supabase
-        .from('records')
-        .update({
-            status: status,
-            activity_description: description,
-        })
-        .eq('id', record_id)
-        .select('status')
-        .single();
-
-    if (updateRecordError){
-        console.log(updateRecordError)
-        throw updateRecordError;
-    }
-
-    console.log('Updated Record: ', recordUpdate)
-};
 
 export async function updateAdminReviewRecord(
     record_id: string, 
