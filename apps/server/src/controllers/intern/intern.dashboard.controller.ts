@@ -123,27 +123,26 @@ export const timeOut = async (req: Request, res: Response) => {
 };
 
 export const fetchProgramProgress = async (req: Request, res: Response) => {
-    const rew_id = req.params.intern_id;
-    const intern_id = Array.isArray(rew_id) ? rew_id[0] : rew_id;
+    const raw_id = req.params.intern_id;
+    const intern_id = Array.isArray(raw_id) ? raw_id[0] : raw_id;
 
     if (!intern_id) {
         return res.status(400).json({ error: 'Intern ID is required' });
     }
-    
+
     const summary = await prisma.intern_hours_summary.findUnique({
         where: { intern_id }
     });
 
-    let data;
-
     if (summary) {
-        data =  {
+        const data = {
             required_hours: summary.required_hours,
             rendered_hours: summary.rendered_hours,
             hours_left: Math.max(0, (summary.required_hours || 0) - (summary.rendered_hours || 0)),
             wfh_hours: summary.total_online_hours,
             onsite_hours: summary.total_onsite_hours,
         };
+        return res.json({ message: 'Program progress fetched successfully', data });
     }
 
     const intern = await prisma.interns.findUnique({ 
@@ -151,7 +150,7 @@ export const fetchProgramProgress = async (req: Request, res: Response) => {
         select: { required_hours: true }
     });
 
-    data =  {
+    const data = {
         required_hours: intern?.required_hours || 0,
         rendered_hours: 0,
         hours_left: intern?.required_hours || 0,
@@ -160,7 +159,6 @@ export const fetchProgramProgress = async (req: Request, res: Response) => {
     };
 
     res.json({ message: 'Program progress fetched successfully', data });
-
 };
 
 export const fetchEODReportByDate = async (req: Request, res: Response) => {
