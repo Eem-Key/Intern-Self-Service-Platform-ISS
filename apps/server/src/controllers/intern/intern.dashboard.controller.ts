@@ -125,41 +125,42 @@ export const timeOut = async (req: Request, res: Response) => {
 export const fetchProgramProgress = async (req: Request, res: Response) => {
     const rew_id = req.params.intern_id;
     const intern_id = Array.isArray(rew_id) ? rew_id[0] : rew_id;
-    const authUser = (req as any).user;
 
     if (!intern_id) {
         return res.status(400).json({ error: 'Intern ID is required' });
     }
+    
+    const summary = await prisma.intern_hours_summary.findUnique({
+        where: { intern_id }
+    });
 
-    try {
-        const summary = await prisma.intern_hours_summary.findUnique({
-            where: { intern_id: intern_id }
-        });
+    let data;
 
-        if (!summary) {
-            return res.status(404).json({ error: 'Progress data not found' });
-        }
-
-        const profile = await prisma.profiles.findUnique({ where: { id: authUser.id } });
-        const isAdmin = profile?.role === 'admin';
-        const isOwner = summary.intern_id === authUser.id;
-
-        if (!isAdmin && !isOwner) {
-            return res.status(403).json({ error: 'Forbidden: You do not have permission.' });
-        }
-
-        const data = {
+    if (summary) {
+        data =  {
             required_hours: summary.required_hours,
             rendered_hours: summary.rendered_hours,
             hours_left: Math.max(0, (summary.required_hours || 0) - (summary.rendered_hours || 0)),
             wfh_hours: summary.total_online_hours,
             onsite_hours: summary.total_onsite_hours,
         };
-
-        res.json({ message: 'Program progress fetched successfully', data });
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch program progress' });
     }
+
+    const intern = await prisma.interns.findUnique({ 
+        where: { id: intern_id },
+        select: { required_hours: true }
+    });
+
+    data =  {
+        required_hours: intern?.required_hours || 0,
+        rendered_hours: 0,
+        hours_left: intern?.required_hours || 0,
+        wfh_hours: 0,
+        onsite_hours: 0,
+    };
+
+    res.json({ message: 'Program progress fetched successfully', data });
+
 };
 
 export const fetchEODReportByDate = async (req: Request, res: Response) => {

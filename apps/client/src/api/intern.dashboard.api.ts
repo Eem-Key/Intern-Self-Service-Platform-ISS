@@ -74,11 +74,11 @@ export async function timeOutAPI(attendance_id: string) {
     });
 }
 
-export async function fetchProgramProgressAPI(inter_id: string): Promise<ProgramProgressResponse> {
+export async function fetchProgramProgressAPI(intern_id: string): Promise<ProgramProgressResponse> {
     const { data } = await supabase.auth.getSession();
     const token = data.session?.access_token;
-
-    return await apiClient<ProgramProgressResponse>(`/intern/dashboard/progress/${inter_id}`, {
+    console.log('here')
+    return await apiClient<ProgramProgressResponse>(`/intern/dashboard/progress/${intern_id}`, {
         method: 'GET',
         token: token ?? undefined,
     });

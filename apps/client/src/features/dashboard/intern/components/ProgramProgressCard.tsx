@@ -14,7 +14,7 @@ function ProgramProgressCard() {
     },
     
   });
-
+  console.log(data)
   const progress = data?.data;
   const renderedHours = progress?.rendered_hours ?? 0;
   const requiredHours = progress?.required_hours ?? 0;
