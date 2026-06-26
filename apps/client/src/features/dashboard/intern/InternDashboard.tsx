@@ -24,7 +24,7 @@ function InternDashboard() {
             <div className="mx-auto flex w-full max-w-[2560px] flex-col gap-5">
             <WelcomeBanner />
 
-            <div className="grid w-full grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(360px,0.95fr)]">
+            <div className="grid w-full grid-cols-1 gap-5 min-[1330px]:grid-cols-[minmax(0,1fr)_minmax(0,0.95fr)] min-[1330px]:gap-5">
                 <div className="grid min-w-0 grid-rows-[auto_auto] gap-5">
                     <AttendanceCard />
                     <ProgramProgressCard />
