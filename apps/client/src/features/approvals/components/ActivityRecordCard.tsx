@@ -106,7 +106,7 @@ function ActivityRecordCard({ record, onView }: ActivityRecordCardProps) {
             </h3>
 
             <p className="mt-0.5 truncate text-xs text-black sm:text-sm">
-            {formatInternRole(record.position)} |{' '} | {record.department || '--'}
+            {formatInternRole(record.position)} |{' '} {record.department || '--'}
             </p>
 
             <p className="mt-1 line-clamp-2 text-xs leading-snug text-gray-600 sm:text-sm">
