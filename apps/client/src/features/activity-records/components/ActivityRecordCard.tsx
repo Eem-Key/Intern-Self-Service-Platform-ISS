@@ -52,6 +52,15 @@ function formatSubmissionDate(value?: string | null) {
     return `${datePart}\n${timePart}`;
 }
 
+function formatDisplayName(name?: string | null) {
+    if (!name?.trim()) return '--';
+
+    return name
+        .replace(/\s+\.\s+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
 function ActivityRecordCard({ record, onView }: ActivityRecordCardProps) {
     const avatarPath = record.avatar_url || null;
     const hasAvatarPath = Boolean(avatarPath);
@@ -106,7 +115,7 @@ function ActivityRecordCard({ record, onView }: ActivityRecordCardProps) {
                             </p>
 
                             <h3 className="mt-1 break-words text-sm font-bold text-black sm:text-base lg:mt-0 lg:truncate">
-                                {record.name}
+                                {formatDisplayName(record.name)}
                             </h3>
                         </div>
 
