@@ -9,6 +9,9 @@ import { useState, useEffect } from 'react';
 import {
     USER_GENDER_VALUES,
     type UserGender,
+    type CompanyDepartment,
+    type JobPosition,
+    type OfficeLocation,
 } from '../../../../../shared/types/enums.types';
 import type {
     ProfileIntern,
@@ -27,8 +30,8 @@ type ProfileDetailsCardProps = {
 };
 
 export const formatDateForInput = (dateString: string | Date | null | undefined) => {
-  if (!dateString) return '';
-  return new Date(dateString).toISOString().split('T')[0];
+    if (!dateString) return '';
+    return new Date(dateString).toISOString().split('T')[0];
 };
 
 function ProfileDetailsCard(
@@ -49,6 +52,56 @@ function ProfileDetailsCard(
     }
     };
 
+    const formatPositionLabel = (position?: string | null) => {
+    switch (position) {
+        case 'Quality Assurance':
+        case 'quality_assurance':
+            return 'Quality Assurance';
+        case 'Front-end Developer':
+        case 'frontend_developer':
+        case 'Front_end_Developer':
+            return 'Front-end Developer';
+        case 'Back-end Developer':
+        case 'backend_developer':
+        case 'Back_end_Developer':
+            return 'Back-end Developer';
+        case 'Business Analyst':
+        case 'business_analyst':
+        case 'Business_Analyst':
+            return 'Business Analyst';
+        default:
+            return position
+                ? position.replace(/_/g, ' ').replace(/-/g, ' ')
+                : '';
+            }
+        };
+
+    const POSITION_OPTIONS: {
+        label: string;
+        value: JobPosition;
+    }[] = [
+        { label: 'Quality Assurance', value: 'Quality Assurance' },
+        { label: 'Front-end Developer', value: 'Front-end Developer' },
+        { label: 'Back-end Developer', value: 'Back-end Developer' },
+        { label: 'Business Analyst', value: 'Business Analyst' },
+    ];
+
+    const DEPARTMENT_OPTIONS: {
+        label: string;
+        value: CompanyDepartment;
+    }[] = [
+        { label: 'ISS', value: 'ISS' },
+        { label: 'SDS', value: 'SDS' },
+    ];
+
+    const OFFICE_OPTIONS: {
+        label: string;
+        value: OfficeLocation;
+    }[] = [
+        { label: 'Binondo', value: 'binondo' },
+        { label: 'Makati', value: 'makati' },
+    ];
+
     const { data: hasPendingProfileRequest = false } = useQuery({
         queryKey: ['pending-profile-update-request', 'information_update', profile.id],
         queryFn: () => hasPendingProfileUpdateRequestAPI('information_update'),
@@ -58,6 +111,9 @@ function ProfileDetailsCard(
     });
 
     const [isGenderDropdownOpen, setIsGenderDropdownOpen] = useState(false);
+    const [isPositionDropdownOpen, setIsPositionDropdownOpen] = useState(false);
+    const [isDepartmentDropdownOpen, setIsDepartmentDropdownOpen] = useState(false);
+    const [isOfficeDropdownOpen, setIsOfficeDropdownOpen] = useState(false);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const queryClient = useQueryClient();
     const [statusMessage, setStatusMessage] = useState<{
@@ -177,6 +233,9 @@ function ProfileDetailsCard(
         resetFormValues();
         setIsEditing(false);
         setIsGenderDropdownOpen(false);
+        setIsPositionDropdownOpen(false);
+        setIsDepartmentDropdownOpen(false);
+        setIsOfficeDropdownOpen(false);
         setFieldErrors({});
     };
 
@@ -531,22 +590,40 @@ function ProfileDetailsCard(
         </h2>
 
         <div className="grid grid-cols-2 gap-2 sm:gap-3">
-            <ProfileField
-            label="Position"
-            value={formValues.position}
-            disabled={!isEditing}
-            required
-            error={fieldErrors.position}
-            onChange={(value) => handleChange('position', value)}
+            <ProfileDropdownField
+                label="Position"
+                value={formValues.position}
+                disabled={!isEditing}
+                required
+                error={fieldErrors.position}
+                isOpen={isPositionDropdownOpen}
+                options={POSITION_OPTIONS}
+                placeholder={
+                    formValues.position
+                        ? formatPositionLabel(formValues.position)
+                        : 'Select position'
+                }
+                onToggle={() => setIsPositionDropdownOpen((prev) => !prev)}
+                onSelect={(value) => {
+                    handleChange('position', value);
+                    setIsPositionDropdownOpen(false);
+                }}
             />
 
-            <ProfileField
-            label="Department"
-            value={formValues.department}
-            disabled={!isEditing}
-            required
-            error={fieldErrors.department}
-            onChange={(value) => handleChange('department', value)}
+            <ProfileDropdownField
+                label="Department"
+                value={formValues.department}
+                disabled={!isEditing}
+                required
+                error={fieldErrors.department}
+                isOpen={isDepartmentDropdownOpen}
+                options={DEPARTMENT_OPTIONS}
+                placeholder="Select department"
+                onToggle={() => setIsDepartmentDropdownOpen((prev) => !prev)}
+                onSelect={(value) => {
+                    handleChange('department', value);
+                    setIsDepartmentDropdownOpen(false);
+                }}
             />
 
             {/* <ProfileField
@@ -585,13 +662,20 @@ function ProfileDetailsCard(
             /> */}
             </div>
 
-            <ProfileField
-            label="Office"
-            value={formValues.office}
-            disabled={!isEditing}
-            required
-            error={fieldErrors.office}
-            onChange={(value) => handleChange('office', value)}
+            <ProfileDropdownField
+                label="Office"
+                value={formValues.office}
+                disabled={!isEditing}
+                required
+                error={fieldErrors.office}
+                isOpen={isOfficeDropdownOpen}
+                options={OFFICE_OPTIONS}
+                placeholder="Select office"
+                onToggle={() => setIsOfficeDropdownOpen((prev) => !prev)}
+                onSelect={(value) => {
+                    handleChange('office', value);
+                    setIsOfficeDropdownOpen(false);
+                }}
             />
         </div>
         </section>
