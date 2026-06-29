@@ -14,11 +14,48 @@ type RecordDetailsProps = {
     onReview?: (status: ReportStatus, feedback: string) => void | Promise<void>;
 };
 
-
 function formatLabel(key: string) {
     return key
         .replaceAll('_', ' ')
         .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function formatInternRole(value?: string | null) {
+    if (!value) return '--';
+
+    switch (value) {
+        case 'quality_assurance':
+        case 'Quality Assurance':
+            return 'Quality Assurance';
+
+        case 'frontend_developer':
+        case 'Front_end_Developer':
+        case 'Front-end Developer':
+            return 'Front-end Developer';
+
+        case 'backend_developer':
+        case 'Back_end_Developer':
+        case 'Back-end Developer':
+            return 'Back-end Developer';
+
+        case 'business_analyst':
+        case 'Business_Analyst':
+        case 'Business Analyst':
+            return 'Business Analyst';
+
+        default:
+            return formatLabel(value);
+    }
+}
+
+
+function formatDisplayName(name?: string | null ) {
+    if (!name?.trim()) return '--';
+
+    return name
+        .replace(/\s+\.\s+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
 }
 
 const profileFieldOrder = [
@@ -123,7 +160,7 @@ function RecordDetails({ record, onClose, onReview }: RecordDetailsProps) {
             <div className="min-h-0 flex-1 overflow-y-auto">
             <div className="bg-[#EAF0FA] px-4 py-3 sm:px-5 sm:py-4">
                 <h3 className="border-l-4 border-[#FFBF10] pl-3 text-lg font-bold text-black sm:text-xl">
-                {record.name}
+                {formatDisplayName(record.name)}
                 </h3>
 
                 <p className="pl-3 text-xs text-gray-700 sm:text-sm">
@@ -150,7 +187,7 @@ function RecordDetails({ record, onClose, onReview }: RecordDetailsProps) {
                     />
                     <DetailItem
                         label="Intern Role"
-                        value={record.details?.intern_role || record.position || '--'}
+                        value={formatInternRole(record.details?.intern_role || record.position)}
                     />
                     </div>
 
