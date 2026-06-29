@@ -111,39 +111,23 @@ export const updateAdminReviewRecord = async (req: Request, res: Response) => {
     const record_id = Array.isArray(raw_id) ? raw_id[0] : raw_id;
 
     if (!record_id) {
-        return res.status(400).json({ error: 'Notification ID is required' });
+        return res.status(400).json({ error: 'Record ID is required' });
     }
 
     try {
-        const result = await prisma.$transaction(async (tx) => {
-            const updatedRecord = await tx.records.update({
-                where: { id: record_id },
-                data: {
-                    status,
-                    admin_feedback,
-                    admin_id,
-                    reviewed_at: new Date()
-                }
-            });
+        const result = await prisma.$queryRaw<typeof prisma.records[]>`
+            SELECT * FROM update_admin_review(
+                ${record_id}::uuid,
+                ${admin_id}::uuid,
+                ${admin_feedback ?? ''}, 
+                ${status.toLowerCase()}::report_status,
+                ${update_type ?? null},
+                ${profile_data ? JSON.stringify(profile_data) : null}::jsonb,
+                ${intern_data ? JSON.stringify(intern_data) : null}::jsonb
+            )
+        `;
 
-            if (profile_data && updatedRecord.intern_id) {
-                await tx.profiles.update({
-                    where: { id: updatedRecord.intern_id },
-                    data: profile_data
-                });
-            }
-
-            if (intern_data && updatedRecord.intern_id) {
-                await tx.interns.update({
-                    where: { id: updatedRecord.intern_id },
-                    data: intern_data
-                });
-            }
-
-            return updatedRecord;
-        });
-
-        await insertAdminNotificationService(result);
+        await insertAdminNotificationService(result[0]);
 
         res.json({ message: 'Record updated successfully', data: result });
     } catch (error) {

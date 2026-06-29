@@ -201,7 +201,7 @@ function AccountStatusGuard({ children }: { children: React.ReactNode }) {
 
     if (!session) return;
 
-    console.log('CURRENT AUTH USER ID:', session.user.id);
+    // console.log('CURRENT AUTH USER ID:', session.user.id);
 
     const { data: intern, error } = await supabase
       .from('interns')
@@ -218,8 +218,8 @@ function AccountStatusGuard({ children }: { children: React.ReactNode }) {
 
     const status = String(intern.status || '').toLowerCase().trim();
 
-    console.log('CURRENT INTERN ROW:', intern);
-    console.log('CURRENT INTERN STATUS:', status);
+    // console.log('CURRENT INTERN ROW:', intern);
+    // console.log('CURRENT INTERN STATUS:', status);
 
     if (status === 'deactivated') {
       await blockAndLogout();

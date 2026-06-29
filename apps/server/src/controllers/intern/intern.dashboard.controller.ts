@@ -204,7 +204,7 @@ export const fetchEODReportByDate = async (req: Request, res: Response) => {
 };
 
 export const insertEODReport = async (req: Request, res: Response) => {
-    const { payload, reportStatus } = req.body;
+    const { payload, report_status } = req.body;
     const intern_id = (req as any).user.id;
 
     try {
@@ -213,8 +213,8 @@ export const insertEODReport = async (req: Request, res: Response) => {
                 data: {
                     intern_id,
                     log_category: 'eod_report',
-                    activity_description: reportStatus === 'draft' ? 'Submission_of_Draft' : 'Submission_of_EOD_Report',
-                    status: reportStatus
+                    activity_description: report_status === 'draft' ? 'Submission_of_Draft' : 'Submission_of_EOD_Report',
+                    status: report_status
                 }
             });
 
@@ -231,7 +231,7 @@ export const insertEODReport = async (req: Request, res: Response) => {
             return report;
         });
 
-        if (reportStatus !== 'draft') {
+        if (report_status !== 'draft') {
             try {
                 await insertInternNotificationService(result);
             } catch (notifError) {
@@ -239,7 +239,7 @@ export const insertEODReport = async (req: Request, res: Response) => {
             }
         }
 
-        res.status(201).json({ message: `EOD ${reportStatus} saved successfully`, data: result });
+        res.status(201).json({ message: `EOD ${report_status} saved successfully`, data: result });
     } catch (error) {
         console.log(error)
         res.status(500).json({ error: 'Failed to save EOD report' });
@@ -247,7 +247,7 @@ export const insertEODReport = async (req: Request, res: Response) => {
 };
 
 export const updateEODReport = async (req: Request, res: Response) => {
-    const { payload, reportStatus } = req.body;
+    const { payload, report_status } = req.body;
 
     const rew_id = req.params.report_id;
     const report_id = Array.isArray(rew_id) ? rew_id[0] : rew_id;
@@ -270,15 +270,15 @@ export const updateEODReport = async (req: Request, res: Response) => {
             await tx.records.update({
                 where: { id: report_id },
                 data: {
-                    activity_description: reportStatus === 'draft' ? 'Submission_of_Draft' : 'Submission_of_EOD_Report',
-                    status: reportStatus
+                    activity_description: report_status === 'draft' ? 'Submission_of_Draft' : 'Submission_of_EOD_Report',
+                    status: report_status
                 }
             });
 
             return report;
         });
 
-        if (reportStatus !== 'draft') {
+        if (report_status !== 'draft') {
             try {
                 await insertInternNotificationService(result);
             } catch (notifError) {
@@ -286,7 +286,7 @@ export const updateEODReport = async (req: Request, res: Response) => {
             }
         }
 
-        res.json({ message: `EOD ${reportStatus} updated successfully`, data: result });
+        res.json({ message: `EOD ${report_status} updated successfully`, data: result });
     } catch (error) {
         console.log(error)
         res.status(500).json({ error: 'Failed to update EOD report' });

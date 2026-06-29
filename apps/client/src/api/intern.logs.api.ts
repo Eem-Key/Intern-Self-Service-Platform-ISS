@@ -62,21 +62,21 @@ export async function fetchProfileUpdateRequestWithProfileByIdAPI(record_id: str
     return await apiClient<any>(`/intern/logs/profile-update-full/${record_id}`, { method: 'GET', token: token ?? undefined });
 }
 
-export async function fetchFullNameAPI(user_id: string): Promise<string> {
-    const { data } = await supabase.auth.getSession();
-    const token = data.session?.access_token;
+// export async function fetchFullNameAPI(user_id: string): Promise<string> {
+//     const { data } = await supabase.auth.getSession();
+//     const token = data.session?.access_token;
 
-    if (!token) {
-        throw new Error('You must be logged in to fetch a record.');
-    }
+//     if (!token) {
+//         throw new Error('You must be logged in to fetch a record.');
+//     }
 
-    const response = await apiClient<{ full_name: string }>(`/intern/logs/name/${user_id}`, {
-        method: 'GET',
-        token: token ?? undefined
-    });
+//     const response = await apiClient<{ full_name: string }>(`/intern/logs/name/${user_id}`, {
+//         method: 'GET',
+//         token: token ?? undefined
+//     });
 
-    return response.full_name;
-}
+//     return response.full_name;
+// }
 
 export async function updateProfileUpdateRequestAPI(
     record_id: string,

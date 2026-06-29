@@ -15,7 +15,7 @@ import type {
 } from '../../../../../shared/types/eodReport.types';
 import { useFetchCompleteRecordDetails } from '../../../api/record.api';
 import { updateEODReportAPI } from '../../../api/intern.dashboard.api';
-import { fetchFullNameAPI } from '../../../api/intern.logs.api';
+import { fetchFullNameAPI } from '../../../api/profile.api';
 
 type LogDetailsModalProps = {
     record: RecordLog;
@@ -756,7 +756,6 @@ function AdminFeedback({
     admin_id?: string | null;
 }) {
     const hasFeedback = Boolean(value?.trim());
-
     const { data: adminName, isLoading } = useQuery({
         queryKey: ['log-feedback-admin-name', admin_id],
         queryFn: async () => {

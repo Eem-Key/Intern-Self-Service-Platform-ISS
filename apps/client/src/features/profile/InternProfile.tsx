@@ -16,6 +16,7 @@ function InternProfile() {
                 }, []);
 
     const { data: profile, isLoading, error } = useFetchProfileAPI();
+    console.log(profile)
 
     useEffect(() => {
     if (!profile?.id) return;

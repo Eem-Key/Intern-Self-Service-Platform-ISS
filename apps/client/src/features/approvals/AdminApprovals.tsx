@@ -199,8 +199,8 @@ function AdminApprovals() {
         admin_feedback: feedback,
         status,
         update_type: updateType,
-        profile_date: profileData,
-        intern_date: internData
+        profile_data: profileData,
+        intern_data: internData
     }
 
     await updateAdminReviewRecordAPI(
