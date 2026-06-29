@@ -122,7 +122,7 @@ function AttendanceLogTable({
                                             key={record.record_id}
                                             className="border-b border-gray-100"
                                         >
-                                           <TableCell>{formatDate(record.work_date)}</TableCell>
+                                            <TableCell>{formatDate(record.work_date)}</TableCell>
                                             <TableCell>{record.work_setup || '--'}</TableCell>
                                             <TableCell center>{formatTime(record.clock_in)}</TableCell>
                                             <TableCell center>{formatTime(record.clock_out)}</TableCell>
@@ -253,18 +253,10 @@ function AttendanceLogModal({
                                             key={record.record_id}
                                             className="border-b border-gray-100"
                                         >
-                                            <TableCell center>
-                                                {formatFullDate(record.work_date)}
-                                            </TableCell>
-                                            <TableCell center>
-                                                {record.work_setup || '--'}
-                                            </TableCell>
-                                            <TableCell center>
-                                                {formatTime(record.clock_in)}
-                                            </TableCell>
-                                            <TableCell center>
-                                                {formatTime(record.clock_out)}
-                                            </TableCell>
+                                            <TableCell>{formatDate(record.work_date)}</TableCell>
+                                            <TableCell>{record.work_setup || '--'}</TableCell>
+                                            <TableCell center>{formatTime(record.clock_in)}</TableCell>
+                                            <TableCell center>{formatTime(record.clock_out)}</TableCell>
                                         </tr>
                                     ))
                                 )}
