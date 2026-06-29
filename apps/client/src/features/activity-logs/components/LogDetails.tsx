@@ -16,6 +16,7 @@ import type {
 import { useFetchCompleteRecordDetails } from '../../../api/record.api';
 import { updateEODReportAPI } from '../../../api/intern.dashboard.api';
 import { fetchFullNameAPI } from '../../../api/profile.api';
+import { useEODAttendance } from '../../../api/eodReport.api';
 
 type LogDetailsModalProps = {
     record: RecordLog;
@@ -69,6 +70,12 @@ function formatDate(value?: string | null) {
         day: '2-digit',
         year: 'numeric',
     });
+}
+
+function formatDateForInput(value?: string | null) {
+    if (!value) return '';
+
+    return new Date(value).toISOString().split('T')[0];
 }
 
 function formatTime(value?: string | null) {
@@ -239,22 +246,27 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
     } | null>(null);
 
     const [eodFormValues, setEodFormValues] = useState<EODReportForm>({
-        date_written: details?.date_written || '',
+        date_written: formatDateForInput(details?.date_written),
         hours_spent: Number(details?.hours_spent || 0),
         project_name: details?.project_name || '',
         task_accomplished: details?.task_accomplished || '',
     });
 
+    const { data: attendanceData } = useEODAttendance(eodFormValues.date_written);
+    const hasTimedOut = Boolean(attendanceData?.clock_out);
+
     useEffect(() => {
         if (!details) return;
 
         setEodFormValues({
-            date_written: details.date_written || '',
-            hours_spent: Number(details.hours_spent || 0),
+            date_written: formatDateForInput(details.date_written),
+            hours_spent: hasTimedOut
+                ? Number(attendanceData?.hours_logged || 0)
+                : Number(details.hours_spent || 0),
             project_name: details.project_name || '',
             task_accomplished: details.task_accomplished || '',
         });
-    }, [details]);
+    }, [details, attendanceData, hasTimedOut]);
 
     const [eodErrors, setEodErrors] = useState<EODReportFormErrors>({});
 
@@ -354,11 +366,20 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
     };
 
     const handleSubmitEODDraft = () => {
+        if (!hasTimedOut) {
+            showStatusMessage(
+                'error',
+                'Cannot Submit',
+                'You can only submit your EOD report after you time out in attendance.'
+            );
+            return;
+        }
+
         const validationErrors = validateEodReport(eodFormValues, 'submit');
 
         if (Object.keys(validationErrors).length > 0) {
-        setEodErrors(validationErrors);
-        return;
+            setEodErrors(validationErrors);
+            return;
         }
 
         submitEODDraftMutation.mutate(eodFormValues);
@@ -485,10 +506,14 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
                     <label className="text-sm font-medium">Hour Spent</label>
                     <div className="relative mt-1">
                         <input
-                        type="text"
-                        value={`${eodFormValues.hours_spent} Hrs`}
-                        disabled
-                        className="h-10 w-full rounded bg-[#eeeeee] px-4 text-sm outline-none disabled:cursor-not-allowed disabled:text-gray-600"
+                            type="text"
+                            value={
+                                hasTimedOut
+                                    ? `${eodFormValues.hours_spent} Hrs`
+                                    : 'Available after time out.'
+                            }
+                            disabled
+                            className="h-10 w-full rounded bg-[#eeeeee] px-4 pr-8 text-xs outline-none disabled:cursor-not-allowed disabled:text-gray-600 sm:text-sm"
                         />
                         <Clock
                         size={17}
@@ -547,6 +572,7 @@ function LogDetailsModal({ record, onClose }: LogDetailsModalProps) {
                             type="button"
                             onClick={handleSaveEODDraft}
                             disabled={
+                                !hasTimedOut ||
                                 saveEODDraftMutation.isPending ||
                                 submitEODDraftMutation.isPending
                             }
