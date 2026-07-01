@@ -2,7 +2,7 @@ import type { ApiErrorResponse } from '../../../shared/types/api.types';
 import { supabase } from '../config/supabase.ts'
 
 const API_BASE_URL =
-    import.meta.env.VITE_API_BASE_URL || 'http://localhost:5137/api';
+    import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
