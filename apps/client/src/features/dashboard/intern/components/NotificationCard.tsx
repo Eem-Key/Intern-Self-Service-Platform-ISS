@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import {
   fetchInternNotificationsAPI,
   updateInternNotificationsAsReadAPI
-} from '../../../../api/intern.dashboard.api';
+} from '../../../../api/intern/intern.dashboard.api';
 import type { Notification } from '../../../../../../shared/types/notification.types';
 
 function getElapsedTime(sentAt: string) {

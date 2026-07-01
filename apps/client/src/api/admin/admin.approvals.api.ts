@@ -1,5 +1,5 @@
-import { apiClient } from '../services/apiClient';
-import { supabase } from '../config/supabase';
+import { apiClient } from '../../services/apiClient';
+import { supabase } from '../../config/supabase';
 
 export async function fetchPendingRequestsPerRecordAPI() {
     const { data } = await supabase.auth.getSession();

@@ -8,7 +8,7 @@ import {
     useFetchAllAttendanceByIdAPI,
     useFetchAllEodReportByIdAPI,
     useFetchProfileByIdAPI,
-} from '../../api/adminInterns.api';
+} from '../../api/admin/admin.interns.use';
 
 import type { InternPosition, InternshipStatus, } from '../../../../shared/types/enums.types';
 

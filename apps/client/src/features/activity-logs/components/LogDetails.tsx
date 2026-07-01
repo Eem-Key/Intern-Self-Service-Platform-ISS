@@ -13,10 +13,10 @@ import type {
     EODReportForm,
     EODReportFormErrors,
 } from '../../../../../shared/types/eodReport.types';
-import { useFetchCompleteRecordDetails } from '../../../api/record.api';
-import { updateEODReportAPI } from '../../../api/intern.dashboard.api';
+import { useFetchCompleteRecordDetails } from '../../../api/intern/intern.logs.use';
+import { updateEODReportAPI } from '../../../api/intern/intern.dashboard.api';
 import { fetchFullNameAPI } from '../../../api/profile.api';
-import { useEODAttendance } from '../../../api/eodReport.api';
+import { useEODAttendance } from '../../../api/intern/intern.dashboard.use';
 
 type LogDetailsModalProps = {
     record: RecordLog;

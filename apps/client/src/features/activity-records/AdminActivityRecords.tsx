@@ -12,7 +12,7 @@ import type { DepartmentFilter } from './components/DepartmentType';
 import type { RecordTypeFilter } from './components/RecordType';
 import type { StatusTypeFilter } from './components/StatusType';
 
-import { useFetchReviewedApprovalRecords } from '../../api/adminActivityRecords.api';
+import { useFetchReviewedApprovalRecords } from '../../api/admin/admin.activity.use';
 
 function getPageNumbers(
     currentPage: number,

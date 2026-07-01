@@ -1,9 +1,9 @@
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
-import type { RecordType } from '../../../shared/types/enums.types';
+import type { RecordType } from '../../../../shared/types/enums.types';
 import { 
     fetchPendingRequestsPerRecordAPI,
     fetchPendingApprovalRecordsAPI
- } from '../api/admin.approvals.api';
+ } from './admin.approvals.api';
 
 
 export function usefetchPendingRequestsPerRecord() {

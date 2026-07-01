@@ -17,7 +17,7 @@ import type {
     InternshipStatus,
 } from '../../../../shared/types/enums.types';
 
-import { useFetchAllInternListInformationAPI } from '../../api/adminInterns.api';
+import { useFetchAllInternListInformationAPI } from '../../api/admin/admin.interns.use';
 
 function getPageNumbers(
     currentPage: number,

@@ -1,11 +1,11 @@
-import { apiClient } from '../services/apiClient';
-import { supabase } from '../config/supabase';
+import { apiClient } from '../../services/apiClient';
+import { supabase } from '../../config/supabase';
 import type { 
     Record,
-} from '../../../shared/types/record.types';
+} from '../../../../shared/types/record.types';
 import type { 
     NotificationsResponse,
-} from '../../../shared/types/notification.types';
+} from '../../../../shared/types/notification.types';
 
 export async function fetchActiveInternsAPI(): Promise<number>  {
     const { data } = await supabase.auth.getSession();

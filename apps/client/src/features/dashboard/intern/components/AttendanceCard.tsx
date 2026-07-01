@@ -7,7 +7,7 @@ import {
   fetchAttendanceByDateAPI,
   timeInAPI,
   timeOutAPI,
-} from '../../../../api/intern.dashboard.api';
+} from '../../../../api/intern/intern.dashboard.api';
 import { useAttendanceTimer } from './attendance/useAttendanceTimer';
 import type { WorkSetup } from '../../../../../../shared/types/enums.types';
 

@@ -1,12 +1,12 @@
-import { apiClient } from '../services/apiClient';
-import { supabase } from '../config/supabase';
+import { apiClient } from '../../services/apiClient';
+import { supabase } from '../../config/supabase';
 import type { 
     Record,
-} from '../../../shared/types/record.types';
+} from '../../../../shared/types/record.types';
 import type { 
     ProfileUpdateRequestForm,
     ProfileUpdateRequest
-} from '../../../shared/types/profile.types';
+} from '../../../../shared/types/profile.types';
 
 export async function fetchRecordsPaginatedAPI(
     page: number, 

@@ -3,8 +3,8 @@ import type {
     RecordType,
     ReportStatus,
     CompanyDepartment
-} from '../../../shared/types/enums.types';
-import { fetchReviewedApprovalRecordsAPI } from '../api/admin.activity.api';
+} from '../../../../shared/types/enums.types';
+import { fetchReviewedApprovalRecordsAPI } from './admin.activity.api';
 
 export function useFetchReviewedApprovalRecords(
     page: number,

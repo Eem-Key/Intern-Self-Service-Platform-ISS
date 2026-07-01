@@ -1,8 +1,8 @@
-import { apiClient } from '../services/apiClient';
-import { supabase } from '../config/supabase';
+import { apiClient } from '../../services/apiClient';
+import { supabase } from '../../config/supabase';
 import type { 
     LeaveRequestForm,
-} from '../../../shared/types/leave.types';
+} from '../../../../shared/types/leave.types';
 
 export async function fetchAllLeaveRequestDatesOfInternAPI() {
     const { data } = await supabase.auth.getSession();

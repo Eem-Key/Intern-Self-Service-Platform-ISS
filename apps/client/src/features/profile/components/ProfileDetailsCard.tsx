@@ -23,7 +23,7 @@ import type {
 import { 
     insertProfileUpdateRequestAPI, 
     hasPendingProfileUpdateRequestAPI,
-} from '../../../api/intern.profile.api';
+} from '../../../api/intern/intern.profile.api.ts';
 
 type ProfileDetailsCardProps = {
     profile: ProfileIntern;

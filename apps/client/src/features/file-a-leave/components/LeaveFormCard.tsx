@@ -10,7 +10,7 @@ import {
     checkLeaveRequestDatesAPI,
     fetchAllLeaveRequestDatesOfInternAPI,
     insertLeaveRequestAPI,
-} from '../../../api/intern.leave.api';
+} from '../../../api/intern/intern.leave.api.ts';
 import StatusMessage from '../../../components/feedback/StatusMessage';
 import RequiredMark from '../../../components/ui/RequiredMark';
 import { validateLeaveForm } from '../../../utils/validateLeave.ts';

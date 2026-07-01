@@ -12,7 +12,7 @@ import type {
 import type { ProfileIntern } from '../../../../../shared/types/profile.types';
 import { 
     updatePasswordAPI 
-} from '../../../api/intern.profile.api';
+} from '../../../api/intern/intern.profile.api';
 
 type ProfileChangePasswordCardProps = {
     profile: ProfileIntern;

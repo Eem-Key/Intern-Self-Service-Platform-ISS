@@ -3,7 +3,7 @@ import { validateProfileUpdateRequest } from '../../../utils/validateProfile.ts'
 import { useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../../../config/supabase';
-import { updateProfileUpdateRequestAPI } from '../../../api/intern.logs.api';
+import { updateProfileUpdateRequestAPI } from '../../../api/intern/intern.logs.api.ts';
 import RequiredMark from '../../../components/ui/RequiredMark';
 
 import type { RecordLog } from '../../../../../shared/types/record.types';

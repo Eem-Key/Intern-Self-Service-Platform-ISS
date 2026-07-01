@@ -2,7 +2,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import type { 
     ReportStatus, 
     RecordType,
-} from '../../../shared/types/enums.types.ts';
+} from '../../../../shared/types/enums.types.ts';
 import {
     fetchRecordsPaginatedAPI,
     fetchAttendanceByIdAPI,
@@ -10,7 +10,7 @@ import {
     fetchLeaveRequestByIdAPI,
     fetchProfileUpdateRequestWithProfileByIdAPI,
     fetchProfileUpdateRequestByIdAPI
-} from './intern.logs.api'
+} from './intern.logs.api.ts'
 
 export function useFetchRecordsPaginatedIntern(
     page:number, 

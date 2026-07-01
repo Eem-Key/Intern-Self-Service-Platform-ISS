@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { fetchProgramProgressAPI } from '../../../../api/intern.dashboard.api';
+import { fetchProgramProgressAPI } from '../../../../api/intern/intern.dashboard.api.ts';
 import { getAuthUserId } from '../../../../utils/auth.util.ts';
 import { Home, Building2 } from 'lucide-react';
 

@@ -11,10 +11,10 @@ import type{
 } from '../../../shared/types/intern.types';
 import { 
     fetchProfileAPI 
-} from './intern.profile.api'
+} from './intern/intern.profile.api'
 import {
     fetchProgramProgressHoursAPI
-}from '../api/admin.interns.api';
+}from './admin/admin.interns.api';
 
 export const useFetchProfileAPI = () => {
     return useQuery({

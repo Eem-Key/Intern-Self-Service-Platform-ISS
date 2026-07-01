@@ -1,13 +1,13 @@
-import { apiClient } from '../services/apiClient';
-import { supabase } from '../config/supabase';
+import { apiClient } from '../../services/apiClient';
+import { supabase } from '../../config/supabase';
 import type { 
     ProfileIntern,
     ProfileUpdateRequestForm,
     ProfileUpdateRequest,
-} from '../../../shared/types/profile.types';
+} from '../../../../shared/types/profile.types';
 import type { 
     ChangePasswordValues,
-} from '../../../shared/types/login.types';
+} from '../../../../shared/types/login.types';
 
 export async function fetchProfileAPI(): Promise<ProfileIntern> {
     const { data } = await supabase.auth.getSession();

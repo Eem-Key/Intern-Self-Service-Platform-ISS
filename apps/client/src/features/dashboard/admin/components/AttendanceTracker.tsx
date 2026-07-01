@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import type { AttendanceWithName } from '../../../../../../shared/types/attendance.types';
-import { fetchAttendancePerDateRange } from '../../../../api/admin.dashboard.api';
+import { fetchAttendancePerDateRange } from '../../../../api/admin/admin.dashboard.api';
 
 function getTodayDateString() {
     return new Date().toISOString().split('T')[0];

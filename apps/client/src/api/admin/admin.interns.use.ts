@@ -1,21 +1,21 @@
-import { supabase } from '../config/supabase';
-import { getAuthUserId, isAdmin } from '../utils/auth.util';
+import { supabase } from '../../config/supabase';
+import { getAuthUserId, isAdmin } from '../../utils/auth.util';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { 
     ProfileInternInsert
-} from '../../../shared/types/profile.types';
+} from '../../../../shared/types/profile.types';
 import type { 
     InternPosition,
     InternshipStatus,
     CompanyDepartment
-} from '../../../shared/types/enums.types';
+} from '../../../../shared/types/enums.types';
 import {
     fetchAllInternListInformationAPI,
     fetchProfileByIdAPI,
     fetchAllAttendanceByIdAPI,
     fetchAllEodReportByIdAPI,
     deactivateInternAPI
-} from '../api/admin.interns.api';
+} from './admin.interns.api';
 
 export function useFetchAllInternListInformationAPI(
     page: number,

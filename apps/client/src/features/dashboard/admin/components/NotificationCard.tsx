@@ -4,7 +4,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import {
     fetchAdminNotificationsAPI,
     updateAdminNotificationsAsReadAPI,
-} from '../../../../api/admin.dashboard.api';
+} from '../../../../api/admin/admin.dashboard.api';
 import type { Notification } from '../../../../../../shared/types/notification.types';
 
 function getElapsedTime(sentAt: string) {

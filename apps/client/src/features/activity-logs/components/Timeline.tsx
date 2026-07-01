@@ -9,7 +9,7 @@ import type {
 import LogDetailsModal from './LogDetails';
 import LogTypeDropdown, { type LogTypeFilter } from './LogType';
 import StatusBadge from './StatusBadge';
-import { useFetchRecordsPaginatedIntern } from '../../../api/record.api'
+import { useFetchRecordsPaginatedIntern } from '../../../api/intern/intern.logs.use'
 
 function formatLogType(type: RecordType) {
     switch (type) {

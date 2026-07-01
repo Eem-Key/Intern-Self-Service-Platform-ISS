@@ -22,10 +22,10 @@ import type {
 import {
     usefetchPendingRequestsPerRecord,
     useFetchPendingApprovalRecords,
-} from '../../api/adminApprovals.api';
+} from '../../api/admin/admin.approvals.use';
 import {
     updateAdminReviewRecordAPI
-} from '../../api/admin.approvals.api';
+} from '../../api/admin/admin.approvals.api';
 
 
 function getPageNumbers(

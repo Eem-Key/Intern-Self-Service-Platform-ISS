@@ -7,11 +7,11 @@ import StatusMessage from '../../../../components/feedback/StatusMessage';
 import {
   useEODAttendance,
   useFetchEODReport,
-} from '../../../../api/eodReport.api';
+} from '../../../../api/intern/intern.dashboard.use';
 import {
   insertEODReportAPI,
   updateEODReportAPI,
-} from '../../../../api/intern.dashboard.api';
+} from '../../../../api/intern/intern.dashboard.api';
 import type { EODReportForm, EODReportFormErrors } from '../../../../../../shared/types/eodReport.types';
 import { validateEodReport } from '../../../../utils/validateEodReport';
 import RequiredMark from '../../../../components/ui/RequiredMark';

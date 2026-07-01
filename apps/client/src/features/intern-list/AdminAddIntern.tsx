@@ -19,7 +19,7 @@ import type { ProfileInternInsert } from '../../../../shared/types/profile.types
 import {
     useInviteInternAPIMutation,
     useResendInviteInternAPIMutation,
-} from '../../api/adminInterns.api';
+} from '../../api/admin/admin.interns.use';
 
 import { validateInternEmailBeforeCreate } from '../../utils/validateIntern';
 

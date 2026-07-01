@@ -1,27 +1,27 @@
-import { apiClient } from '../services/apiClient';
-import { supabase } from '../config/supabase';
+import { apiClient } from '../../services/apiClient';
+import { supabase } from '../../config/supabase';
 import type { 
     WorkSetup,
     ReportStatus
-} from '../../../shared/types/enums.types';
+} from '../../../../shared/types/enums.types';
 import type {
     AttendanceRecord,
     TimeInResponse,
     TimeOutResponse
-} from '../../../shared/types/attendance.types';
+} from '../../../../shared/types/attendance.types';
 import type {
     ProgramProgressResponse
-} from '../../../shared/types/intern.types';
+} from '../../../../shared/types/intern.types';
 import type {
     Record
-} from '../../../shared/types/record.types';
+} from '../../../../shared/types/record.types';
 import type {
     EODReport,
     EODReportForm
-} from '../../../shared/types/eodReport.types';
+} from '../../../../shared/types/eodReport.types';
 import type {
     NotificationsResponse
-} from '../../../shared/types/notification.types';
+} from '../../../../shared/types/notification.types';
 
 export async function fetchAttendanceByDateAPI(
     date: string

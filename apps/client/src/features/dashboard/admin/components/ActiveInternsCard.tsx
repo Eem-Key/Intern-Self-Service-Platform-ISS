@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { UsersRound } from 'lucide-react';
 
-import { fetchActiveInternsAPI } from '../../../../api/admin.dashboard.api';
+import { fetchActiveInternsAPI } from '../../../../api/admin/admin.dashboard.api';
 
 function ActiveInternsCard() {
     const {

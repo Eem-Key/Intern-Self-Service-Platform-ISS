@@ -1,6 +1,6 @@
 import { ClipboardList } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { fetchPendingRequests } from '../../../../api/admin.dashboard.api';
+import { fetchPendingRequests } from '../../../../api/admin/admin.dashboard.api';
 
 function PendingApprovalsCard() {
   const {
