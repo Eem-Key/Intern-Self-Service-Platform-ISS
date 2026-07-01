@@ -147,6 +147,15 @@ function EODReportCard() {
       return;
     }
 
+    if (isApproved) {
+      showStatusMessage(
+        'error',
+        'Cannot Edit',
+        'This report has already been approved and cannot be changed.'
+      );
+      return;
+    }
+
     const validationErrors = validateEodReport(formValues, 'save');
       if (Object.keys(validationErrors).length > 0) return setErrors(validationErrors);
 
@@ -167,6 +176,15 @@ function EODReportCard() {
 
     if (isSubmitted) {
       showStatusMessage('error', 'Cannot Submit', 'This report has already been submitted.');
+      return;
+    }
+
+    if (isApproved) {
+      showStatusMessage(
+        'error',
+        'Cannot Edit',
+        'This report has already been approved and cannot be changed.'
+      );
       return;
     }
 
@@ -225,12 +243,12 @@ function EODReportCard() {
 
         <div>
           <label className="text-sm">Project Name</label> <RequiredMark/>
-          <input disabled={isReportLocked} type="text" value={formValues.project_name} onChange={(e) => handleChange('project_name', e.target.value)} className="h-10 w-full rounded bg-[#eeeeee] px-4 text-sm outline-none disabled:cursor-not-allowed disabled:text-gray-500" />
+          <input disabled={isReportLocked || isApprovedYesterdayReport || isApproved} type="text" value={formValues.project_name} onChange={(e) => handleChange('project_name', e.target.value)} className="h-10 w-full rounded bg-[#eeeeee] px-4 text-sm outline-none disabled:cursor-not-allowed disabled:text-gray-500" />
         </div>
 
         <div>
           <label className="text-sm">Task Accomplished</label> <RequiredMark/>
-          <textarea disabled={isReportLocked} value={formValues.task_accomplished} onChange={(e) => handleChange('task_accomplished', e.target.value)} className="h-[200px] w-full resize-none rounded bg-[#eeeeee] p-3 text-sm outline-none disabled:cursor-not-allowed disabled:text-gray-500"/>
+          <textarea disabled={isReportLocked || isApprovedYesterdayReport || isApproved} value={formValues.task_accomplished} onChange={(e) => handleChange('task_accomplished', e.target.value)} className="h-[200px] w-full resize-none rounded bg-[#eeeeee] p-3 text-sm outline-none disabled:cursor-not-allowed disabled:text-gray-500"/>
         </div>
 
         <div className="flex flex-row gap-3 pt-2 justify-end">
@@ -240,7 +258,9 @@ function EODReportCard() {
             disabled={
               saveMutation.isPending ||
               submitMutation.isPending ||
-              isReportLocked
+              isReportLocked ||
+              isApprovedYesterdayReport ||
+              isApproved
             }
             className="h-10 flex-1 rounded-full bg-[#eeeeee] px-4 text-sm font-bold text-gray-500 disabled:cursor-not-allowed disabled:opacity-70 sm:flex-none sm:min-w-[100px] sm:px-7"
           >
@@ -253,7 +273,10 @@ function EODReportCard() {
               !hasTimedOut ||
               saveMutation.isPending ||
               submitMutation.isPending ||
-              isReportLocked
+              isReportLocked ||
+              isApprovedYesterdayReport ||
+              isApproved
+
             }
             className="h-10 flex-1 rounded-full bg-[#FFBF10] px-4 text-sm font-bold text-white disabled:cursor-not-allowed disabled:bg-[#eeeeee] disabled:text-gray-500 disabled:opacity-70 sm:flex-none sm:min-w-[110px] sm:px-7"
           >
