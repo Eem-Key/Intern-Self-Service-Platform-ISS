@@ -278,7 +278,7 @@ function RecordDetails({ record, onClose }: RecordDetailsProps) {
                     {record.details?.update_type === 'information_update' && (
                     <DetailCard
                         label="Description"
-                        value={`${record.name} made changes to their personal information.\n\n${formatRequestedData(
+                        value={`${formatDisplayName(record.name)} made changes to their personal information.\n\n${formatRequestedData(
                         record.details?.requested_data as
                             | Record<string, unknown>
                             | undefined
