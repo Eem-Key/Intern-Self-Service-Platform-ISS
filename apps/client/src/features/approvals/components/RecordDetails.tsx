@@ -49,11 +49,15 @@ function formatInternRole(value?: string | null) {
 }
 
 
-function formatDisplayName(name?: string | null ) {
+function formatDisplayName(name?: string | null) {
     if (!name?.trim()) return '--';
 
     return name
+        .replace(/\s+(undefined|null)\.\s+/gi, ' ')
+        .replace(/\s+(undefined|null)\s+/gi, ' ')
+
         .replace(/\s+\.\s+/g, ' ')
+
         .replace(/\s+/g, ' ')
         .trim();
 }
