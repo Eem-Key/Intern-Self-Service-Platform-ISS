@@ -20,7 +20,7 @@ router.get('/pending-requests', authenticate, isAdmin, fetchPendingRequestsCount
 
 router.get('/attendance', authenticate, isAdmin, fetchAttendanceByRange);
 
-router.get('/notifications', authenticate, fetchAdminNotifications);
-router.patch('/notifications/:id/read', authenticate, markAdminNotificationAsRead);
+router.get('/notifications', authenticate, isAdmin, fetchAdminNotifications);
+router.patch('/notifications/:id/read', authenticate, isAdmin, markAdminNotificationAsRead);
 
 export default router;
